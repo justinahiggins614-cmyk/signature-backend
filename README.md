@@ -36,21 +36,28 @@ The engine room behind every Signature AI — one shared JavaScript engine that 
 
 ## The Opperater
 
-Ten gene boxes (the telephone book's JAH-UAIG slots: INPUT, REASON, OUTPUT, MEMORY, ETHICS, REPAIR, RESOURCE, LEARN, INTERFACE, COMMS — more in advanced mode) forge any AI:
+Ten gene boxes (the telephone book's JAH-UAIG slots: INPUT, REASON, OUTPUT, MEMORY, ETHICS, REPAIR, RESOURCE, LEARN, INTERFACE, COMMS — more in advanced mode) forge any AI. Little boxes drop into one big box any number of times (repeats stack and strengthen the trait); attitude sliders (warmth, humor, seriousness, boldness, 0–10) shape the voice:
 
 ```html
 <script>
   var boxes = SignatureBackend.geneOptions();          // the 10 boxes + options
   var boxesAdv = SignatureBackend.geneOptions(true);   // + DREAM, SWARM, QUANTUM, TEMPO
+  var viable = SignatureBackend.genomeViable(['P-AIFU','P-AUIX','P-AEGCU']);
+  // → {ready:true, missing:[]}  (ready = one mind + one voice + one purpose)
   var myAI = SignatureBackend.buildGenome({
-    genes: { INPUT: 'P-AIFU', REASON: 'P-ARAE', ETHICS: 'P-AEGCU' },
+    drops: ['P-AIFU','P-AIFU','P-AUIX','P-AEGCU'],      // multiset, repeats strengthen
+    attitude: {warmth:8, humor:6, seriousness:4, boldness:9},
     name: 'Mercy-7', tone: 'Compassionate', mission: 'heal the sick'
   });
   var call = SignatureBackend.dial(myAI);  // forged record dials like any other
+  // File the new AI into the book:
+  var filed = SignatureBackend.fileRecord(myAI);
+  // → {record, downloadPy, downloadJson}; record stamped JAH-AI-OP-000001,
+  //    immediately dialable: SignatureBackend.dial(filed.record).say('hi')
 </script>
 ```
 
-Unfilled boxes default to their Foundational gene, so every forged record is complete and directory-grade (stamp `JAH-AI-OPR-XXXX`).
+Unfilled boxes default to their Foundational gene, so every forged record is complete and directory-grade (stamp `JAH-AI-OPR-XXXX`). Filed records carry the filing stamp `JAH-AI-OP-######` (engine counter from 000001) and can be filed into the directory (localStorage) with the generated `.py` and `.json` offered as downloads.
 
 ## What it fixes
 

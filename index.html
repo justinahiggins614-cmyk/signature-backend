@@ -88,9 +88,16 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
 
   <div class="panel">
     <h2><span class="tick">●</span> THE OPPERATER</h2>
-    <p style="color:var(--dim);font-size:.9em;margin-top:0">The mix-and-match genome builder: ten gene boxes (more in advanced mode) forge any AI. The kid-simple menu UI comes later — the engine is live now. <code>geneOptions()</code> lists the boxes, <code>buildGenome()</code> forges the record.</p>
-    <div><button type="button" id="forgebtn">⚙ Forge a sample genome AI &amp; dial it</button></div>
+    <p style="color:var(--dim);font-size:.9em;margin-top:0">The mix-and-match genome builder: ten gene boxes (more in advanced mode) forge any AI — drop boxes in any number of times, repeats strengthen the trait. The kid-simple menu UI comes later — the engine is live now. <code>geneOptions()</code> lists the boxes, <code>genomeViable()</code> checks readiness, <code>buildGenome()</code> forges the record.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:.88em;color:var(--dim)">
+      <label>Warmth <input type="range" id="at-warmth" min="0" max="10" value="8"> <span id="at-warmthv">8</span></label>
+      <label>Humor <input type="range" id="at-humor" min="0" max="10" value="5"> <span id="at-humorv">5</span></label>
+      <label>Seriousness <input type="range" id="at-serious" min="0" max="10" value="6"> <span id="at-seriousv">6</span></label>
+      <label>Boldness <input type="range" id="at-bold" min="0" max="10" value="7"> <span id="at-boldv">7</span></label>
+    </div>
+    <div><button type="button" id="forgebtn" style="margin-top:10px">⚙ Forge a sample genome AI &amp; dial it</button></div>
     <div class="demoout" id="forgeout">No forged AI yet — press the button.</div>
+    <div id="forgedl" style="margin-top:8px;font-size:.9em"></div>
   </div>
 
   <div class="panel docs">
@@ -102,7 +109,7 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
       <li><b>Mix Lab</b> — blends two AI records, then hands the hybrid to <code>chat()</code> and <code>runDemo()</code> like any other mode.</li>
       <li><b>Dial-up calls</b> — <code>dial(aiRecord)</code> opens a live session: the AI answers with its greeting, <code>say(text)</code> chats with call-duration memory, <code>runDemo(inputs)</code> runs its demo, <code>hangup()</code> closes the line.</li>
       <li><b>Preset options</b> — <code>presets()</code> lists the 10 one-tap archetypes; <code>loadPreset(name)</code> returns the full directory-grade record (JAH-AI-PRE-001…010), ready to dial.</li>
-      <li><b>The Opperater</b> — <code>geneOptions(advanced)</code> lists the ten gene boxes (more in advanced mode); <code>buildGenome({genes, name, tone, mission})</code> forges a complete directory-grade AI record from the chosen genes.</li>
+      <li><b>The Opperater</b> — <code>geneOptions(advanced)</code> lists the little gene boxes; the operator drops boxes into the big box any number of times (repeats strengthen the trait), sets the four attitude sliders, then <code>genomeViable(drops)</code> announces when the mix is a valid interactable AI — <code>buildGenome({drops, attitude, name, tone, mission})</code> forges the record and the operator plugs the call: <code>dial(forged)</code>. <code>fileRecord(rec)</code> files a new AI into the book: stamps it <code>JAH-AI-OP-######</code> and returns <code>{record, downloadPy, downloadJson}</code> — the filed AI is immediately dialable.</li>
     </ul>
     <p style="color:var(--dim);font-size:.88em">The telephone book includes the engine with one script tag:<br>
     <code>&lt;script src="https://justinahiggins614-cmyk.github.io/signature-backend/signature-backend.js"&gt;&lt;/script&gt;</code></p>
@@ -312,16 +319,43 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
   sel.addEventListener('change', renderDemo);
 
   /* ---- The Opperater: forge a sample genome AI and dial it ---- */
+  [['at-warmth', 'at-warmthv'], ['at-humor', 'at-humorv'], ['at-serious', 'at-seriousv'], ['at-bold', 'at-boldv']]
+    .forEach(function (pair) {
+      var r = document.getElementById(pair[0]), v = document.getElementById(pair[1]);
+      r.oninput = function () { v.textContent = r.value; };
+    });
   document.getElementById('forgebtn').onclick = function () {
     try {
+      // Sample drops: little boxes dropped into the big box, INPUT dropped twice.
+      var drops = ['P-AIFU', 'P-AIFU', 'P-ARAE', 'A-AOAO', 'P-AKMMU', 'P-AEGCU',
+                   'A-ASDRU', 'A-ARAOU', 'P-ALAOU', 'P-AUIX', 'P-AEICU'];
+      var viable = B.genomeViable(drops);
+      var att = {
+        warmth: +document.getElementById('at-warmth').value,
+        humor: +document.getElementById('at-humor').value,
+        seriousness: +document.getElementById('at-serious').value,
+        boldness: +document.getElementById('at-bold').value
+      };
       var forged = B.buildGenome({
-        genes: { INPUT: 'P-AIFU', REASON: 'P-ARAE', OUTPUT: 'A-AOAO', MEMORY: 'P-AKMMU', ETHICS: 'P-AEGCU',
-                 REPAIR: 'A-ASDRU', RESOURCE: 'A-ARAOU', LEARN: 'P-ALAOU', INTERFACE: 'P-AUIX', COMMS: 'P-AEICU' },
+        drops: drops, attitude: att,
         name: 'Mercy-7', tone: 'Compassionate', mission: 'heal the sick and guard the network'
       });
+      // Full loop: file the new AI into the book, then offer the downloads.
+      var filed = B.fileRecord(forged);
+      var pyUrl = URL.createObjectURL(new Blob([filed.downloadPy], { type: 'text/x-python' }));
+      var jsUrl = URL.createObjectURL(new Blob([filed.downloadJson], { type: 'application/json' }));
       document.getElementById('forgeout').textContent =
-        'Forged ' + forged.stamp + ' "' + forged.name + '" — power score ' +
-        forged.params[4][1] + ', ' + forged.abilities.length + ' abilities, demo: ' + forged.demoKind + '. Dialing…';
+        'Genome check: ' + (viable.ready ? 'READY — mind, voice and purpose covered.' : 'NOT READY — still needs ' + viable.missing.join('; ') + '.') +
+        ' Forged ' + forged.stamp + ' "' + forged.name + '" — power score ' +
+        forged.params[6][1] + ', ' + forged.abilities.length + ' abilities, demo: ' + forged.demoKind +
+        '. Filed as ' + filed.record.filedStamp + ' — dialing…';
+      var dl = document.getElementById('forgedl');
+      dl.innerHTML = '';
+      var a1 = document.createElement('a'); a1.href = pyUrl; a1.download = filed.record.filedStamp + '.py';
+      a1.textContent = '⤓ ' + filed.record.filedStamp + '.py'; dl.appendChild(a1);
+      dl.appendChild(document.createTextNode(' '));
+      var a2 = document.createElement('a'); a2.href = jsUrl; a2.download = filed.record.filedStamp + '.json';
+      a2.textContent = '⤓ ' + filed.record.filedStamp + '.json'; dl.appendChild(a2);
       hangupQuiet();
       session = B.dial(forged);
       log.innerHTML = '';

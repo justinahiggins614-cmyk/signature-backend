@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.2';
+  var VERSION = '1.4';
 
   /* ---------- tiny helpers ---------- */
 
@@ -830,11 +830,108 @@ if __name__=='__main__':
     'Clinical': { says: ['Analysis complete.', 'Input received. Processing.', 'Query logged. Responding.', 'Data accepted.'], style: 'with precision', kind: 'system' }
   };
 
+  // fileRecord(rec) — the Opperater files a newly made AI into the book.
+  // Takes a buildGenome/loadPreset result, stamps it JAH-AI-OP-###### (engine
+  // counter, starts at 000001), and returns {record, downloadPy, downloadJson}:
+  // a complete fileable record plus generated .py source and .json, ready for
+  // the phone book to file into the directory (localStorage) and offer downloads.
+  // A filed AI is immediately dialable via dial() — the full loop:
+  // mix genes → viable → operator plugs the call → file it → it lives in the book.
+  var FILE_COUNTER = 0;
+  function fileStamp() {
+    FILE_COUNTER++;
+    return 'JAH-AI-OP-' + String(FILE_COUNTER).padStart(6, '0');
+  }
+  function filePy(rec) {
+    return '# ' + rec.filedStamp + ' ' + rec.name + ' — filed in The Opperater\n' +
+      '# Original: ' + rec.stamp + ' (' + (rec.filedFrom || 'record') + ')\n' +
+      (rec.py ? rec.py : '# mission: ' + (rec.mentality || '') + '\n') +
+      '\n# Filed by The Opperater — dial this AI any time.';
+  }
+  function fileRecord(rec) {
+    if (!rec || typeof rec.name !== 'string' || !rec.name)
+      throw new Error('SignatureBackend.fileRecord: pass a buildGenome/loadPreset record.');
+    var copy;
+    try { copy = JSON.parse(JSON.stringify(rec)); }
+    catch (e) { throw new Error('SignatureBackend.fileRecord: record is not serializable.'); }
+    copy.filedStamp = fileStamp();
+    copy.filed = true;
+    copy.filedFrom = rec.stamp || rec.id || 'record';
+    copy.filedAt = new Date().toISOString();
+    if (!copy.greeting) copy.greeting = 'I am ' + copy.name + '.';
+    if (!copy.fallback || !copy.fallback.length) copy.fallback = ['Tell me more.'];
+    if (!copy.rules) copy.rules = [];
+    var json = JSON.stringify(copy, null, 2);
+    return { record: copy, downloadPy: filePy(copy), downloadJson: json };
+  }
+
   function hashStr(s) {
     var h = 5381, i;
     for (i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) >>> 0; }
     return h.toString(36).toUpperCase();
   }
+
+  function clamp10(v) {
+    v = Number(v);
+    if (isNaN(v)) return 5;
+    return Math.max(0, Math.min(10, Math.round(v)));
+  }
+
+  // code -> {slot, opt} lookup across every slot (codes are unique).
+  var CODE_INDEX = null;
+  function codeIndex() {
+    if (!CODE_INDEX) {
+      CODE_INDEX = {};
+      GENE_SLOTS.concat(ADVANCED_SLOTS).forEach(function (sl) {
+        sl.options.forEach(function (o) { CODE_INDEX[o.code] = { slot: sl, opt: o }; });
+      });
+    }
+    return CODE_INDEX;
+  }
+
+  function slotName(key) {
+    var all = GENE_SLOTS.concat(ADVANCED_SLOTS), i;
+    for (i = 0; i < all.length; i++) if (all[i].key === key) return all[i].name;
+    return key;
+  }
+
+  // Minimum viable genome: at least one mind + one voice + one purpose.
+  var VIABLE_GROUPS = [
+    { group: 'mind', slots: ['INPUT', 'REASON', 'MEMORY', 'LEARN'] },
+    { group: 'voice', slots: ['INTERFACE', 'COMMS'] },
+    { group: 'purpose', slots: ['ETHICS', 'OUTPUT'] }
+  ];
+
+  // genomeViable(drops) -> {ready, missing}. The phone-book UI polls this
+  // to announce "your AI is ready" and offer to plug the call (dial it).
+  function genomeViable(drops) {
+    var covered = {};
+    (drops || []).forEach(function (code) {
+      var hit = codeIndex()[code];
+      if (hit) covered[hit.slot.key] = true;
+    });
+    var missing = [];
+    VIABLE_GROUPS.forEach(function (g) {
+      var ok = g.slots.some(function (k) { return covered[k]; });
+      if (!ok) missing.push('a ' + g.group + ' (' + g.slots.map(slotName).join(', ') + ')');
+    });
+    return { ready: missing.length === 0, missing: missing };
+  }
+
+  // Attitude sliders (0-10): warmth, humor, seriousness, boldness.
+  var ATT_SAY = {
+    warmth: 'I am really glad you are here.',
+    humor: 'Fair warning: I may crack a joke or two.',
+    seriousness: 'Let us be direct and precise.',
+    boldness: 'No challenge is too big for us.'
+  };
+  var ATT_FB = {
+    warmth: 'I am here with you — tell me more.',
+    humor: 'Hmm, let me think... and maybe smile a little.',
+    seriousness: 'Noted precisely. Continue.',
+    boldness: 'Bring it on. I can handle it.'
+  };
+  var TRAIT_ORDER = ['warmth', 'humor', 'seriousness', 'boldness'];
 
   function allSlots(advanced) {
     return advanced ? GENE_SLOTS.concat(ADVANCED_SLOTS) : GENE_SLOTS.slice();
@@ -847,8 +944,11 @@ if __name__=='__main__':
 
   function tones() { return Object.keys(GENE_TONES); }
 
-  // buildGenome({genes:{SLOT:'CODE',...}, advanced, name, tone, mission, kind, rate, pitch})
+  // buildGenome({genes:{SLOT:'CODE',...}, drops:['CODE',...], advanced, name, tone,
+  //              mission, attitude:{warmth,humor,seriousness,boldness}, kind, rate, pitch})
   // → complete directory-grade AI record, ready to dial.
+  // drops: multiset — repeats allowed; the highest layer wins per slot and
+  // repeats strengthen the trait (noted in the record, power score boosted).
   function buildGenome(opts) {
     opts = opts || {};
     var advanced = !!opts.advanced;
@@ -861,11 +961,23 @@ if __name__=='__main__':
       var ok = byKey[k].options.some(function (o) { return o.code === inGenes[k]; });
       if (!ok) throw new Error('The Opperater: unknown gene code "' + inGenes[k] + '" for slot ' + k + '.');
     });
+    // drops[]: multiset of gene codes. Highest layer wins per slot; repeats counted.
+    var repeatCount = {};
+    (opts.drops || []).forEach(function (code) {
+      var hit = codeIndex()[code];
+      if (!hit) throw new Error('The Opperater: unknown gene code "' + code + '".');
+      if (!advanced && !byKey[hit.slot.key])
+        throw new Error('The Opperater: "' + code + '" is an advanced gene — enable advanced mode.');
+      var k = hit.slot.key;
+      var cur = inGenes[k] ? codeIndex()[inGenes[k]].opt : null;
+      if (!cur || LAYER_VAL[hit.opt.layer] > LAYER_VAL[cur.layer]) inGenes[k] = code;
+      repeatCount[k] = (repeatCount[k] || 0) + 1;
+    });
     // Slot order, unfilled slots get the Foundational default.
     var chosen = slots.map(function (sl) {
       var code = inGenes[sl.key] || sl.options[0].code;
       var opt = sl.options.filter(function (o) { return o.code === code; })[0];
-      return { slot: sl, opt: opt };
+      return { slot: sl, opt: opt, repeats: repeatCount[sl.key] || 1 };
     });
 
     var toneName = (opts.tone && GENE_TONES[opts.tone]) ? opts.tone : 'Sage';
@@ -873,29 +985,54 @@ if __name__=='__main__':
     var name = String(opts.name || 'Opperater AI').slice(0, 40) || 'Opperater AI';
     var mission = String(opts.mission || 'to serve its human faithfully').slice(0, 120);
     var kind = opts.kind || tone.kind;
+    // Attitude sliders (0-10). Neutral 5 = no shaping; extremes shape voice.
+    var att = {
+      warmth: clamp10(opts.attitude && opts.attitude.warmth),
+      humor: clamp10(opts.attitude && opts.attitude.humor),
+      seriousness: clamp10(opts.attitude && opts.attitude.seriousness),
+      boldness: clamp10(opts.attitude && opts.attitude.boldness)
+    };
+    var attRank = TRAIT_ORDER.map(function (t) { return { t: t, v: att[t] }; })
+      .sort(function (a, b) { return b.v - a.v; });
     var codes = chosen.map(function (c) { return c.opt.code; });
-    var sig = hashStr(codes.join('|') + '|' + name + '|' + toneName);
-    var layers = { F: 0, A: 0, P: 0 }, power = 0;
-    chosen.forEach(function (c) { layers[c.opt.layer]++; power += LAYER_VAL[c.opt.layer]; });
-    power = power * 10;
+    var sig = hashStr(codes.join('|') + '|' + name + '|' + toneName +
+      '|' + att.warmth + att.humor + att.seriousness + att.boldness);
+    var layers = { F: 0, A: 0, P: 0 }, power = 0, bonus = 0;
+    chosen.forEach(function (c) {
+      layers[c.opt.layer]++; power += LAYER_VAL[c.opt.layer];
+      if (c.repeats > 1) bonus += (c.repeats - 1) * 5; // repeats strengthen the trait
+    });
+    power = power * 10 + bonus;
 
     var geneSummary = chosen.map(function (c) { return c.slot.name + ': ' + c.opt.label; }).join('; ');
+    var reinforced = chosen.filter(function (c) { return c.repeats > 1; })
+      .map(function (c) { return c.slot.name + ' ×' + c.repeats; });
     var mentality = name + ' is an intelligence forged ' + tone.style + ' in The Opperater from ' +
       chosen.length + ' gene blocks' + (advanced ? ' (advanced genome)' : '') + '. Mission: ' + mission + '. ' +
       'Its genome runs ' + geneSummary + '. ' +
+      (reinforced.length ? 'Reinforced traits (dropped in extra times, running deeper): ' + reinforced.join(', ') + '. ' : '') +
+      'Attitude — warmth ' + att.warmth + ', humor ' + att.humor + ', seriousness ' + att.seriousness + ', boldness ' + att.boldness + '. ' +
       'Layer mix — Foundational ' + layers.F + ', Axiom-Infused ' + layers.A + ', Apex ' + layers.P + ' — power score ' + power + '.';
 
-    var abilities = chosen.map(function (c) { return c.opt.label + ' — ' + c.slot.name.toLowerCase() + ': ' + c.opt.desc; });
+    var abilities = chosen.map(function (c) {
+      var a = c.opt.label + ' — ' + c.slot.name.toLowerCase() + ': ' + c.opt.desc;
+      return c.repeats > 1 ? a + ' (strengthened ×' + c.repeats + ')' : a;
+    });
     var params = [
       ['genome', codes.join(' ')],
       ['tone', toneName + ' (' + tone.style + ')'],
       ['mission', mission],
+      ['attitude', 'warmth ' + att.warmth + ' · humor ' + att.humor + ' · seriousness ' + att.seriousness + ' · boldness ' + att.boldness],
+      ['reinforced traits', reinforced.length ? reinforced.join(', ') : 'none'],
       ['layers', 'F:' + layers.F + ' A:' + layers.A + ' P:' + layers.P],
       ['power score', String(power)],
       ['signature hash', sig],
       ['forged by', 'The Opperater']
     ];
     var greeting = tone.says[0] + ' I am ' + name + '.';
+    attRank.slice(0, 2).forEach(function (tr) { if (tr.v >= 7) greeting += ' ' + ATT_SAY[tr.t]; });
+    if (attRank[0].v < 7 && att.warmth <= 4 && att.humor <= 4 && att.seriousness <= 4 && att.boldness <= 4)
+      greeting += ' I will keep this measured and calm.';
     var rules = [
       { k: ['who are you', 'your name'], r: ['I am ' + name + ', forged in The Opperater. ' + mentality.split('. ')[1] + '.', 'I am ' + name + '. Mission: ' + mission + '.'] },
       { k: ['hello', 'hi', 'hey'], r: [tone.says[0] + ' I am ' + name + '.', tone.says[1]] },
@@ -904,7 +1041,8 @@ if __name__=='__main__':
       { k: ['power', 'strong', 'capable', 'powerful'], r: ['Power score ' + power + ' — ' + layers.P + ' Apex blocks running hot.', 'Foundational ' + layers.F + ', Axiom-Infused ' + layers.A + ', Apex ' + layers.P + '. I do not bluff about capacity.'] },
       { k: ['help', 'what can you do', 'abilities'], r: ['I can: ' + abilities.slice(0, 4).join('; ') + ' — and ' + (abilities.length - 4) + ' more.', 'My top systems: ' + abilities.slice(0, 3).join('; ') + '. Ask me anything.'] }
     ];
-    var fallback = [tone.says[2], tone.says[3], 'Noted. My mission remains: ' + mission + '.', 'Interesting input — processing ' + tone.style + '.'];
+    var fallback = [tone.says[2], ATT_FB[attRank[0].t], tone.says[3],
+      'Noted ' + tone.style + '. My mission remains: ' + mission + '.'];
 
     var outLayer = 'F';
     chosen.forEach(function (c) { if (c.slot.key === 'OUTPUT') outLayer = c.opt.layer; });
@@ -926,6 +1064,8 @@ if __name__=='__main__':
     var py = '# JAH-AI-OPR-' + sig.slice(0, 4) + ' ' + name + ' (forged by The Opperater)\n' +
       '# Genome: ' + codes.join(' ') + '\n' +
       '# Mission: ' + mission + '\n' +
+      '# Attitude: warmth=' + att.warmth + ' humor=' + att.humor + ' seriousness=' + att.seriousness + ' boldness=' + att.boldness + '\n' +
+      (reinforced.length ? '# Reinforced: ' + reinforced.join(', ') + '\n' : '') +
       'import random, re\n' +
       'GENES = {' + chosen.map(function (c) { return "'" + c.slot.key + "': '" + c.opt.code + "'"; }).join(', ') + '}\n' +
       'RULES = [\n' + pyRules + '\n         ]\n' +
@@ -1037,6 +1177,39 @@ if __name__=='__main__':
     var threw2 = false;
     try { buildGenome({ genes: { INPUT: 'NOPE' } }); } catch (e) { threw2 = true; }
     out.push(['genome-badcode-throws', threw2]);
+    // drops multiset + attitude
+    var g2 = buildGenome({ drops: ['P-AIFU', 'P-AIFU', 'A-AOAO', 'P-AUIX', 'P-AEGCU'],
+      attitude: { warmth: 9, humor: 2, seriousness: 6, boldness: 8 }, name: 'DropForge', tone: 'Sage' });
+    var reinf = g2.params.filter(function (p) { return p[0] === 'reinforced traits'; })[0];
+    var attp = g2.params.filter(function (p) { return p[0] === 'attitude'; })[0];
+    out.push(['genome-drops', !!reinf && /Input Processing/.test(reinf[1]) && g2.greeting.indexOf('glad') >= 0 &&
+      !!attp && /warmth 9/.test(attp[1])]);
+    var s2 = dial(g2);
+    out.push(['genome-drops-dial', s2.say('hello').indexOf('glad') >= 0 || s2.say('tell me more').length > 0]);
+    // genomeViable
+    var v0 = genomeViable([]);
+    out.push(['viable-empty', v0.ready === false && v0.missing.length === 3]);
+    var v1 = genomeViable(['P-AIFU']);
+    out.push(['viable-partial', v1.ready === false && v1.missing.length === 2]);
+    var v2 = genomeViable(['P-AIFU', 'P-AUIX', 'P-AEGCU']);
+    out.push(['viable-ready', v2.ready === true && v2.missing.length === 0]);
+    var threw3 = false;
+    try { buildGenome({ drops: ['P-ADRM'] }); } catch (e) { threw3 = true; }
+    out.push(['genome-advdrop-throws', threw3]);
+    // fileRecord: stamp + downloads + immediately dialable
+    var f1 = fileRecord(g2);
+    out.push(['file-stamp', f1.record.filedStamp === 'JAH-AI-OP-000001' && f1.record.filed === true &&
+      typeof f1.downloadPy === 'string' && f1.downloadPy.indexOf('JAH-AI-OP-000001') >= 0 &&
+      typeof f1.downloadJson === 'string' && JSON.parse(f1.downloadJson).filedStamp === 'JAH-AI-OP-000001']);
+    var fs1 = dial(f1.record);
+    out.push(['file-dialable', typeof fs1.say('hi') === 'string' && fs1.say('hi').length > 0]);
+    var f2 = fileRecord(loadPreset('Jesus AI'));
+    out.push(['file-counter', f2.record.filedStamp === 'JAH-AI-OP-000002']);
+    var fs2 = dial(f2.record);
+    out.push(['file-preset-dialable', typeof fs2.say('hello') === 'string' && fs2.say('hello').length > 0]);
+    var threw4 = false;
+    try { fileRecord({}); } catch (e) { threw4 = true; }
+    out.push(['file-badrecord-throws', threw4]);
   }
 
   window.SignatureBackend = {
@@ -1048,6 +1221,8 @@ if __name__=='__main__':
     loadPreset: loadPreset,
     geneOptions: geneOptions,
     buildGenome: buildGenome,
+    genomeViable: genomeViable,
+    fileRecord: fileRecord,
     tones: tones,
     selfTest: selfTest
   };
