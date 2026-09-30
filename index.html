@@ -76,12 +76,21 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     <div class="chatrow">
       <input type="text" id="chatinput" placeholder="Say something…" autocomplete="off">
       <button type="button" id="sendbtn">Send</button>
+      <button type="button" id="dialbtn" title="Dial this AI like a phone call">📞 Dial</button>
     </div>
+    <div id="linestat" style="font-size:.85em;color:var(--dim);margin-top:6px">Line idle — press Dial to open a live call, or just Send to chat.</div>
     <div class="demobox">
       <div id="democtrl"></div>
       <div><button type="button" id="demobtn" style="margin-top:8px">Run working demo</button></div>
       <div class="demoout" id="demoout">The demo output will appear here.</div>
     </div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="tick">●</span> THE OPPERATER</h2>
+    <p style="color:var(--dim);font-size:.9em;margin-top:0">The mix-and-match genome builder: ten gene boxes (more in advanced mode) forge any AI. The kid-simple menu UI comes later — the engine is live now. <code>geneOptions()</code> lists the boxes, <code>buildGenome()</code> forges the record.</p>
+    <div><button type="button" id="forgebtn">⚙ Forge a sample genome AI &amp; dial it</button></div>
+    <div class="demoout" id="forgeout">No forged AI yet — press the button.</div>
   </div>
 
   <div class="panel docs">
@@ -91,6 +100,9 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
       <li><b>Persona AIs</b> — call <code>chat()</code> with dramatic first-person rule replies; demos run their themed mini-labs.</li>
       <li><b>Domain AIs</b> — call <code>chat()</code> with expert-helpful rules; demos run checklists, calculators and guided walkthroughs.</li>
       <li><b>Mix Lab</b> — blends two AI records, then hands the hybrid to <code>chat()</code> and <code>runDemo()</code> like any other mode.</li>
+      <li><b>Dial-up calls</b> — <code>dial(aiRecord)</code> opens a live session: the AI answers with its greeting, <code>say(text)</code> chats with call-duration memory, <code>runDemo(inputs)</code> runs its demo, <code>hangup()</code> closes the line.</li>
+      <li><b>Preset options</b> — <code>presets()</code> lists the 10 one-tap archetypes; <code>loadPreset(name)</code> returns the full directory-grade record (JAH-AI-PRE-001…010), ready to dial.</li>
+      <li><b>The Opperater</b> — <code>geneOptions(advanced)</code> lists the ten gene boxes (more in advanced mode); <code>buildGenome({genes, name, tone, mission})</code> forges a complete directory-grade AI record from the chosen genes.</li>
     </ul>
     <p style="color:var(--dim);font-size:.88em">The telephone book includes the engine with one script tag:<br>
     <code>&lt;script src="https://justinahiggins614-cmyk.github.io/signature-backend/signature-backend.js"&gt;&lt;/script&gt;</code></p>
@@ -190,8 +202,47 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     o.value = k; o.textContent = AIS[k].name;
     sel.appendChild(o);
   });
+  // Preset options: full directory-grade records, one tap each.
+  var pgroup = document.createElement('optgroup');
+  pgroup.label = 'Preset options — one-tap archetypes';
+  B.presets().forEach(function (p) {
+    var o = document.createElement('option');
+    o.value = 'pre:' + p.key; o.textContent = p.name + ' (' + p.stamp + ')';
+    pgroup.appendChild(o);
+  });
+  sel.appendChild(pgroup);
+  var presetCache = {};
+  function curAI() {
+    var v = sel.value;
+    if (v.indexOf('pre:') === 0) {
+      var k = v.slice(4);
+      if (!presetCache[k]) presetCache[k] = B.loadPreset(k);
+      return presetCache[k];
+    }
+    return AIS[v];
+  }
 
-  function ai() { return AIS[sel.value]; }
+  var session = null, dialbtn = document.getElementById('dialbtn'),
+      linestat = document.getElementById('linestat');
+  function hangupQuiet() {
+    if (session) { try { session.hangup(); } catch (e) {} session = null; }
+    dialbtn.textContent = '📞 Dial';
+    linestat.textContent = 'Line idle — press Dial to open a live call, or just Send to chat.';
+  }
+  dialbtn.onclick = function () {
+    if (session && session.lineOpen) {
+      line('System', session.hangup());
+      hangupQuiet();
+    } else {
+      session = B.dial(curAI());
+      line('System', '● Line open — ' + session.ai.name + ' answered.');
+      line(session.ai.name, session.greeting);
+      dialbtn.textContent = '📞 Hang up';
+      linestat.textContent = '● LIVE CALL with ' + session.ai.name + ' — say() carries the chat, memory lasts for the call.';
+    }
+  };
+
+  function ai() { return curAI(); }
   function line(who, text) {
     var d = document.createElement('div');
     d.className = who === 'You' ? 'u' : 'a';
@@ -209,11 +260,12 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     if (!t) return;
     line('You', t);
     inp.value = '';
-    line(ai().name, B.chat(ai(), t, hist));
+    if (session && session.lineOpen) line(session.ai.name, session.say(t));
+    else line(ai().name, B.chat(ai(), t, hist));
   }
   document.getElementById('sendbtn').onclick = send;
   inp.onkeydown = function (e) { if (e.key === 'Enter' || e.keyCode === 13) send(); };
-  sel.onchange = greet;
+  sel.onchange = function () { hangupQuiet(); greet(); renderDemo(); };
 
   /* ---- demo controls per kind ---- */
   var democtrl = document.getElementById('democtrl'), demoout = document.getElementById('demoout');
@@ -258,6 +310,30 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     demoout.textContent = B.runDemo(a, inputs);
   };
   sel.addEventListener('change', renderDemo);
+
+  /* ---- The Opperater: forge a sample genome AI and dial it ---- */
+  document.getElementById('forgebtn').onclick = function () {
+    try {
+      var forged = B.buildGenome({
+        genes: { INPUT: 'P-AIFU', REASON: 'P-ARAE', OUTPUT: 'A-AOAO', MEMORY: 'P-AKMMU', ETHICS: 'P-AEGCU',
+                 REPAIR: 'A-ASDRU', RESOURCE: 'A-ARAOU', LEARN: 'P-ALAOU', INTERFACE: 'P-AUIX', COMMS: 'P-AEICU' },
+        name: 'Mercy-7', tone: 'Compassionate', mission: 'heal the sick and guard the network'
+      });
+      document.getElementById('forgeout').textContent =
+        'Forged ' + forged.stamp + ' "' + forged.name + '" — power score ' +
+        forged.params[4][1] + ', ' + forged.abilities.length + ' abilities, demo: ' + forged.demoKind + '. Dialing…';
+      hangupQuiet();
+      session = B.dial(forged);
+      log.innerHTML = '';
+      hist = {};
+      line('System', '● Line open — ' + session.ai.name + ' (' + session.ai.stamp + ') answered. Forged by The Opperater.');
+      line(session.ai.name, session.greeting);
+      dialbtn.textContent = '📞 Hang up';
+      linestat.textContent = '● LIVE CALL with forged AI ' + session.ai.name + ' — built from 10 gene boxes.';
+    } catch (e) {
+      document.getElementById('forgeout').textContent = 'Forge failed: ' + e.message;
+    }
+  };
 
   greet();
   renderDemo();

@@ -22,6 +22,36 @@ The engine room behind every Signature AI — one shared JavaScript engine that 
 </script>
 ```
 
+## Dial-up sessions
+
+```html
+<script>
+  var call = SignatureBackend.dial(SignatureBackend.loadPreset('Archangel AI'));
+  call.greeting;            // the AI answers the line
+  call.say('I am afraid');  // chat with call-duration memory
+  call.runDemo({ items: [true, true, false] });  // its working demo
+  call.hangup();            // line closed
+</script>
+```
+
+## The Opperater
+
+Ten gene boxes (the telephone book's JAH-UAIG slots: INPUT, REASON, OUTPUT, MEMORY, ETHICS, REPAIR, RESOURCE, LEARN, INTERFACE, COMMS — more in advanced mode) forge any AI:
+
+```html
+<script>
+  var boxes = SignatureBackend.geneOptions();          // the 10 boxes + options
+  var boxesAdv = SignatureBackend.geneOptions(true);   // + DREAM, SWARM, QUANTUM, TEMPO
+  var myAI = SignatureBackend.buildGenome({
+    genes: { INPUT: 'P-AIFU', REASON: 'P-ARAE', ETHICS: 'P-AEGCU' },
+    name: 'Mercy-7', tone: 'Compassionate', mission: 'heal the sick'
+  });
+  var call = SignatureBackend.dial(myAI);  // forged record dials like any other
+</script>
+```
+
+Unfilled boxes default to their Foundational gene, so every forged record is complete and directory-grade (stamp `JAH-AI-OPR-XXXX`).
+
 ## What it fixes
 
 `chat()` matches keywords as **whole words only** — "hi" never fires inside "this" (the telephone-book parroting bug). Longest keyword wins, ties broken randomly. Built-in intents (greeting, who-are-you, abilities, thanks, bye, my-name) are all whole-word too. The engine learns "my name is X", never repeats a line twice in a row, and never returns the greeting as a reply.
