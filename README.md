@@ -30,9 +30,15 @@ The engine room behind every Signature AI — one shared JavaScript engine that 
   call.greeting;            // the AI answers the line
   call.say('I am afraid');  // chat with call-duration memory
   call.runDemo({ items: [true, true, false] });  // its working demo
+  call.lockRole('semiconductor replacement');   // automation mode: see below
+  call.say('check pin 7 voltage');              // ROLE:/ACK:/OUT:/END structured lines
+  call.unlockRole();          // back to normal conversation
   call.hangup();            // line closed
 </script>
 ```
+
+### Role lock (automation)
+Every AI can **lock in as a role** on an automated system — e.g. an AI that is a semiconductor replacement, or an AI that is an auto-pen. While `session.lockRole(roleName)` is engaged, the AI stays in that role across the whole call: replies are concise, in-role, machine-friendly — short structured lines (`ROLE:` / `ACK:` / `OUT:` / `END`), no wandering, no breaking character — suitable for driving automation. `session.unlockRole()` releases it back to normal conversation. `hangup()` also clears the lock.
 
 ## The Opperater
 

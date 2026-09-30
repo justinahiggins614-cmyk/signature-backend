@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.4';
+  var VERSION = '1.5';
 
   /* ---------- tiny helpers ---------- */
 
@@ -220,8 +220,19 @@
 
   // dial(aiRecord) -> a live working instance of that AI's model:
   // { ai, history, greeting, lineOpen, say(text), runDemo(inputs), hangup() }
+  // Role-lock framing: while a session is locked into a role (e.g. 'semiconductor
+  // replacement', 'auto-pen'), replies are concise, in-role, machine-friendly —
+  // short structured lines, no wandering, no breaking character — suitable for
+  // driving automation.
+  function frameRoleLocked(role, input, reply) {
+    var first = String(reply).split(/[.?!]\s|\n/)[0] || String(reply);
+    if (first.length > 140) first = first.slice(0, 137) + '...';
+    return 'ROLE: ' + role + '\nACK: ' + String(input).slice(0, 80) + '\nOUT: ' + first + '\nEND';
+  }
+
   function dial(aiRecord) {
     var ai = aiRecord || {};
+    var lockedRole = null;
     var session = {
       ai: ai,
       history: {},
@@ -229,7 +240,21 @@
       greeting: ai.greeting || fallbackLine(ai, {}),
       say: function (text) {
         if (!session.lineOpen) return 'The line is closed. Dial again to start a new call.';
-        return chat(ai, text, session.history);
+        var reply = chat(ai, text, session.history);
+        if (lockedRole) return frameRoleLocked(lockedRole, text, reply);
+        return reply;
+      },
+      // Lock the AI into a role for the whole call (automation mode).
+      lockRole: function (roleName) {
+        lockedRole = String(roleName || 'automation').slice(0, 60);
+        return 'ROLE LOCKED: ' + lockedRole + ' — machine channel open. Short structured replies engaged for the rest of this call.';
+      },
+      // Release back to normal conversation.
+      unlockRole: function () {
+        var was = lockedRole;
+        lockedRole = null;
+        return was ? 'ROLE RELEASED: ' + was + ' — normal conversation resumed.'
+                   : 'No role is locked on this call.';
       },
       runDemo: function (inputs) {
         if (!session.lineOpen) return 'The line is closed. Dial again to run a demo.';
@@ -237,6 +262,7 @@
       },
       hangup: function () {
         session.lineOpen = false;
+        lockedRole = null;
         return 'Call ended. ' + (ai.name || 'The AI') + ' is back on the hook. Dial again any time.';
       }
     };
@@ -1210,6 +1236,19 @@ if __name__=='__main__':
     var threw4 = false;
     try { fileRecord({}); } catch (e) { threw4 = true; }
     out.push(['file-badrecord-throws', threw4]);
+    // role lock on sessions
+    var rs = dial(loadPreset('Universal Problem Solver'));
+    var lockMsg = rs.lockRole('semiconductor replacement');
+    var locked = rs.say('check pin 7 voltage');
+    var unMsg = rs.unlockRole();
+    var normal = rs.say('check pin 7 voltage');
+    out.push(['lockrole', lockMsg.indexOf('semiconductor replacement') >= 0 &&
+      locked.indexOf('ROLE: semiconductor replacement') === 0 &&
+      locked.indexOf('ACK:') >= 0 && locked.indexOf('OUT:') >= 0 &&
+      locked.trim().split('\n').pop() === 'END' &&
+      locked.split('\n').every(function (l) { return l.length <= 220; })]);
+    out.push(['unlockrole', unMsg.indexOf('ROLE RELEASED') >= 0 && normal.indexOf('ROLE:') !== 0]);
+    rs.hangup();
   }
 
   window.SignatureBackend = {

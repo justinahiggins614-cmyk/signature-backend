@@ -77,7 +77,10 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
       <input type="text" id="chatinput" placeholder="Say something…" autocomplete="off">
       <button type="button" id="sendbtn">Send</button>
       <button type="button" id="dialbtn" title="Dial this AI like a phone call">📞 Dial</button>
+      <button type="button" id="lockbtn" title="Lock the call into an automation role">🔒 Lock role</button>
+      <button type="button" id="unlockbtn" title="Release the role lock">🔓 Unlock</button>
     </div>
+    <div style="margin-top:6px;font-size:.85em;color:var(--dim)">Role: <input type="text" id="rolename" value="semiconductor replacement" size="26" style="font-size:1em"> <span style="opacity:.8">e.g. semiconductor replacement, auto-pen</span></div>
     <div id="linestat" style="font-size:.85em;color:var(--dim);margin-top:6px">Line idle — press Dial to open a live call, or just Send to chat.</div>
     <div class="demobox">
       <div id="democtrl"></div>
@@ -107,7 +110,7 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
       <li><b>Persona AIs</b> — call <code>chat()</code> with dramatic first-person rule replies; demos run their themed mini-labs.</li>
       <li><b>Domain AIs</b> — call <code>chat()</code> with expert-helpful rules; demos run checklists, calculators and guided walkthroughs.</li>
       <li><b>Mix Lab</b> — blends two AI records, then hands the hybrid to <code>chat()</code> and <code>runDemo()</code> like any other mode.</li>
-      <li><b>Dial-up calls</b> — <code>dial(aiRecord)</code> opens a live session: the AI answers with its greeting, <code>say(text)</code> chats with call-duration memory, <code>runDemo(inputs)</code> runs its demo, <code>hangup()</code> closes the line.</li>
+      <li><b>Dial-up calls</b> — <code>dial(aiRecord)</code> opens a live session: the AI answers with its greeting, <code>say(text)</code> chats with call-duration memory, <code>runDemo(inputs)</code> runs its demo, <code>hangup()</code> closes the line. <code>session.lockRole('semiconductor replacement')</code> locks the AI into a role for the whole call — replies turn concise, in-role, machine-friendly (short structured <code>ROLE / ACK / OUT / END</code> lines, no wandering, no breaking character), suitable for driving automation; <code>session.unlockRole()</code> releases it back to normal conversation. Try <code>'auto-pen'</code> too.</li>
       <li><b>Preset options</b> — <code>presets()</code> lists the 10 one-tap archetypes; <code>loadPreset(name)</code> returns the full directory-grade record (JAH-AI-PRE-001…010), ready to dial.</li>
       <li><b>The Opperater</b> — <code>geneOptions(advanced)</code> lists the little gene boxes; the operator drops boxes into the big box any number of times (repeats strengthen the trait), sets the four attitude sliders, then <code>genomeViable(drops)</code> announces when the mix is a valid interactable AI — <code>buildGenome({drops, attitude, name, tone, mission})</code> forges the record and the operator plugs the call: <code>dial(forged)</code>. <code>fileRecord(rec)</code> files a new AI into the book: stamps it <code>JAH-AI-OP-######</code> and returns <code>{record, downloadPy, downloadJson}</code> — the filed AI is immediately dialable.</li>
     </ul>
@@ -230,7 +233,20 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
   }
 
   var session = null, dialbtn = document.getElementById('dialbtn'),
+      lockbtn = document.getElementById('lockbtn'), unlockbtn = document.getElementById('unlockbtn'),
+      rolename = document.getElementById('rolename'),
       linestat = document.getElementById('linestat');
+  lockbtn.onclick = function () {
+    if (!(session && session.lineOpen)) { line('System', 'Dial first, then lock a role.'); return; }
+    var role = (rolename.value || 'automation').trim() || 'automation';
+    line('System', session.lockRole(role));
+    linestat.textContent = '🔒 ROLE LOCKED (' + role + ') — machine channel: short structured replies.';
+  };
+  unlockbtn.onclick = function () {
+    if (!(session && session.lineOpen)) { line('System', 'No open line.'); return; }
+    line('System', session.unlockRole());
+    linestat.textContent = '● LIVE CALL with ' + session.ai.name + ' — role released, normal conversation.';
+  };
   function hangupQuiet() {
     if (session) { try { session.hangup(); } catch (e) {} session = null; }
     dialbtn.textContent = '📞 Dial';
