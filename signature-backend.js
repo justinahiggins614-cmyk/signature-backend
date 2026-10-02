@@ -47,6 +47,32 @@
     return 'helpful';
   }
 
+  /* ---------- JAHtalk: the shared human-talk final layer ----------
+     Invisible plumbing (zero network, zero visual change):
+     - beProfile(ai) shapes any AI record for the shared talker.
+     - beGuard(ai, line) repairs terse machine-stat replies
+       ("Name: X | CPC=G06F | UPTIME=99.99% ...") into human words;
+       human replies pass through byte-identical. If the engine produced
+       nothing at all, JAHtalk speaks for the AI — silence never. */
+  function beProfile(ai) {
+    ai = ai || {};
+    var abs = ai.abilities;
+    if (!Array.isArray(abs)) abs = [];
+    return {name: ai.name || 'Signature AI', id: ai.stamp || ai.ai_id || ai.id || '',
+      description: ai.mentality || ai.description || '',
+      abilities: abs, domain: ai.domain || '', kind: ai.kind || 'domain'};
+  }
+  function beGuard(ai, line) {
+    try {
+      if (typeof JAHtalk !== 'undefined') {
+        line = String(line == null ? '' : line);
+        if (!line.trim()) line = JAHtalk.reply(beProfile(ai), '') || line;
+        line = JAHtalk.guard(line, beProfile(ai));
+      }
+    } catch (e) {}
+    return line;
+  }
+
   /* ---------- chat ---------- */
 
   // Built-in intents. All matching is WHOLE-WORD (token/phrase), never substring.
@@ -160,7 +186,7 @@
     if (learnName(t, h)) {
       h.lastTopic = 'name';
       h.lastReply = 'name-learned';
-      return 'Nice to meet you, ' + h.name + '! I will remember that.';
+      return beGuard(ai, 'Nice to meet you, ' + h.name + '! I will remember that.');
     }
 
     // 2) Built-in intents (whole-word only).
@@ -172,7 +198,7 @@
         if (r === h.lastReply) r = r + ' '; // never the identical line twice in a row
         h.lastTopic = it.id;
         h.lastReply = r;
-        return r;
+        return beGuard(ai, r);
       }
     }
 
@@ -192,14 +218,21 @@
       var line = pick(replies) || fallbackLine(ai, h);
       h.lastTopic = rule.topic || 'rule';
       h.lastReply = line;
-      return line;
+      return beGuard(ai, line);
     }
 
     // 4) Fallback rotation — never the greeting, never a repeat.
     var fb = fallbackLine(ai, h);
+    // 5) JAHtalk: the FINAL fallback — after INTENTS/rules/fallbackLine.
+    //    Only fires when the engine's own lines ran dry (empty); the AI
+    //    still answers like a human, in its own voice. The engine's
+    //    rotation/no-repeat behavior above is untouched.
+    if (!fb || !String(fb).trim()) {
+      try { if (typeof JAHtalk !== 'undefined') fb = JAHtalk.reply(beProfile(ai), t) || fb; } catch (e) {}
+    }
     h.lastTopic = 'fallback';
     h.lastReply = fb;
-    return fb;
+    return beGuard(ai, fb);
   }
 
   function fallbackLine(ai, h) {
@@ -238,7 +271,7 @@
       ai: ai,
       history: {},
       lineOpen: true,
-      greeting: ai.greeting || fallbackLine(ai, {}),
+      greeting: beGuard(ai, ai.greeting || fallbackLine(ai, {})),
       say: function (text) {
         if (!session.lineOpen) return 'The line is closed. Dial again to start a new call.';
         var reply = chat(ai, text, session.history);
