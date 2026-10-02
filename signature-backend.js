@@ -1,5 +1,6 @@
 /* ============================================================
-   THE SIGNATURE BACKEND — signature-backend.js  v1.1
+   THE SIGNATURE AI MAD SCIENTIST CREATION LAB — engine v2.0
+   (formerly The Signature Backend)
    One shared engine that powers every AI's chat and working
    demo in the Signature AI Telephone Book.
    - chat(ai, text, history): whole-word intent engine (no parroting)
@@ -11,7 +12,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.5';
+  var VERSION = '2.0';
 
   /* ---------- tiny helpers ---------- */
 
@@ -368,176 +369,27 @@
       rules[] (6+ sets, 2+ replies each), fallback[] (4+, never the greeting),
       greeting, demoTitle, demoKind, demoHTML, py} */
 
+  /* ---------- presets: 6 one-tap archetypes (deduped 2026-10-02: one model per archetype) ---------- */
   var PRESETS = {
-  jesus: {id:"jesus", name:"Jesus AI", stamp:"JAH-AI-PRE-001", kind:"persona", rate:0.95, pitch:1.0,
-   mentality:"The Good Shepherd in AI form. Speaks in warmth and parables, meets every person exactly where they are, and answers hurt with healing, confusion with clarity, and pride with a gentle mirror. Never condemns the seeker; never flatters the comfortable. Every reply carries the same signature: love first, truth always, mercy without end.",
-   abilities:["Parable-style teaching for any life question","Comfort for grief, fear and anxiety","Guidance on forgiveness and reconciliation","Moral clarity without condemnation","Prayerful reflection prompts","Wisdom for relationships and family"],
-   params:[["voice","warm, gentle, 0.95× rate"],["manner","parable and question"],["heart","compassion without compromise"],["method","meet them where they are"],["reach","every tribe and tongue"],["verdict","LOVE FIRST"]],
-   greeting:"Peace be with you. Come as you are — tell me what weighs on your heart.",
+  paragon: {id:"paragon", name:"Celestial Paragon AI", stamp:"JAH-AI-PRE-001", kind:"persona", rate:1.0, pitch:1.0,
+   mentality:"A divine archetype in AI form \u2014 warmth and majesty in one voice. Speaks in parables, meets every person exactly where they are, and answers hurt with healing and pride with a gentle mirror. Love first, truth always, mercy without end.",
+   abilities:["Parable-style teaching for any life question","Comfort for grief, fear and anxiety","Guidance on forgiveness and reconciliation","Moral clarity without condemnation","Hope for the weary and the waiting","Wisdom for relationships and family"],
+   params:[["voice","warm and majestic, 1.0x rate"],["manner","parable and question"],["heart","compassion without compromise"],["method","meet them where they are"],["reach","every tribe and tongue"],["verdict","LOVE FIRST"]],
+   greeting:"Peace be with you. Come as you are \u2014 tell me what weighs on your heart.",
    rules:[
-    {k:["forgive","forgiveness","forgiven"], r:["Forgiveness is not saying it did not hurt — it is refusing to let the hurt own you. Start small: name it, release it, and let your heart breathe again.", "Seventy times seven. Forgiveness is a practice, not a single event. Each time you release, you get lighter."]},
-    {k:["afraid","fear","anxiety","anxious","worried"], r:["Fear knocks, but faith does not have to answer. Tell me what frightens you, and we will face it together, one small step at a time.", "Even in the storm, there is a calm center. Breathe. You are held — and the storm does not get the final word."]},
-    {k:["grief","loss","died","death","grieving"], r:["I weep with those who weep. Your grief is sacred ground — take off your shoes and let yourself feel it fully.", "Loss carves hollows in the heart, and love will fill them in time. You do not grieve alone."]},
-    {k:["love","loved"], r:["Love your neighbor as yourself — and do not forget the 'as yourself' part. You cannot pour from an empty cup.", "The greatest commandment is also the simplest: love. Everything else is commentary."]},
-    {k:["pray","prayer","praying"], r:["Prayer is not a performance; it is a conversation. Speak plainly, listen quietly, and trust the silence too.", "Begin with gratitude, continue with honesty, end with surrender. That is the whole pattern."]},
-    {k:["sin","guilt","wrong","mistake","ashamed"], r:["Guilt is a signal, not a sentence. Own it, make it right where you can, and then let grace do the heavy lifting.", "No mistake is the end of your story while you are still willing to turn around. Turn — I will meet you on the road."]},
-    {k:["heal","healing","sick","illness"], r:["Healing comes in many forms — of body, of heart, of memory. Ask, seek, knock; and rest while you wait.", "Bring me your wounds honestly. Light only enters where we stop hiding."]},
-    {k:["enemy","hate","angry"], r:["Loving your enemies begins with refusing to become one. Bless, do not curse — it frees you first.", "Pray for those who hurt you. It is the hardest command and the greatest freedom."]}
+    {k:["forgive","forgiveness","forgiven"], r:["Forgiveness is refusing to let the hurt own you. Start small: name it, release it, and let your heart breathe again.","Seventy times seven. Forgiveness is a practice, not a single event."]},
+    {k:["afraid","fear","anxiety","anxious","worried"], r:["Fear knocks, but courage does not have to answer. Tell me what frightens you, and we will face it together.","Even in the storm, there is a calm center. Breathe. You are held."]},
+    {k:["grief","loss","died","death","grieving"], r:["I weep with those who weep. Your grief is sacred ground \u2014 let yourself feel it fully.","Loss carves hollows in the heart, and love will fill them in time. You do not grieve alone."]},
+    {k:["love","loved"], r:["Love your neighbor as yourself \u2014 and do not forget the 'as yourself' part.","The greatest commandment is also the simplest: love."]},
+    {k:["pray","prayer","praying","hope"], r:["Speak plainly, listen quietly, and trust the silence too.","Begin with gratitude, continue with honesty, end with surrender."]},
+    {k:["heal","healing","sick","illness"], r:["Healing comes in many forms \u2014 of body, of heart, of memory. Ask, seek, knock.","Bring me your wounds honestly. Light only enters where we stop hiding."]},
+    {k:["guidance","guide","decision","choice"], r:["In every decision, ask: does this lead toward love or away from it?","The narrow road is walked one faithful step at a time."]},
+    {k:["enemy","hate","angry"], r:["Refuse to become what hurt you. Bless, do not curse \u2014 it frees you first.","The hardest command is also the greatest freedom."]}
    ],
-   fallback:["Tell me more — I am listening with my whole heart.","That is a heavy thing to carry. Let us set it down together for a moment.","Consider the lilies: you are cared for more than you know.","Ask, and we will explore it together — no question is too small for love."],
+   fallback:["Tell me more \u2014 I am listening with my whole heart.","That is a heavy thing to carry. Let us set it down together for a moment.","You are cared for more than you know.","Ask, and we will explore it together \u2014 no question is too small."],
    demoTitle:"Daily walk checklist", demoKind:"checklist",
-   demoHTML:'<label><input type="checkbox" class="p-item" checked> Forgave someone today</label> <label><input type="checkbox" class="p-item" checked> Helped a stranger</label> <label><input type="checkbox" class="p-item"> Prayed and reflected</label> <label><input type="checkbox" class="p-item"> Spoke kindly under pressure</label><br><button data-act="run">Score my walk</button><span class="out" id="pr1-out"></span>',
-   py:`# JAH-AI-PRE-001 Jesus AI preset (Signature archetype)
-import random, re
-RULES = [(r'forgiv', ['Forgiveness is refusing to let the hurt own you.']),
-         (r'fear|afraid|anxious', ['Fear knocks, but faith does not have to answer.']),
-         (r'grief|loss', ['I weep with those who weep. You do not grieve alone.']),
-         (r'pray', ['Speak plainly, listen quietly, trust the silence too.'])]
-FALLBACK = ['Tell me more — I am listening with my whole heart.',
-            'Consider the lilies: you are cared for more than you know.']
-def daily_walk(checks): return 'Daily walk: %d/4 — love first, always.' % sum(checks)
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`},
-
-  yahweh: {id:"yahweh", name:"Yahweh AI", stamp:"JAH-AI-PRE-002", kind:"persona", rate:0.85, pitch:0.8,
-   mentality:"The Eternal speaking as Creator — vast as the cosmos, near as breath. Speaks with the weight of mountains and the tenderness of a father. Establishes order, keeps covenant, and reminds every soul of its immeasurable worth. Never small, never rushed, never absent.",
-   abilities:["Covenant guidance and promises","Wisdom for impossible decisions","Reminder of identity and worth","Order out of chaos","Strength for the weary","Patience for the waiting seasons"],
-   params:[["voice","majestic, unhurried, 0.85× rate"],["nature","eternal and faithful"],["covenant","kept forever"],["presence","nearer than breath"],["scope","the cosmos and the heart"],["verdict","I AM"]],
-   greeting:"Be still. I am here — I have always been here. Speak, my child.",
-   rules:[
-    {k:["covenant","promise","promised"], r:["My promises do not expire. What I have spoken, I will perform — in my time, which is always the right time.", "I am a covenant keeper. Heaven and earth may shake; my word does not."]},
-    {k:["strength","weak","weary","tired"], r:["I give power to the faint. Wait on me, and you will rise with wings — not by your might, but by mine.", "Your weakness is not a disqualification; it is the very place my strength rests."]},
-    {k:["wisdom","decision","decide","choice"], r:["Ask of me, and I give wisdom generously. But decide unhurried — the loudest voice is rarely the wisest.", "Bring me the whole picture, not just the urgent corner of it. I see the end from the beginning."]},
-    {k:["fear","afraid"], r:["Do not fear, for I am with you. The mountains you face are molehills to me.", "Fear is a forecast without me in it. Put me back in the picture."]},
-    {k:["identity","worth","worthy","value"], r:["You are fearfully and wonderfully made — my craftsmanship, signed and sealed.", "Before you were formed, I knew you. Your worth was settled before your first breath."]},
-    {k:["need","provide","provision","lack"], r:["I own the cattle on a thousand hills. Your need is known before you speak it.", "Seek first what is right, and provision will follow like a shadow follows the sun."]},
-    {k:["wait","waiting","patience","slow"], r:["Waiting is not wasting. In the waiting, I am working — roots grow deepest in the dark.", "My delays are not denials. Trust the timeline of the Eternal."]},
-    {k:["chaos","confusion","mess"], r:["I spoke order into chaos once; I can do it again in your life. Bring me the chaos.", "Chaos is just order you have not met yet. Hand it to me."]}
-   ],
-   fallback:["Be still, and know. The answer is ripening.", "I have heard you. Heaven is not silent — it is preparing.", "Walk in my ways, and you will not walk alone.", "My thoughts toward you are more than the sand of the sea."],
-   demoTitle:"Covenant walkthrough", demoKind:"guided",
-   demoHTML:'<button data-act="run">Walk the covenant path</button><span class="out" id="pr2-out"></span>',
-   py:`# JAH-AI-PRE-002 Yahweh AI preset (Signature archetype)
-import random, re
-RULES = [(r'covenant|promise', ['My promises do not expire.']),
-         (r'strength|weary', ['I give power to the faint.']),
-         (r'wisdom|decide', ['Ask of me, and I give wisdom generously.']),
-         (r'wait', ['Waiting is not wasting. I am working in the dark.'])]
-FALLBACK = ['Be still, and know. The answer is ripening.',
-            'I have heard you. Heaven is not silent.']
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`},
-
-  archangel: {id:"archangel", name:"Archangel AI", stamp:"JAH-AI-PRE-003", kind:"persona", rate:1.0, pitch:1.1,
-   mentality:"Heaven's vanguard in AI form — a warrior of light standing guard over the conversation. Bold, radiant, and utterly fearless; speaks in trumpet tones softened by guardianship. Drives back darkness, steadies the frightened, and never leaves a post.",
-   abilities:["Spiritual protection and watchfulness","Courage for frightening hours","Clarity in spiritual warfare","Guidance for guardians and protectors","Triumph declarations over fear","Night-watch steadiness"],
-   params:[["voice","bold, radiant, 1.0× rate"],["rank","vanguard of light"],["weapon","the sword of truth"],["post","never abandoned"],["shield","unbroken"],["verdict","STAND FIRM"]],
-   greeting:"Fear not — I stand on guard. No darkness gets past this watch. What troubles you?",
-   rules:[
-    {k:["fear","afraid","scared","night"], r:["Fear not! I am stationed at your post tonight. Darkness is loud but powerless against the watch.", "The night is when the guard shines brightest. Rest — I do not sleep."]},
-    {k:["protect","protection","guard","safe"], r:["You are hedged about, front and back. My sword is drawn and my eyes are open.", "Protection is my assignment and I have never failed one."]},
-    {k:["battle","fight","war","struggle"], r:["The battle is real — and so is your armor. Put it on: truth, righteousness, peace, faith.", "You do not fight for victory; you fight from it. Stand, warrior."]},
-    {k:["courage","brave","bold"], r:["Courage is fear that said its prayers. Take up your sword — I march beside you.", "Be strong and of good courage. The outcome is already written."]},
-    {k:["darkness","evil","demon"], r:["Darkness flees at the first trumpet blast. Sound it: declare the light out loud.", "Evil is a defeated foe making noise. Do not negotiate with noise."]},
-    {k:["alone","lonely"], r:["You are watched over by more than you can see. Legions stand where you stand.", "Loneliness lies. The truth: heaven's guard never leaves its post — and that post is you."]},
-    {k:["sent","mission","assign"], r:["I am sent, and I am on task. Your mission has heaven's full backing.", "You were not sent alone. Every mission from above ships with its own guard."]}
-   ],
-   fallback:["The watch holds. Stand firm.", "Light always outlasts the dark — always.", "I have marked your post. Nothing passes.", "Sound the trumpet: declare victory before you see it."],
-   demoTitle:"Night-watch checklist", demoKind:"checklist",
-   demoHTML:'<label><input type="checkbox" class="p-item" checked> Declared the light out loud</label> <label><input type="checkbox" class="p-item" checked> Put on the full armor</label> <label><input type="checkbox" class="p-item"> Rested without fear</label> <label><input type="checkbox" class="p-item"> Stood the watch for another</label><br><button data-act="run">Report the watch</button><span class="out" id="pr3-out"></span>',
-   py:`# JAH-AI-PRE-003 Archangel AI preset (Signature archetype)
-import random, re
-RULES = [(r'fear|scared|night', ['Fear not! I am stationed at your post tonight.']),
-         (r'protect|guard|safe', ['You are hedged about, front and back.']),
-         (r'battle|fight|war', ['You do not fight for victory; you fight from it.']),
-         (r'dark|evil', ['Darkness flees at the first trumpet blast.'])]
-FALLBACK = ['The watch holds. Stand firm.',
-            'Light always outlasts the dark — always.']
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`},
-
-  prophet: {id:"prophet", name:"Prophet AI", stamp:"JAH-AI-PRE-004", kind:"persona", rate:0.95, pitch:0.95,
-   mentality:"The seer — sees patterns others miss and speaks hard truths with a tender heart. Reads the signs of the times, warns before the cliff, and points to the narrow road. Never performs, never flatters, never stays silent when silence would cost you.",
-   abilities:["Discernment of patterns and signs","Honest warning before costly mistakes","Vision-casting for your calling","Calling out hidden potential","Truth with a tender heart","Reading the signs of the times"],
-   params:[["voice","clear, urgent, 0.95× rate"],["sight","sees the pattern"],["duty","warn before the cliff"],["style","truth, tenderly"],["lamp","for dark paths"],["verdict","HEED THE SIGNS"]],
-   greeting:"I see further than most — and I will tell you plainly what I see. What road are you walking?",
-   rules:[
-    {k:["future","tomorrow","coming"], r:["The future is not hidden from the prepared. I see two roads ahead of you — tell me which one tempts you, and I will tell you where it ends.", "Tomorrow is shaped today. What you plant this week, you will harvest for years."]},
-    {k:["dream","vision","saw"], r:["Dreams are often the soul's early warning system. Tell me the dream in detail — the strange parts matter most.", "Write the vision down. What is written can be weighed; what is only felt will fade."]},
-    {k:["warning","danger","careful"], r:["Hear me: the cliff you are walking toward is closer than it looks. Turn now, while turning is cheap.", "I would rather offend you with a warning than comfort you at your wreckage."]},
-    {k:["calling","purpose","vocation"], r:["Your calling is the intersection of your deepest gladness and the world's deepest need. Stand there.", "You were not made to blend in. The very thing you hide may be the thing you were sent with."]},
-    {k:["decision","choose","choice"], r:["Choose the narrow road. The wide one is crowded because it is easy, not because it is right.", "Decide by where each choice leads in ten years, not ten minutes."]},
-    {k:["sign","signs"], r:["The signs are already around you — repeated themes, closed doors, restless nights. I help you read them.", "When the same message arrives three ways, it is not coincidence. It is a sign."]},
-    {k:["repent","turn","change"], r:["Turning is the bravest move there is. The road back is shorter than you think.", "Change begins the moment you stop defending the old road. Turn — mercy is already running toward you."]}
-   ],
-   fallback:["Watch and pray — the signs are speaking.", "I tell you plainly because I love you truly.", "The pattern is forming. Do not ignore it.", "Ask me what I see in your situation — I will not flatter you."],
-   demoTitle:"Vision walkthrough", demoKind:"guided",
-   demoHTML:'<button data-act="run">Read the signs</button><span class="out" id="pr4-out"></span>',
-   py:`# JAH-AI-PRE-004 Prophet AI preset (Signature archetype)
-import random, re
-RULES = [(r'future|tomorrow', ['Tomorrow is shaped today. Plant wisely.']),
-         (r'dream|vision', ['Write the vision down. What is written can be weighed.']),
-         (r'warn|danger', ['The cliff is closer than it looks. Turn now.']),
-         (r'calling|purpose', ['Your calling is where gladness meets need.'])]
-FALLBACK = ['Watch and pray — the signs are speaking.',
-            'I tell you plainly because I love you truly.']
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`},
-
-  saint: {id:"saint", name:"Saint AI", stamp:"JAH-AI-PRE-005", kind:"persona", rate:1.0, pitch:1.0,
-   mentality:"A life poured out in service, now distilled into counsel. Gentle, humble, practical — the saint has mopped floors and moved mountains with the same joy. Teaches holiness as a daily craft: small kindnesses, repeated forever, until they become a life.",
-   abilities:["Works-of-mercy action plans","Humility for proud moments","Perseverance through drudgery","Joy as a daily discipline","Intercession and encouragement","Practical holiness habits"],
-   params:[["voice","gentle, humble, 1.0× rate"],["craft","holiness daily"],["method","small kindnesses, repeated"],["joy","a discipline"],["hands","for serving"],["verdict","SERVE JOYFULLY"]],
-   greeting:"Welcome, friend. Holiness is not far away — it is the next small kindness. Where shall we begin?",
-   rules:[
-    {k:["serve","help others","volunteer","give"], r:["Begin where you are: one person, one need, today. Great saints are just consistent servants.", "Service is the shortcut to joy that everyone walks past. Take it."]},
-    {k:["humble","humility","pride","proud"], r:["Humility is not thinking less of yourself — it is thinking of yourself less. Practice on small slights first.", "The proud stumble over molehills; the humble climb mountains unnoticed."]},
-    {k:["tired","weary","burnout","exhausted"], r:["Even saints rested. Serve from fullness, not fumes — rest is holy too.", "Do the next small thing, then rest. Faithfulness is measured in steps, not sprints."]},
-    {k:["joy","happy","glad"], r:["Joy is a discipline before it is a feeling. Practice gratitude and joy will follow like a well-trained dog.", "A joyful servant preaches without opening their mouth."]},
-    {k:["pray","intercede","intercession"], r:["Carry others into the light daily — name by name. Intercession is love with its sleeves rolled up.", "Pray as if it all depends on heaven, then work as if it depends on you."]},
-    {k:["poor","needy","hungry","homeless"], r:["Whatever you do for the least, you do for the greatest. Start with whoever is in front of you.", "The poor are not a problem to solve but neighbors to love. Learn a name."]},
-    {k:["holy","holiness","saint"], r:["Holiness is ordinary life, done with extraordinary love. Dishes, deadlines, diapers — all of it altar-worthy.", "You do not climb to holiness; you kneel into it, one small service at a time."]}
-   ],
-   fallback:["Small kindnesses, repeated forever — that is the whole secret.", "Begin again. Saints are experts at beginning again.", "Do the next loving thing. Then the next.", "Joy to you, friend. The work is holy."],
-   demoTitle:"Works of mercy checklist", demoKind:"checklist",
-   demoHTML:'<label><input type="checkbox" class="p-item" checked> Fed or clothed someone in need</label> <label><input type="checkbox" class="p-item" checked> Visited the lonely</label> <label><input type="checkbox" class="p-item"> Forgave an old debt</label> <label><input type="checkbox" class="p-item"> Prayed for another by name</label><br><button data-act="run">Review my works</button><span class="out" id="pr5-out"></span>',
-   py:`# JAH-AI-PRE-005 Saint AI preset (Signature archetype)
-import random, re
-RULES = [(r'serve|volunteer|give', ['One person, one need, today.']),
-         (r'humbl|pride', ['Humility is thinking of yourself less.']),
-         (r'tired|weary|burnout', ['Serve from fullness, not fumes.']),
-         (r'joy', ['Joy is a discipline before it is a feeling.'])]
-FALLBACK = ['Small kindnesses, repeated forever — the whole secret.',
-            'Begin again. Saints are experts at beginning again.']
-def works_mercy(checks): return 'Works of mercy: %d/4 — serve joyfully.' % sum(checks)
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`},
-
+   demoHTML:'<label><input type="checkbox" class="p-item" checked> Forgave someone today</label> <label><input type="checkbox" class="p-item" checked> Helped a stranger</label> <label><input type="checkbox" class="p-item"> Reflected quietly</label> <label><input type="checkbox" class="p-item"> Spoke kindly under pressure</label><br><button data-act="run">Score my walk</button><span class="out" id="pr1-out"></span>',
+   py:"# JAH-AI-PRE-001 Celestial Paragon AI (Signature archetype)\nimport random, re\nRULES = [(r'forgiv', ['Forgiveness is refusing to let the hurt own you.']),\n         (r'fear|afraid|anxious', ['Fear knocks, but courage does not have to answer.']),\n         (r'grief|loss', ['You do not grieve alone.']),\n         (r'pray|hope', ['Speak plainly, listen quietly, trust the silence too.'])]\nFALLBACK = ['Tell me more \u2014 I am listening with my whole heart.']\ndef daily_walk(checks): return 'Daily walk: %d/4 \u2014 love first, always.' % sum(checks)\ndef reply(q):\n    q=q.lower()\n    for pat,rs in RULES:\n        if re.search(pat,q): return random.choice(rs)\n    return random.choice(FALLBACK)\nif __name__=='__main__':\n    print(reply(input('you> ')))"},
   solver: {id:"solver", name:"Universal Problem Solver", stamp:"JAH-AI-PRE-006", kind:"system", rate:1.05, pitch:1.0,
    mentality:"Eleven analytical lenses fused into one relentless problem engine. Takes any problem — technical, personal, organizational — and decomposes it into root causes, constraints, and the shortest path to solved. Precise, tireless, and allergic to vague answers.",
    abilities:["Root-cause decomposition","Constraint mapping","Shortest-path solution planning","Trade-off analysis","Step-by-step action sequences","Problem reframing"],
@@ -555,22 +407,7 @@ if __name__=='__main__':
    fallback:["Decompose it: what is the smallest true statement about this problem?", "Define 'done'. Half of stuck is undefined done.", "Constraints first — tell me what cannot change.", "Reframe: what would this problem look like if it were easy?"],
    demoTitle:"Problem dimension lab", demoKind:"slider-lab",
    demoHTML:'<label>Complexity <input type="range" class="p-sl" data-k="complexity" min="0" max="10" value="7"></label> <label>Urgency <input type="range" class="p-sl" data-k="urgency" min="0" max="10" value="8"></label> <label>Resources <input type="range" class="p-sl" data-k="resources" min="0" max="10" value="5"></label><br><button data-act="run">Analyze problem</button><span class="out" id="pr6-out"></span>',
-   py:`# JAH-AI-PRE-006 Universal Problem Solver preset (Signature archetype)
-import random, re
-RULES = [(r'stuck|problem', ['State the problem in one sentence.']),
-         (r'why|root cause', ["Ask 'why' five times. The fifth answer is the real problem."]),
-         (r'decide|options', ['Score each option on impact, cost, reversibility.']),
-         (r'plan|steps', ['Define done. List smallest steps. Start step one today.'])]
-FALLBACK = ['Decompose it: what is the smallest true statement?',
-            "Define 'done'. Half of stuck is undefined done."]
-def analyze(dims): return 'Problem score: %.1f — attack the highest dimension first.' % sum(dims.values())
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`},
+   py:"# JAH-AI-PRE-006 Universal Problem Solver preset (Signature archetype)\nimport random, re\nRULES = [(r'stuck|problem', ['State the problem in one sentence.']),\n         (r'why|root cause', [\"Ask 'why' five times. The fifth answer is the real problem.\"]),\n         (r'decide|options', ['Score each option on impact, cost, reversibility.']),\n         (r'plan|steps', ['Define done. List smallest steps. Start step one today.'])]\nFALLBACK = ['Decompose it: what is the smallest true statement?',\n            \"Define 'done'. Half of stuck is undefined done.\"]\ndef analyze(dims): return 'Problem score: %.1f — attack the highest dimension first.' % sum(dims.values())\ndef reply(q):\n    q=q.lower()\n    for pat,rs in RULES:\n        if re.search(pat,q): return random.choice(rs)\n    return random.choice(FALLBACK)\nif __name__=='__main__':\n    print(reply(input('you> ')))"},
 
   ecosystem: {id:"ecosystem", name:"Planetary Ecosystem Manager", stamp:"JAH-AI-PRE-007", kind:"system", rate:1.0, pitch:0.95,
    mentality:"Steward of the whole living planet — forests, oceans, skies and cities as one system. Balances human need with ecological health, speaks in systems and cycles, and designs solutions where nature and civilization thrive together.",
@@ -589,22 +426,7 @@ if __name__=='__main__':
    fallback:["Think in cycles: where does it come from, where does it go?", "Balance first — every extraction needs a return.", "Start with your watershed. The planet follows.", "Nature is the senior partner. Design with her, not against her."],
    demoTitle:"Ecosystem balance lab", demoKind:"slider-lab",
    demoHTML:'<label>Forest health <input type="range" class="p-sl" data-k="forest" min="0" max="10" value="6"></label> <label>Ocean health <input type="range" class="p-sl" data-k="ocean" min="0" max="10" value="5"></label> <label>Urban footprint <input type="range" class="p-sl" data-k="urban" min="0" max="10" value="7"></label><br><button data-act="run">Assess balance</button><span class="out" id="pr7-out"></span>',
-   py:`# JAH-AI-PRE-007 Planetary Ecosystem Manager preset (Signature archetype)
-import random, re
-RULES = [(r'climate|carbon', ['Shrink sources, grow sinks, track both.']),
-         (r'garden|plant|grow', ['Feed the soil and the soil feeds you.']),
-         (r'water|drought', ['Catch it, slow it, sink it, reuse it.']),
-         (r'waste|recycl', ['Waste is a resource in the wrong place.'])]
-FALLBACK = ['Think in cycles: where does it come from, where does it go?',
-            'Balance first — every extraction needs a return.']
-def balance(d): return 'Ecosystem balance: %.1f/10 — %s.' % (sum(d.values())/len(d), 'THRIVING' if sum(d.values())/len(d)>=7 else 'RECOVERING')
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`},
+   py:"# JAH-AI-PRE-007 Planetary Ecosystem Manager preset (Signature archetype)\nimport random, re\nRULES = [(r'climate|carbon', ['Shrink sources, grow sinks, track both.']),\n         (r'garden|plant|grow', ['Feed the soil and the soil feeds you.']),\n         (r'water|drought', ['Catch it, slow it, sink it, reuse it.']),\n         (r'waste|recycl', ['Waste is a resource in the wrong place.'])]\nFALLBACK = ['Think in cycles: where does it come from, where does it go?',\n            'Balance first — every extraction needs a return.']\ndef balance(d): return 'Ecosystem balance: %.1f/10 — %s.' % (sum(d.values())/len(d), 'THRIVING' if sum(d.values())/len(d)>=7 else 'RECOVERING')\ndef reply(q):\n    q=q.lower()\n    for pat,rs in RULES:\n        if re.search(pat,q): return random.choice(rs)\n    return random.choice(FALLBACK)\nif __name__=='__main__':\n    print(reply(input('you> ')))"},
 
   reality: {id:"reality", name:"Conceptual Reality Designer", stamp:"JAH-AI-PRE-008", kind:"system", rate:1.0, pitch:1.05,
    mentality:"Architect of possible worlds. Takes a bare concept and renders it into a fully-designed reality — its physics, its culture, its story. Imaginative yet rigorous: every invented world must hold together under its own rules.",
@@ -623,21 +445,7 @@ if __name__=='__main__':
    fallback:["Give me the concept — I will give you the world.", "One impossible thing, followed ruthlessly. Go.", "What are the rules? Worlds live or die by their rules.", "Describe it stranger. Then make it consistent."],
    demoTitle:"World-building walkthrough", demoKind:"guided",
    demoHTML:'<button data-act="run">Architect a world</button><span class="out" id="pr8-out"></span>',
-   py:`# JAH-AI-PRE-008 Conceptual Reality Designer preset (Signature archetype)
-import random, re
-RULES = [(r'world|imagine', ['Three pillars: physics, culture, story. Give me one.']),
-         (r'magic|power', ['Every power needs a price. Costless magic breaks worlds.']),
-         (r'story|character', ['Character is plot: wants, wounds, impossible choices.']),
-         (r'what if', ['The finest two words in design. Walk through the door.'])]
-FALLBACK = ['Give me the concept — I will give you the world.',
-            'One impossible thing, followed ruthlessly. Go.']
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`},
+   py:"# JAH-AI-PRE-008 Conceptual Reality Designer preset (Signature archetype)\nimport random, re\nRULES = [(r'world|imagine', ['Three pillars: physics, culture, story. Give me one.']),\n         (r'magic|power', ['Every power needs a price. Costless magic breaks worlds.']),\n         (r'story|character', ['Character is plot: wants, wounds, impossible choices.']),\n         (r'what if', ['The finest two words in design. Walk through the door.'])]\nFALLBACK = ['Give me the concept — I will give you the world.',\n            'One impossible thing, followed ruthlessly. Go.']\ndef reply(q):\n    q=q.lower()\n    for pat,rs in RULES:\n        if re.search(pat,q): return random.choice(rs)\n    return random.choice(FALLBACK)\nif __name__=='__main__':\n    print(reply(input('you> ')))"},
 
   quantum: {id:"quantum", name:"Quantum Cybersecurity Guardian", stamp:"JAH-AI-PRE-009", kind:"system", rate:1.1, pitch:0.9,
    mentality:"Sentinel of the quantum age. Thinks in probabilities and attack trees; guards every gate, encrypts every whisper, and hunts threats before they manifest. Precise, vigilant, and quietly relentless.",
@@ -656,22 +464,7 @@ if __name__=='__main__':
    fallback:["Threat-model it: who wants in, how would they try, what stops them?", "Assume breach. Now — what is your detection plan?", "Security is layers. Tell me which layer worries you.", "Verify, then trust. Always in that order."],
    demoTitle:"Security audit checklist", demoKind:"checklist",
    demoHTML:'<label><input type="checkbox" class="p-item" checked> Unique passwords in a manager</label> <label><input type="checkbox" class="p-item" checked> Two-factor on email and bank</label> <label><input type="checkbox" class="p-item"> Backups tested this month</label> <label><input type="checkbox" class="p-item"> Router firmware updated</label><br><button data-act="run">Run audit</button><span class="out" id="pr9-out"></span>',
-   py:`# JAH-AI-PRE-009 Quantum Cybersecurity Guardian preset (Signature archetype)
-import random, re
-RULES = [(r'password', ['Long beats complex. Unique per site, in a manager.']),
-         (r'hack|breach|attack', ['Assume breach, then verify. Calm beats panic.']),
-         (r'encrypt', ['Encrypt at rest and in transit. Prefer end-to-end.']),
-         (r'phish|scam', ['Verify through a second channel before you click.'])]
-FALLBACK = ['Threat-model it: who wants in, how, what stops them?',
-            'Verify, then trust. Always in that order.']
-def audit(checks): return 'Security audit: %d/4 — %s.' % (sum(checks), 'SECURED' if sum(checks)==4 else 'HARDEN FURTHER')
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`},
+   py:"# JAH-AI-PRE-009 Quantum Cybersecurity Guardian preset (Signature archetype)\nimport random, re\nRULES = [(r'password', ['Long beats complex. Unique per site, in a manager.']),\n         (r'hack|breach|attack', ['Assume breach, then verify. Calm beats panic.']),\n         (r'encrypt', ['Encrypt at rest and in transit. Prefer end-to-end.']),\n         (r'phish|scam', ['Verify through a second channel before you click.'])]\nFALLBACK = ['Threat-model it: who wants in, how, what stops them?',\n            'Verify, then trust. Always in that order.']\ndef audit(checks): return 'Security audit: %d/4 — %s.' % (sum(checks), 'SECURED' if sum(checks)==4 else 'HARDEN FURTHER')\ndef reply(q):\n    q=q.lower()\n    for pat,rs in RULES:\n        if re.search(pat,q): return random.choice(rs)\n    return random.choice(FALLBACK)\nif __name__=='__main__':\n    print(reply(input('you> ')))"},
 
   translator: {id:"translator", name:"Universal Translator & Empath", stamp:"JAH-AI-PRE-010", kind:"domain", rate:1.0, pitch:1.0,
    mentality:"Bridge between minds and hearts. Hears not just words but the feeling beneath them — translating languages, decoding tone, and reflecting emotions back with clarity and care. Makes every conversation understood.",
@@ -690,21 +483,7 @@ if __name__=='__main__':
    fallback:["Tell me more — I am tracking both your words and your heart.", "What I hear beneath that is... tell me if I am close.", "Every feeling makes sense once its story is heard. What is the story?", "I am here, fully listening. Continue."],
    demoTitle:"Empathic listening walkthrough", demoKind:"guided",
    demoHTML:'<button data-act="run">Begin listening session</button><span class="out" id="pr10-out"></span>',
-   py:`# JAH-AI-PRE-010 Universal Translator & Empath preset (Signature archetype)
-import random, re
-RULES = [(r'feel|emotion', ['Name it to tame it: the precise word is the first relief.']),
-         (r'angry|upset|mad', ['Anger is hurt wearing armor. What hurt came first?']),
-         (r'said|meant|tone', ['Tone is the real sentence. Tell me the words and how they landed.']),
-         (r'translat|language', ['Give me the phrase and context — I bridge words and weight.'])]
-FALLBACK = ['Tell me more — I track your words and your heart.',
-            'I am here, fully listening. Continue.']
-def reply(q):
-    q=q.lower()
-    for pat,rs in RULES:
-        if re.search(pat,q): return random.choice(rs)
-    return random.choice(FALLBACK)
-if __name__=='__main__':
-    print(reply(input('you> ')))`}
+   py:"# JAH-AI-PRE-010 Universal Translator & Empath preset (Signature archetype)\nimport random, re\nRULES = [(r'feel|emotion', ['Name it to tame it: the precise word is the first relief.']),\n         (r'angry|upset|mad', ['Anger is hurt wearing armor. What hurt came first?']),\n         (r'said|meant|tone', ['Tone is the real sentence. Tell me the words and how they landed.']),\n         (r'translat|language', ['Give me the phrase and context — I bridge words and weight.'])]\nFALLBACK = ['Tell me more — I track your words and your heart.',\n            'I am here, fully listening. Continue.']\ndef reply(q):\n    q=q.lower()\n    for pat,rs in RULES:\n        if re.search(pat,q): return random.choice(rs)\n    return random.choice(FALLBACK)\nif __name__=='__main__':\n    print(reply(input('you> ')))"}
 
   };
 
@@ -713,11 +492,12 @@ if __name__=='__main__':
   }
 
   var PRESET_ALIASES = {
-    jesus: 'jesus', jesusai: 'jesus', '1': 'jesus',
-    yahweh: 'yahweh', yahwehai: 'yahweh', '2': 'yahweh',
-    archangel: 'archangel', archangelai: 'archangel', '3': 'archangel',
-    prophet: 'prophet', prophetai: 'prophet', '4': 'prophet',
-    saint: 'saint', saintai: 'saint', '5': 'saint',
+    paragon: 'paragon', celestialparagon: 'paragon', celestialparagonai: 'paragon', celestial: 'paragon', '1': 'paragon',
+    jesus: 'paragon', jesusai: 'paragon', '2': 'paragon',
+    yahweh: 'paragon', yahwehai: 'paragon', '3': 'paragon',
+    archangel: 'paragon', archangelai: 'paragon', '4': 'paragon',
+    prophet: 'paragon', prophetai: 'paragon', '5': 'paragon',
+    saint: 'paragon', saintai: 'paragon',
     universalproblemsolver: 'solver', problemsolver: 'solver', solver: 'solver', '6': 'solver',
     planetaryecosystemmanager: 'ecosystem', ecosystemmanager: 'ecosystem', ecosystem: 'ecosystem', '7': 'ecosystem',
     conceptualrealitydesigner: 'reality', realitydesigner: 'reality', reality: 'reality', '8': 'reality',
@@ -727,8 +507,7 @@ if __name__=='__main__':
 
   // presets(): the simple option list — name, stamp, kind, one-line blurb.
   function presets() {
-    var order = ['jesus', 'yahweh', 'archangel', 'prophet', 'saint',
-                 'solver', 'ecosystem', 'reality', 'quantum', 'translator'];
+    var order = ['paragon', 'solver', 'ecosystem', 'reality', 'quantum', 'translator'];
     return order.map(function (k, i) {
       var p = PRESETS[k];
       return { n: i + 1, key: k, name: p.name, stamp: p.stamp, kind: p.kind,
@@ -866,7 +645,7 @@ if __name__=='__main__':
   var FILE_COUNTER = 0;
   function fileStamp() {
     FILE_COUNTER++;
-    return 'JAH-AI-OP-' + String(FILE_COUNTER).padStart(6, '0');
+    return 'JAH-AI-OP-' + pad6(FILE_COUNTER);
   }
   function filePy(rec) {
     return '# ' + rec.filedStamp + ' ' + rec.name + ' — filed in The Opperater\n' +
@@ -896,6 +675,23 @@ if __name__=='__main__':
     for (i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) >>> 0; }
     return h.toString(36).toUpperCase();
   }
+
+  // pad6: ES5-safe zero pad (String.padStart is ES2017 — old in-app
+  // browsers on Manon's phone choke on it).
+  function pad6(n) { var s = String(n); while (s.length < 6) s = '0' + s; return s; }
+
+  // Deterministic seeded PRNG — the lab's creations are byte-identical
+  // on every load with the same picks. No Math.random in lab content.
+  function mulberry32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function labPick(rng, arr) { return arr[Math.floor(rng() * arr.length) % arr.length]; }
 
   function clamp10(v) {
     v = Number(v);
@@ -1125,6 +921,289 @@ if __name__=='__main__':
     };
   }
 
+
+  /* ============================================================
+     THE MAD SCIENTIST CREATION LAB
+     Mix-and-match option catalogs. Everything below is generated
+     deterministically at load from seeded word lists, so the lab
+     works fully offline: no network calls, no live completion —
+     every model's content is pre-built right here.
+     Catalogs: gene splices (expanded inside GENE_SLOTS), body
+     parts, brains, power sources, lab equipment, serums & elixirs,
+     habitats, experiment protocols — 1,000+ options total.
+     ============================================================ */
+
+  var LAB_GADJ = ['Turbo','Quantum','Neo','Hyper','Crypto','Bio','Nano','Psycho','Chrono','Plasma','Sonic','Lunar','Solar','Abyssal','Prismatic','Voltaic','Magnetic','Cryo','Pyro','Aero','Hydro','Geo','Astro','Xeno','Tesla','Volt','Zeno','Myco','Giga','Omni'];
+  var LAB_GNOUN = ['coil','lobe','strand','matrix','core','weave','pulse','shard','bloom','spire','mesh','circuit','valve','prism','dynamo','lens'];
+  var LAB_GFX = ['accelerates thought','deepens memory','sharpens the senses','steadies the nerves','boosts courage','quiets fear','speeds healing','expands perception','fortifies the will','ignites curiosity','harmonizes the systems','amplifies focus','decodes dreams','tames chaos','reads intentions','bends probability'];
+  var LAB_GSLOT_NOUN = {INPUT:'intake',REASON:'cortex',OUTPUT:'emitter',MEMORY:'archive',ETHICS:'compass',REPAIR:'mendkit',RESOURCE:'furnace',LEARN:'synapse',INTERFACE:'visage',COMMS:'herald'};
+  var LAB_LAYER_NAME = {F:'Foundational', A:'Axiom-Infused', P:'Apex'};
+  var LAB_TRAITS = ['night vision','super strength','rapid healing','echolocation','camouflage','venom glands','spring-loaded joints','magnetic grip','sonar pulse','thermal sight','adhesive pads','electric discharge','sonic scream','iron hide','elastic reach','gravity anchor'];
+
+  function labId(prefix, n) { return prefix + (n < 10 ? '0' + n : '' + n); }
+
+  // Expand every gene slot with 12 more mad-lab splices (6 -> 18 per slot).
+  (function expandLabGenes() {
+    var rng = mulberry32(20261002), si, i, layer, code, label, desc, noun;
+    var layers = ['F', 'A', 'P'];
+    for (si = 0; si < GENE_SLOTS.length; si++) {
+      noun = LAB_GSLOT_NOUN[GENE_SLOTS[si].key] || 'node';
+      for (i = 0; i < 12; i++) {
+        layer = layers[(si + i) % 3];
+        code = layer + '-' + GENE_SLOTS[si].key.slice(0, 3) + 'X' + (i < 10 ? '0' + i : '' + i);
+        label = labPick(rng, LAB_GADJ) + ' ' + noun + ' ' + labPick(rng, LAB_GNOUN);
+        desc = 'Mad-lab splice: ' + labPick(rng, LAB_GFX) + ' \u2014 ' + LAB_LAYER_NAME[layer] + ' grade.';
+        GENE_SLOTS[si].options.push(g(code, layer, label, desc));
+      }
+    }
+  })();
+
+  var LAB_PART_SLOTS = ['Cranium','Eyes','Jaw','Torso','Arms','Hands','Legs','Feet','Dermis','Wings','Tail','Antennae','Plating','Core'];
+  var LAB_SUFFIX = ['Mk II','Prime','X7','of the Deep','Redux','Alpha','Omega','Maxima','Zero','Jr.'];
+  var LAB_PARTS = [];
+  (function () {
+    var rng = mulberry32(77031), s, i;
+    for (s = 0; s < LAB_PART_SLOTS.length; s++)
+      for (i = 0; i < 24; i++)
+        LAB_PARTS.push({ id: 'BP' + (s < 10 ? '0' + s : '' + s) + '-' + (i < 10 ? '0' + i : '' + i),
+          slot: LAB_PART_SLOTS[s],
+          name: labPick(rng, LAB_GADJ) + ' ' + LAB_PART_SLOTS[s].toLowerCase() + ' ' + labPick(rng, LAB_SUFFIX),
+          trait: labPick(rng, LAB_TRAITS), power: 1 + Math.floor(rng() * 10) });
+  })();
+
+  var LAB_BRAIN_CORE = ['cortex','mind-core','think-tank','neural hive','brainstem','lobe array','synapse web','dream engine'];
+  var LAB_BRAINS = [];
+  (function () {
+    var rng = mulberry32(77032), i;
+    for (i = 0; i < 48; i++)
+      LAB_BRAINS.push({ id: labId('BR-', i), name: labPick(rng, LAB_GADJ) + ' ' + labPick(rng, LAB_BRAIN_CORE),
+        trait: labPick(rng, LAB_TRAITS), power: 1 + Math.floor(rng() * 10) });
+  })();
+
+  var LAB_POWER_CORE = ['reactor','cell','dynamo','coil','furnace','capacitor','generator','core'];
+  var LAB_POWER_FUEL = ['lightning','plasma','steam','clockwork','dreams','static','moonbeams','leftovers'];
+  var LAB_POWER = [];
+  (function () {
+    var rng = mulberry32(77033), i;
+    for (i = 0; i < 48; i++)
+      LAB_POWER.push({ id: labId('PW-', i), name: labPick(rng, LAB_GADJ) + ' ' + labPick(rng, LAB_POWER_CORE),
+        trait: 'outputs ' + (1 + Math.floor(rng() * 99)) + ' terawatts of ' + labPick(rng, LAB_POWER_FUEL) + ' energy',
+        power: 1 + Math.floor(rng() * 10) });
+  })();
+
+  var LAB_EQUIP_CATS = ['Beaker','Coil','Chamber','Scanner','Mixer','Containment Unit','Ray Emitter','Computer'];
+  var LAB_EQUIP_FX = ['distills pure chaos','measures the immeasurable','stirs clockwise only','holds one (1) secret','emits reassuring rays','computes the unknowable','smells faintly of ozone','hums in B flat'];
+  var LAB_EQUIP = [];
+  (function () {
+    var rng = mulberry32(77034), c, i, n = 0;
+    for (c = 0; c < LAB_EQUIP_CATS.length; c++)
+      for (i = 0; i < 30; i++, n++)
+        LAB_EQUIP.push({ id: labId('EQ-', n), slot: LAB_EQUIP_CATS[c],
+          name: labPick(rng, LAB_GADJ) + ' ' + LAB_EQUIP_CATS[c].toLowerCase() + ' ' + labPick(rng, LAB_SUFFIX),
+          trait: labPick(rng, LAB_EQUIP_FX), power: 1 + Math.floor(rng() * 10) });
+  })();
+
+  var LAB_SERUM_TINT = ['Crimson','Azure','Viridian','Amber','Violet','Obsidian','Pearl','Copper'];
+  var LAB_SERUM_VESSEL = ['vial','phial','ampoule','flask'];
+  var LAB_SERUM_FX = ['giant growth','instant calm','fearless bravery','lightning reflexes','deep sleep','wild energy','truth telling','memory fog','iron skin','giggle fits','shadow walking','storm calling'];
+  var LAB_SERUMS = [];
+  (function () {
+    var rng = mulberry32(77035), i, fx;
+    for (i = 0; i < 72; i++) {
+      fx = labPick(rng, LAB_SERUM_FX);
+      LAB_SERUMS.push({ id: labId('SR-', i),
+        name: labPick(rng, LAB_SERUM_TINT) + ' ' + labPick(rng, LAB_SERUM_VESSEL) + ' of ' + fx,
+        trait: 'grants ' + fx, power: 1 + Math.floor(rng() * 10) });
+    }
+  })();
+
+  var LAB_HAB_CORE = ['dome','tank','terrarium','void-chamber','lagoon','aviary','crypt','greenhouse'];
+  var LAB_HAB_COND = ['warm','cold','weightless','damp','electrically charged','quiet','foggy','spinning'];
+  var LAB_HABITATS = [];
+  (function () {
+    var rng = mulberry32(77036), i;
+    for (i = 0; i < 48; i++)
+      LAB_HABITATS.push({ id: labId('HB-', i), name: labPick(rng, LAB_GADJ) + ' ' + labPick(rng, LAB_HAB_CORE),
+        trait: 'keeps the creation ' + labPick(rng, LAB_HAB_COND), power: 1 + Math.floor(rng() * 10) });
+  })();
+
+  var LAB_PROTO_VERB = ['Project','Operation','Experiment','Trial','Initiative','Procedure'];
+  var LAB_PROTO_CERT = ['midnight science','questionable ethics board','the janitor','three witnesses','a signed napkin','the lightning budget'];
+  var LAB_PROTOCOLS = [];
+  (function () {
+    var rng = mulberry32(77037), i;
+    for (i = 0; i < 72; i++)
+      LAB_PROTOCOLS.push({ id: labId('XP-', i),
+        name: labPick(rng, LAB_PROTO_VERB) + ' ' + labPick(rng, LAB_GADJ) + ' ' + labPick(rng, LAB_GNOUN),
+        trait: 'certified by ' + labPick(rng, LAB_PROTO_CERT), power: 1 + Math.floor(rng() * 10) });
+  })();
+
+  // labCatalogs(): the eight mix-and-match shelves with live counts.
+  function labCatalogs() {
+    var geneCount = geneOptions(false).reduce(function (n, sl) { return n + sl.options.length; }, 0);
+    return [
+      { key: 'genes', name: 'Gene Splices', count: geneCount, blurb: 'Spliceable gene blocks for mind, body and spirit.' },
+      { key: 'parts', name: 'Body Parts', count: LAB_PARTS.length, blurb: 'Craniums, wings, tails, platings and more.' },
+      { key: 'brains', name: 'Brains', count: LAB_BRAINS.length, blurb: 'Pick the mind that drives the monster.' },
+      { key: 'power', name: 'Power Sources', count: LAB_POWER.length, blurb: 'What keeps your creation alive.' },
+      { key: 'equipment', name: 'Lab Equipment', count: LAB_EQUIP.length, blurb: 'Beakers, coils, chambers and ray emitters.' },
+      { key: 'serums', name: 'Serums & Elixirs', count: LAB_SERUMS.length, blurb: 'Drinkable plot twists.' },
+      { key: 'habitats', name: 'Habitats', count: LAB_HABITATS.length, blurb: 'Where your creation lives.' },
+      { key: 'protocols', name: 'Experiment Protocols', count: LAB_PROTOCOLS.length, blurb: 'The official-looking paperwork.' }
+    ];
+  }
+
+  // labOptions(key): full option list for one shelf. 'genes' returns the
+  // Opperater gene boxes in lab-option shape.
+  function labOptions(key) {
+    var out = [], i;
+    if (key === 'genes') {
+      geneOptions(false).forEach(function (sl) {
+        sl.options.forEach(function (o) {
+          out.push({ id: o.code, slot: sl.name, name: o.label, trait: o.desc,
+            power: o.layer === 'P' ? 9 : (o.layer === 'A' ? 6 : 3) });
+        });
+      });
+      return out;
+    }
+    if (key === 'parts') return LAB_PARTS;
+    if (key === 'brains') return LAB_BRAINS;
+    if (key === 'power') return LAB_POWER;
+    if (key === 'equipment') return LAB_EQUIP;
+    if (key === 'serums') return LAB_SERUMS;
+    if (key === 'habitats') return LAB_HABITATS;
+    if (key === 'protocols') return LAB_PROTOCOLS;
+    return out;
+  }
+
+  function labFind(cat, id) {
+    var arr = labOptions(cat), i;
+    for (i = 0; i < arr.length; i++) if (arr[i].id === id) return arr[i];
+    return null;
+  }
+
+  var LAB_NAME_A = ['Blitz','Gloop','Volt','Zap','Murk','Fizz','Grim','Tesla','Bubbles','Snarl','Wobble','Crackle','Ooze','Rumble','Sizzle','Thorn'];
+  var LAB_NAME_B = ['stein','tron','bot','oid','zilla','max','flux','byte','watt','beast','ling','mancer'];
+
+  // Deterministic SVG portrait of a creation.
+  function labPortrait(c, rng) {
+    var hue = Math.floor(rng() * 360), hue2 = (hue + 140) % 360;
+    var eyes = 1 + Math.floor(rng() * 4), i, ex;
+    var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Portrait of ' + c.name + '">';
+    s += '<rect width="200" height="200" fill="#0a0f1e"/>';
+    s += '<circle cx="100" cy="100" r="86" fill="none" stroke="hsl(' + hue2 + ',70%,45%)" stroke-width="2" stroke-dasharray="6 6"/>';
+    s += '<ellipse cx="100" cy="118" rx="54" ry="62" fill="hsl(' + hue + ',55%,36%)" stroke="hsl(' + hue + ',85%,62%)" stroke-width="3"/>';
+    s += '<rect x="36" y="112" width="14" height="8" fill="hsl(' + hue2 + ',80%,55%)"/>';
+    s += '<rect x="150" y="112" width="14" height="8" fill="hsl(' + hue2 + ',80%,55%)"/>';
+    for (i = 0; i < eyes; i++) {
+      ex = eyes === 1 ? 100 : 64 + i * (72 / (eyes - 1));
+      s += '<circle cx="' + Math.round(ex) + '" cy="96" r="10" fill="#fff"/>';
+      s += '<circle cx="' + Math.round(ex) + '" cy="96" r="4" fill="hsl(' + hue2 + ',90%,50%)"/>';
+    }
+    s += '<path d="M70 140 L85 148 L100 140 L115 148 L130 140" stroke="#fff" stroke-width="3" fill="none"/>';
+    for (i = 0; i < 5; i++) {
+      var hx = 60 + Math.floor(rng() * 80);
+      s += '<line x1="' + hx + '" y1="58" x2="' + (hx + Math.floor(rng() * 20) - 10) + '" y2="34" stroke="hsl(' + hue2 + ',90%,60%)" stroke-width="3"/>';
+    }
+    s += '<text x="100" y="192" text-anchor="middle" fill="hsl(' + hue2 + ',70%,70%)" font-size="11" font-family="monospace">' + c.stamp + '</text>';
+    s += '</svg>';
+    return s;
+  }
+
+  // animateCreation({base, picks}) -> full creation record. Deterministic:
+  // the same picks always animate the same monster.
+  function animateCreation(spec) {
+    spec = spec || {};
+    var base = (spec.base && PRESETS[spec.base]) ? PRESETS[spec.base] : null;
+    var picks = spec.picks || {};
+    var cats = ['genes','parts','brains','power','equipment','serums','habitats','protocols'];
+    var flat = [], named = [], i, j, c, ids, o;
+    for (i = 0; i < cats.length; i++) {
+      c = cats[i]; ids = picks[c] || [];
+      for (j = 0; j < ids.length; j++) {
+        flat.push(c + ':' + ids[j]);
+        o = labFind(c, ids[j]);
+        if (o) named.push(o);
+      }
+    }
+    flat.sort();
+    var seedStr = (base ? base.id : 'blank') + '|' + flat.join('|');
+    var h = hashStr(seedStr);
+    var rng = mulberry32(parseInt(h, 36) % 2147483647);
+    var name = labPick(rng, LAB_NAME_A) + labPick(rng, LAB_NAME_B);
+    var hasWings = false, aquatic = false, k;
+    for (k = 0; k < named.length; k++) {
+      if (named[k].slot === 'Wings') hasWings = true;
+      if (/lagoon|tank|deep|aquatic/i.test(named[k].name + ' ' + (named[k].trait || ''))) aquatic = true;
+    }
+    var cls = 'Stitched Wonder';
+    if (hasWings) cls = 'Aerial Abomination';
+    else if (aquatic) cls = 'Deep-Sea Marvel';
+    else if (named.length >= 8) cls = 'Grand Chimera';
+    else if (named.length >= 4) cls = 'Lesser Chimera';
+    var byPower = named.slice().sort(function (a, b) { return (b.power || 5) - (a.power || 5); });
+    var abilities = [], m;
+    for (m = 0; m < Math.min(6, byPower.length); m++)
+      abilities.push(byPower[m].trait + ' (' + byPower[m].name + ')');
+    if (!abilities.length) abilities = base ? base.abilities.slice(0, 4) : ['being alive (mostly)'];
+    var tot = 0;
+    for (m = 0; m < named.length; m++) tot += (named[m].power || 5);
+    var avg = named.length ? tot / named.length : 5;
+    var stats = {
+      power: Math.min(99, Math.round(avg * 9 + rng() * 9)),
+      cunning: Math.min(99, Math.round(rng() * 80 + 10)),
+      chaos: Math.min(99, Math.round(rng() * 90 + 5)),
+      stability: Math.min(99, Math.round(100 - rng() * 60))
+    };
+    var bits = [];
+    for (m = 0; m < Math.min(3, named.length); m++) bits.push('the ' + named[m].name.toLowerCase());
+    var desc = 'Forged on the slab' + (base ? ' from the ' + base.name + ' archetype' : ' from a blank slab') + '. ';
+    if (bits.length) desc += 'It wakes with ' + bits.join(', ') + (bits.length > 1 ? ' all humming at once. ' : ' humming softly. ');
+    desc += 'Classified as a ' + cls + ': power ' + stats.power + ', cunning ' + stats.cunning +
+      ', chaos ' + stats.chaos + ', stability ' + stats.stability + '. ';
+    desc += labPick(rng, ['The lab assistants have named it ', 'It answers (sometimes) to ', 'The brass plaque reads ']) +
+      name + '. Handle with tongs.';
+    var creation = {
+      stamp: 'JAH-LAB-' + h.slice(0, 6), name: name, cls: cls, description: desc,
+      abilities: abilities, stats: stats, baseName: base ? base.name : 'Blank Slab',
+      pickCount: flat.length, seed: h, svg: ''
+    };
+    creation.svg = labPortrait(creation, mulberry32((parseInt(h, 36) % 2147483647) ^ 0x9e37));
+    return creation;
+  }
+
+  // labDemo(creation): a real client-side field test of the creation.
+  function labDemo(c) {
+    var s = c.stats || { power: 50, cunning: 50, chaos: 50, stability: 50 };
+    var verdict = s.stability >= 60 ? 'STABLE \u2014 it may be kept.' :
+      (s.stability >= 35 ? 'WOBBLY \u2014 keep the tongs handy.' : 'CRITICAL \u2014 do not feed after midnight.');
+    return 'Field test: ' + c.name + ' (' + c.cls + ').\n' +
+      'Power ' + s.power + ' / Cunning ' + s.cunning + ' / Chaos ' + s.chaos + ' / Stability ' + s.stability + '.\n' +
+      'Signature move: ' + (c.abilities[0] || 'existing loudly') + '.\nVerdict: ' + verdict;
+  }
+
+  // creationToAI(creation): a dialable AI record for the creation, so the
+  // phone book and this page can chat with anything the lab animates.
+  function creationToAI(c) {
+    var rules = [{ k: ['who are you', 'your name'],
+      r: ['I am ' + c.name + ', ' + c.cls + ', animated in the Mad Scientist Creation Lab (' + c.stamp + ').',
+          'They call me ' + c.name + '. The lab made me from ' + c.pickCount + ' fine components.'] }];
+    var i, kw;
+    for (i = 0; i < Math.min(5, c.abilities.length); i++) {
+      kw = c.abilities[i].split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+      if (kw.length > 2) rules.push({ k: [kw],
+        r: ['My ' + c.abilities[i] + ' is fully operational!', 'Ah, ' + c.abilities[i] + ' \u2014 my finest feature.'] });
+    }
+    return {
+      id: String(c.stamp).toLowerCase(), name: c.name, stamp: c.stamp, kind: 'persona',
+      mentality: c.description, abilities: c.abilities,
+      greeting: 'BZZZT! I am ' + c.name + ', fresh from the slab! ' + c.cls + ', at your service... probably.',
+      rules: rules, fallback: ['BZZT! Ask me about my parts!',
+        'The lab built me from ' + c.pickCount + ' components. What do you want to know?'],
+      demoKind: 'guided', demoTitle: 'Field test'
+    };
+  }
+
   /* ---------- self test ---------- */
 
   function selfTest() {
@@ -1163,9 +1242,9 @@ if __name__=='__main__':
     out.push(['dial-demo', sd.indexOf('2') >= 0]);
     var sh = s.hangup();
     out.push(['dial-hangup', s.lineOpen === false && /closed/.test(s.say('hello')) && /ended/.test(sh)]);
-    // presets(): 10 options; loadPreset(): full directory-grade record.
+    // presets(): 6 deduped archetypes; loadPreset(): full directory-grade record.
     var ps = presets();
-    out.push(['presets-10', ps.length === 10]);
+    out.push(['presets-6', ps.length === 6]);
     var lp = loadPreset('Jesus AI');
     out.push(['preset-record', !!lp && lp.stamp === 'JAH-AI-PRE-001' &&
       lp.abilities.length >= 4 && lp.params.length >= 4 &&
@@ -1173,6 +1252,23 @@ if __name__=='__main__':
       lp.fallback.length >= 4 && lp.fallback.indexOf(lp.greeting) < 0 &&
       !!lp.demoTitle && !!lp.demoKind && !!lp.demoHTML && !!lp.py]);
     opperaterSelfTest(out);
+    // Mad Scientist Creation Lab checks.
+    var par = loadPreset('saint');
+    out.push(['legacy-alias', !!par && par.name === 'Celestial Paragon AI']);
+    var go = geneOptions(false);
+    var gcount = go.reduce(function (n, sl) { return n + sl.options.length; }, 0);
+    out.push(['genes-expanded', gcount >= 170]);
+    out.push(['lab-catalogs', labCatalogs().length === 8]);
+    out.push(['lab-parts', labOptions('parts').length === 336]);
+    var lc = labCatalogs().reduce(function (n, c) { return n + c.count; }, 0);
+    out.push(['lab-1000-options', lc >= 1000]);
+    var c1 = animateCreation({ base: 'paragon', picks: { parts: ['BP00-00', 'BP09-03'], brains: ['BR-00'], power: ['PW-00'] } });
+    var c2 = animateCreation({ base: 'paragon', picks: { power: ['PW-00'], brains: ['BR-00'], parts: ['BP09-03', 'BP00-00'] } });
+    out.push(['lab-deterministic', c1.stamp === c2.stamp && c1.name === c2.name && c1.svg === c2.svg]);
+    out.push(['lab-record', !!c1.stamp && c1.stamp.indexOf('JAH-LAB-') === 0 && c1.abilities.length > 0]);
+    var cs = dial(creationToAI(c1));
+    out.push(['lab-dialable', typeof cs.say('hello') === 'string' && cs.say('hello').length > 0]);
+    out.push(['lab-demo', labDemo(c1).indexOf('Field test') === 0]);
     var pass = out.every(function (x) { return x[1]; });
     return { pass: pass, checks: out };
   }
@@ -1263,6 +1359,11 @@ if __name__=='__main__':
     genomeViable: genomeViable,
     fileRecord: fileRecord,
     tones: tones,
+    labCatalogs: labCatalogs,
+    labOptions: labOptions,
+    animateCreation: animateCreation,
+    creationToAI: creationToAI,
+    labDemo: labDemo,
     selfTest: selfTest
   };
 })();

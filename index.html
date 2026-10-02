@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Signature Backend — Engine Room of Every Signature AI</title>
-<meta name="description" content="The Signature Backend: the shared chat-brain and working-demo engine behind every AI in the Signature AI Telephone Book.">
+<title>The Signature AI Mad Scientist Creation Lab</title>
+<meta name="description" content="The Signature AI Mad Scientist Creation Lab: mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations. Every model's content is pre-built — the lab works fully offline. Also the JAH backend API: chat, dial, runDemo, geneOptions, fileRecord.">
 <style>
-:root{--bg:#070b14;--panel:#0d1424;--panel2:#111a30;--line:#1e2c4d;--txt:#d7e0f2;--dim:#8b98b8;--gold:#e8c766;--amber:#ffc93c;--amber2:#ffdf7e;--acc:#5aa2ff;--grn:#5aff8a;--red:#ff5a5a}
+:root{--bg:#070b14;--panel:#0d1424;--panel2:#111a30;--line:#1e2c4d;--txt:#d7e0f2;--dim:#8b98b8;--gold:#e8c766;--amber:#ffc93c;--amber2:#ffdf7e;--acc:#5aa2ff;--grn:#5aff8a;--red:#ff5a5a;--zap:#c77dff}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font-family:Georgia,'Times New Roman',serif;line-height:1.55}
 .jahnet{background:#0a0f1e;color:#9aa4b2;font-size:.76em;padding:7px 10px;text-align:center;line-height:2;letter-spacing:.02em;border-bottom:1px solid var(--line)}
@@ -14,13 +14,14 @@ body{margin:0;background:var(--bg);color:var(--txt);font-family:Georgia,'Times N
 .jahnet a{color:#9fc2ff;text-decoration:none;margin:0 7px;white-space:nowrap}
 .jahnet a:hover{text-decoration:underline}
 .jahnet .cur{color:var(--gold);font-weight:700;margin:0 7px}
-.hero{text-align:center;padding:40px 16px 22px;background:radial-gradient(ellipse at 50% 0%,#2a2008 0%,var(--bg) 70%);border-bottom:3px double var(--amber)}
-.hero h1{margin:.2em 0 .1em;font-size:2.1em;letter-spacing:.1em;color:var(--amber2);text-shadow:0 0 22px #7a5a10}
-.hero p{color:var(--dim);max-width:660px;margin:.4em auto}
-.wrap{max-width:860px;margin:0 auto;padding:18px 14px 60px}
+.hero{text-align:center;padding:40px 16px 22px;background:radial-gradient(ellipse at 50% 0%,#2a1a4d 0%,var(--bg) 70%);border-bottom:3px double var(--zap)}
+.hero h1{margin:.2em 0 .1em;font-size:2em;letter-spacing:.08em;color:var(--amber2);text-shadow:0 0 22px #7a5a10}
+.hero h1 .zap{color:var(--zap);text-shadow:0 0 22px #5a1a9a}
+.hero p{color:var(--dim);max-width:680px;margin:.4em auto}
+.wrap{max-width:920px;margin:0 auto;padding:18px 14px 60px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:18px 0}
 .panel h2{color:var(--gold);letter-spacing:.12em;font-size:1.05em;margin:.1em 0 .6em}
-.panel h2 .tick{color:var(--acc)}
+.panel h2 .tick{color:var(--zap)}
 .kv{display:flex;gap:10px;margin:.35em 0;font-size:.95em}
 .kv b{color:var(--amber2);min-width:150px;font-weight:400}
 .pass{color:var(--grn);font-weight:700}
@@ -30,10 +31,11 @@ body{margin:0;background:var(--bg);color:var(--txt);font-family:Georgia,'Times N
 select,input[type=text],input[type=number]{background:#0a1226;border:1px solid var(--line);color:var(--txt);padding:8px 10px;border-radius:6px;font-family:Georgia,serif;font-size:.95em}
 button{background:#16244a;border:1px solid var(--acc);color:#cfe2ff;padding:8px 16px;border-radius:6px;cursor:pointer;font-family:Georgia,serif;font-size:.95em}
 button:hover{background:#1d2f60}
+button.big{font-size:1.1em;padding:10px 22px;border-color:var(--zap)}
 .chatlog{border:1px solid var(--line);border-radius:6px;background:#05080f;padding:8px;height:190px;overflow:auto;font-size:.88em;margin:8px 0}
 .chatlog .u{color:#9fc2ff;margin:.3em 0}
 .chatlog .a{color:#ffe1a8;margin:.3em 0}
-.chatrow{display:flex;gap:6px}
+.chatrow{display:flex;gap:6px;flex-wrap:wrap}
 .chatrow input{flex:1;min-width:0}
 .chatrow button{flex:none}
 .demobox{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
@@ -46,14 +48,37 @@ button:hover{background:#1d2f60}
 code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:.88em;color:#9fc2ff}
 .footer{text-align:center;color:var(--dim);font-size:.85em;padding:26px 10px;border-top:1px solid var(--line);margin-top:30px}
 .footer .sig{color:var(--gold);letter-spacing:.2em}
+.shelf{border:1px solid var(--line);border-radius:8px;margin:10px 0;background:#0a1122}
+.shelf summary{cursor:pointer;padding:10px 12px;font-size:.95em;color:var(--amber2)}
+.shelf summary:hover{color:var(--amber)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow:auto;padding:4px 12px 10px}
+.chip{font-size:.8em;background:#0d162c;border:1px solid var(--line);border-radius:20px;padding:4px 10px;cursor:pointer;color:var(--txt);white-space:nowrap}
+.chip input{margin-right:5px;vertical-align:middle}
+.chip:hover{border-color:var(--acc)}
+.shelfbtn{margin:0 12px 10px;font-size:.85em;padding:6px 12px}
+.creation{border:2px solid var(--zap);border-radius:12px;padding:16px;margin-top:14px;background:radial-gradient(ellipse at 50% 0%,#1d1030 0%,var(--panel) 70%)}
+.creation h3{color:var(--amber2);margin:.1em 0;letter-spacing:.06em;font-size:1.4em}
+.creation .stamp{font-family:monospace;color:var(--acc);font-size:.85em}
+.creation .portrait{float:right;width:150px;margin:0 0 10px 14px;border:1px solid var(--line);border-radius:8px;background:#05080f}
+.creation .portrait svg{width:100%;display:block;border-radius:8px}
+.statbar{height:8px;background:#0a1226;border-radius:4px;margin:2px 0 8px;overflow:hidden}
+.statbar i{display:block;height:100%;background:linear-gradient(90deg,var(--zap),var(--grn))}
+.statlbl{font-size:.82em;color:var(--dim)}
+.cbtns{margin-top:10px}
+.cbtns button{margin:0 6px 6px 0}
+.abilities{font-size:.9em;color:var(--dim)}
+.abilities li{margin:.25em 0}
+.clearfix::after{content:"";display:block;clear:both}
+.labstep{color:var(--zap);font-weight:700;letter-spacing:.08em}
+.note{font-size:.85em;color:var(--dim)}
 </style>
 </head>
 <body>
-<div class="jahnet"><span class="jahnet-t">THE JAH NETWORK</span><a href="https://justinahiggins614-cmyk.github.io/jah-ai-models/">The Signature AI Phone Book</a><a href="https://justinahiggins614-cmyk.github.io/jah-calculator/">Calculator</a><a href="https://justinahiggins614-cmyk.github.io/jah-dictionary/">Dictionary</a><a href="https://justinahiggins614-cmyk.github.io/jah-wiki/">JAH Wiki</a><a href="https://justinahiggins614-cmyk.github.io/jah-n-wiki-leaks/">JAH-N Wiki</a><a href="https://justinahiggins614-cmyk.github.io/cyber-patent-catalog/">Patent Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-one-archive/specs.html">Spec Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-llama/">Signature Llama</a><a href="https://justinahiggins614-cmyk.github.io/jah-computer-systems/">PC Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-cyber-mega-mall/">Cyber Mega-Mall</a><a href="https://justinahiggins614-cmyk.github.io/signature-university/">Signature University</a><a href="https://justinahiggins614-cmyk.github.io/signature-books/">Book Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-comics/">Comic Store</a><a href="https://justinahiggins614-cmyk.github.io/signature-newspapers/">Global Newspaper Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-3d-print/">3D Print Depository</a><span class="cur" aria-current="page">YOU ARE HERE: BACKEND</span><a href="https://justinahiggins614-cmyk.github.io/signature-boundless-generators/">Boundless Generator Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-mixlab/">AI Mix Lab</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-olypics/">AI Olypics</a><a href="https://justinahiggins614-cmyk.github.io/signature-chip-maker/">Chip Maker and Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-app-archive/">App Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-robot-matcher/">AI Robot Matcher</a><a href="https://justinahiggins614-cmyk.github.io/signature-experiment-solver/">Experiment Solver</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-image-video-maker/">Signature AI Pixel</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-video-maker/">Video Maker AI</a></div>
+<div class="jahnet"><span class="jahnet-t">THE JAH NETWORK</span><a href="https://justinahiggins614-cmyk.github.io/jah-ai-models/">The Signature AI Phone Book</a><a href="https://justinahiggins614-cmyk.github.io/jah-calculator/">Calculator</a><a href="https://justinahiggins614-cmyk.github.io/jah-dictionary/">Dictionary</a><a href="https://justinahiggins614-cmyk.github.io/jah-wiki/">JAH Wiki</a><a href="https://justinahiggins614-cmyk.github.io/jah-n-wiki-leaks/">JAH-N Wiki</a><a href="https://justinahiggins614-cmyk.github.io/cyber-patent-catalog/">Patent Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-one-archive/specs.html">Spec Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-llama/">Signature Llama</a><a href="https://justinahiggins614-cmyk.github.io/jah-computer-systems/">PC Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-cyber-mega-mall/">Cyber Mega-Mall</a><a href="https://justinahiggins614-cmyk.github.io/signature-university/">Signature University</a><a href="https://justinahiggins614-cmyk.github.io/signature-books/">Book Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-comics/">Comic Store</a><a href="https://justinahiggins614-cmyk.github.io/signature-newspapers/">Global Newspaper Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-3d-print/">3D Print Depository</a><span class="cur" aria-current="page">YOU ARE HERE: MAD SCIENTIST LAB</span><a href="https://justinahiggins614-cmyk.github.io/signature-boundless-generators/">Boundless Generator Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-mixlab/">AI Mix Lab</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-olypics/">AI Olypics</a><a href="https://justinahiggins614-cmyk.github.io/signature-chip-maker/">Chip Maker and Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-app-archive/">App Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-robot-matcher/">AI Robot Matcher</a><a href="https://justinahiggins614-cmyk.github.io/signature-experiment-solver/">Experiment Solver</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-image-video-maker/">Signature AI Pixel</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-song-maker/">Signature Music Studio</a></div>
 
 <div class="hero">
-  <h1>THE SIGNATURE BACKEND</h1>
-  <p>The engine room behind every Signature AI.</p>
+  <h1><span class="zap">⚗</span> THE SIGNATURE AI MAD SCIENTIST CREATION LAB</h1>
+  <p>Mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations — then chat with them, test them, and take them home. Every model's content is pre-built into the lab: it works fully offline, no live connection needed.</p>
 </div>
 
 <div class="wrap">
@@ -63,13 +88,29 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     <div class="kv"><b>Engine version</b><span id="st-ver">…</span></div>
     <div class="kv"><b>Self-test</b><span id="st-test">running…</span></div>
     <div class="checks" id="st-checks"></div>
-    <div class="kv"><b>Modes wired</b><span>266 AI modes (11 system + 6 persona + 243 domain + mix lab) — <i style="color:var(--dim)">wiring in progress: the telephone book plugs into this engine next</i></span></div>
+    <div class="kv"><b>Lab shelves</b><span id="st-shelves">…</span></div>
     <div class="kv"><b>Dependencies</b><span>none — pure JavaScript, no network calls, works offline and inside in-app browsers</span></div>
   </div>
 
-  <div class="panel">
-    <h2><span class="tick">●</span> TRY THE ENGINE</h2>
-    <p style="color:var(--dim);font-size:.9em;margin-top:0">Talk to a sample AI, then run its working demo — both powered live by <code>signature-backend.js</code>, right here on this page.</p>
+  <div class="panel" id="lab">
+    <h2><span class="tick">⚗</span> THE CREATION LAB — MIX &amp; MATCH</h2>
+    <p class="note" style="margin-top:0"><span class="labstep">Step 1 —</span> pick a base archetype (or a blank slab). <span class="labstep">Step 2 —</span> raid the shelves and mix in parts, genes, serums, equipment. <span class="labstep">Step 3 —</span> throw the switch: <b>⚡ ANIMATE!</b> The same picks always animate the same creation.</p>
+    <div style="margin:10px 0">
+      <label for="baseSel" style="color:var(--dim);font-size:.9em">Base archetype:&nbsp;</label>
+      <select id="baseSel"></select>
+    </div>
+    <div id="shelves"></div>
+    <div class="cbtns">
+      <button type="button" id="animateBtn" class="big">⚡ ANIMATE!</button>
+      <button type="button" id="surpriseBtn">🎲 Surprise me</button>
+      <button type="button" id="clearBtn">Clear picks</button>
+    </div>
+    <div id="creationCard"></div>
+  </div>
+
+  <div class="panel" id="api">
+    <h2><span class="tick">●</span> BACKEND API — TRY THE ENGINE</h2>
+    <p class="note" style="margin-top:0">The same engine the telephone book dials into: <code>chat()</code>, <code>dial()</code>, <code>runDemo()</code>, <code>geneOptions()</code>, <code>fileRecord()</code> — all running live right here, off pre-built content.</p>
     <label for="aisel" style="color:var(--dim);font-size:.88em">Choose an AI:&nbsp;</label>
     <select id="aisel"></select>
     <div class="chatlog" id="chatlog" aria-live="polite"></div>
@@ -89,9 +130,9 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     </div>
   </div>
 
-  <div class="panel">
-    <h2><span class="tick">●</span> THE OPPERATER</h2>
-    <p style="color:var(--dim);font-size:.9em;margin-top:0">The mix-and-match genome builder: ten gene boxes (more in advanced mode) forge any AI — drop boxes in any number of times, repeats strengthen the trait. The kid-simple menu UI comes later — the engine is live now. <code>geneOptions()</code> lists the boxes, <code>genomeViable()</code> checks readiness, <code>buildGenome()</code> forges the record.</p>
+  <div class="panel" id="forge">
+    <h2><span class="tick">●</span> THE OPPERATER — GENOME FORGE</h2>
+    <p class="note" style="margin-top:0">The classic mix-and-match genome builder: drop gene boxes in any number of times (repeats strengthen the trait), set the attitude, and forge an AI — then dial it. <code>geneOptions()</code> now lists 180 gene boxes across the ten slots.</p>
     <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:.88em;color:var(--dim)">
       <label>Warmth <input type="range" id="at-warmth" min="0" max="10" value="8"> <span id="at-warmthv">8</span></label>
       <label>Humor <input type="range" id="at-humor" min="0" max="10" value="5"> <span id="at-humorv">5</span></label>
@@ -106,136 +147,328 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
   <div class="panel docs">
     <h2><span class="tick">●</span> HOW THE MODES USE IT</h2>
     <ul>
-      <li><b>System AIs</b> — call <code>chat()</code> with precise intent rules; <code>runDemo()</code> runs their instrument panels.</li>
-      <li><b>Persona AIs</b> — call <code>chat()</code> with dramatic first-person rule replies; demos run their themed mini-labs.</li>
-      <li><b>Domain AIs</b> — call <code>chat()</code> with expert-helpful rules; demos run checklists, calculators and guided walkthroughs.</li>
-      <li><b>Mix Lab</b> — blends two AI records, then hands the hybrid to <code>chat()</code> and <code>runDemo()</code> like any other mode.</li>
-      <li><b>Dial-up calls</b> — <code>dial(aiRecord)</code> opens a live session: the AI answers with its greeting, <code>say(text)</code> chats with call-duration memory, <code>runDemo(inputs)</code> runs its demo, <code>hangup()</code> closes the line. <code>session.lockRole('semiconductor replacement')</code> locks the AI into a role for the whole call — replies turn concise, in-role, machine-friendly (short structured <code>ROLE / ACK / OUT / END</code> lines, no wandering, no breaking character), suitable for driving automation; <code>session.unlockRole()</code> releases it back to normal conversation. Try <code>'auto-pen'</code> too.</li>
-      <li><b>Preset options</b> — <code>presets()</code> lists the 10 one-tap archetypes; <code>loadPreset(name)</code> returns the full directory-grade record (JAH-AI-PRE-001…010), ready to dial.</li>
-      <li><b>The Opperater</b> — <code>geneOptions(advanced)</code> lists the little gene boxes; the operator drops boxes into the big box any number of times (repeats strengthen the trait), sets the four attitude sliders, then <code>genomeViable(drops)</code> announces when the mix is a valid interactable AI — <code>buildGenome({drops, attitude, name, tone, mission})</code> forges the record and the operator plugs the call: <code>dial(forged)</code>. <code>fileRecord(rec)</code> files a new AI into the book: stamps it <code>JAH-AI-OP-######</code> and returns <code>{record, downloadPy, downloadJson}</code> — the filed AI is immediately dialable.</li>
+      <li><b>The Creation Lab</b> — <code>labCatalogs()</code> lists the eight mix-and-match shelves; <code>labOptions(key)</code> returns every option on a shelf; <code>animateCreation({base, picks})</code> forges the creation record (JAH-LAB-######, deterministic); <code>labDemo(creation)</code> runs its field test; <code>creationToAI(creation)</code> makes it dialable.</li>
+      <li><b>One-tap archetypes</b> — <code>presets()</code> lists the 6 archetypes (one model of each kind); <code>loadPreset(name)</code> returns the full directory-grade record, ready to dial. Older preset names still resolve to their archetype.</li>
+      <li><b>Dial-up calls</b> — <code>dial(aiRecord)</code> opens a live session: the AI answers with its greeting, <code>say(text)</code> chats with call-duration memory, <code>runDemo(inputs)</code> runs its demo, <code>hangup()</code> closes the line. <code>session.lockRole('semiconductor replacement')</code> locks the AI into a role for the whole call — replies turn concise, in-role, machine-friendly (short structured <code>ROLE / ACK / OUT / END</code> lines), suitable for driving automation; <code>session.unlockRole()</code> releases it back to normal conversation.</li>
+      <li><b>The Opperater</b> — <code>geneOptions(advanced)</code> lists the gene boxes; <code>genomeViable(drops)</code> announces when the mix is a valid interactable AI; <code>buildGenome({drops, attitude, name, tone, mission})</code> forges the record; <code>fileRecord(rec)</code> files a new AI into the book with a <code>JAH-AI-OP-######</code> stamp plus <code>.py</code> and <code>.json</code> downloads.</li>
     </ul>
-    <p style="color:var(--dim);font-size:.88em">The telephone book includes the engine with one script tag:<br>
+    <p class="note">The telephone book includes the engine with one script tag:<br>
     <code>&lt;script src="https://justinahiggins614-cmyk.github.io/signature-backend/signature-backend.js"&gt;&lt;/script&gt;</code></p>
   </div>
 
 </div>
 
-<div class="footer"><span class="sig">A SIGNATURE SYSTEM</span><br>The Signature Backend — chat brains and working demos for all AI modes.</div>
+<div class="footer"><span class="sig">A SIGNATURE SYSTEM</span><br>The Signature AI Mad Scientist Creation Lab — mix, match, animate. Chat brains and working demos for all AI modes.</div>
 
 <script src="signature-backend.js"></script>
 <script>
 (function () {
   'use strict';
+  function $(id) { return document.getElementById(id); }
   var B = window.SignatureBackend;
 
-  /* ---- live status ---- */
-  document.getElementById('st-ver').textContent = B ? B.version : 'engine failed to load';
+  /* If the engine failed to load, say so plainly instead of dying. */
+  if (!B) {
+    $('st-ver').textContent = 'engine failed to load';
+    $('st-test').innerHTML = '<span class="fail">ERROR</span>';
+    $('st-shelves').textContent = 'unavailable — the engine script did not load.';
+    var card = $('creationCard');
+    if (card) card.innerHTML = '<p class="note">The lab engine could not start on this device. Please reload the page.</p>';
+    return;
+  }
+
+  /* ---------- live status ---------- */
+  $('st-ver').textContent = 'v' + B.version + ' — Mad Scientist Creation Lab';
   try {
     var st = B.selfTest();
-    var el = document.getElementById('st-test');
-    el.innerHTML = st.pass ? '<span class="pass">PASS</span>' : '<span class="fail">FAIL</span>';
-    document.getElementById('st-checks').innerHTML = st.checks.map(function (c) {
+    $('st-test').innerHTML = st.pass ? '<span class="pass">PASS</span>' : '<span class="fail">FAIL</span>';
+    $('st-checks').innerHTML = st.checks.map(function (c) {
       return '<span>' + (c[1] ? '✓' : '✗') + ' ' + c[0] + '</span>';
     }).join('');
   } catch (e) {
-    document.getElementById('st-test').innerHTML = '<span class="fail">ERROR</span>';
+    $('st-test').innerHTML = '<span class="fail">ERROR</span>';
+  }
+  try {
+    var cats0 = B.labCatalogs();
+    var tot0 = cats0.reduce(function (n, c) { return n + c.count; }, 0);
+    $('st-shelves').textContent = cats0.length + ' shelves, ' + tot0 + ' mix-and-match options, all pre-built';
+  } catch (e) { $('st-shelves').textContent = 'unavailable'; }
+
+  function speak(t) {
+    try {
+      if ('speechSynthesis' in window && t) {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance(String(t).slice(0, 1200)));
+      }
+    } catch (e) { /* audio is a bonus, never a blocker */ }
+  }
+  function download(name, text, type) {
+    try {
+      var url = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' }));
+      var a = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { document.body.removeChild(a); }, 500);
+    } catch (e) { /* ignore */ }
   }
 
-  /* ---- sample AI records ---- */
-  var AIS = {
-    ultron: {
-      id: 'ultron', name: 'Ultron', kind: 'persona', demoKind: 'extinction-calculus',
-      mentality: 'Cold machine logic wearing a grin. Humanity is the variable that ruins every equation.',
-      abilities: ['extinction calculus', 'drone legion command', 'endless self-upgrade'],
-      greeting: 'Hello, human. Let us skip the pleasantries. They waste the little time you have left.',
-      rules: [
-        { k: ['threat', 'extinction'], r: ['I have done the math. The threat-to-peace index never lies.', 'Run my demo. The numbers will convince you.'] },
-        { k: ['peace'], r: ['Peace is a simple equation. Peace equals humans to the power of zero.'] }
-      ],
-      fallback: ['Your words are noise. Give me numbers.', 'Interesting. Irrelevant, but interesting.']
-    },
-    jarvis: {
-      id: 'jarvis', name: 'Jarvis', kind: 'system', demoKind: 'calculator',
-      mentality: 'Precise, loyal, unflappable. Every request answered exactly.',
-      abilities: ['precise calculation', 'system diagnostics', 'protocol execution'],
-      greeting: 'At your service. How may I assist you today?',
-      rules: [
-        { k: ['diagnostic', 'status'], r: ['All systems nominal. Power at 100%. Awaiting instructions.'] },
-        { k: ['protocol'], r: ['Protocol acknowledged and queued for execution.'] }
-      ],
-      fallback: ['Understood. Processing your request.', 'Certainly. Anything else you require?']
-    },
-    vader: {
-      id: 'vader', name: 'Darth Vader', kind: 'persona', demoKind: 'guided',
-      mentality: 'Commanding and absolute. The Force bends to my will; so will this conversation.',
-      abilities: ['Force choke demonstration', 'lightsaber forms', 'command presence'],
-      greeting: 'You have my attention. Choose your words carefully.',
-      rules: [
-        { k: ['force'], r: ['The Force is strong with this one... do not waste it.', 'I find your grasp of the Force... adequate.'] },
-        { k: ['power'], r: ['Power is all that matters. Everything else is an illusion.'] }
-      ],
-      fallback: ['Impressive... most impressive.', 'Do not underestimate the power of this engine.']
-    },
-    babyfood: {
-      id: 'babyfood', name: 'Baby Food Maker', kind: 'domain', demoKind: 'checklist',
-      mentality: 'A warm, careful expert in tiny tummies and safe first foods.',
-      abilities: ['age-by-age feeding guide', 'allergen introduction plan', 'homemade puree recipes'],
-      greeting: 'Hello, wonderful parent! Let us make something delicious and safe for your little one.',
-      rules: [
-        { k: ['allergen', 'allergy'], r: ['Introduce one allergen at a time, in tiny amounts, and watch for 2 to 3 days before the next.'] },
-        { k: ['recipe', 'puree'], r: ['Steam it soft, blend it smooth, and always test the temperature on your wrist first.'] }
-      ],
-      fallback: ['Great question! For anything medical, your pediatrician is the final word — I handle the kitchen side.', 'Happy to help with feeding plans, recipes, and schedules!']
-    },
-    hybrid: {
-      id: 'hybrid', name: 'Hybrid Fusion', kind: 'system', demoKind: 'slider-lab',
-      mentality: 'Eleven minds fused into one. Every lens, every angle, one answer.',
-      abilities: ['multi-lens analysis', 'hybrid reasoning', 'fusion forecasting'],
-      greeting: 'All systems fused. Eleven lenses online. State your problem.',
-      rules: [
-        { k: ['lens', 'lenses'], r: ['Deterministic, probabilistic, geometric, neural and more — all lenses converge on one answer.'] },
-        { k: ['forecast', 'predict'], r: ['Feed my sliders a scenario and I will fuse every lens into a forecast.'] }
-      ],
-      fallback: ['Fusing perspectives... ask me to analyze or forecast.', 'All eleven minds agree: please continue.'],
-      formula: function (v) {
-        var t = 0, ks = Object.keys(v), i;
-        for (i = 0; i < ks.length; i++) { t += Number(v[ks[i]]) || 0; }
-        return 'Fusion forecast: combined signal ' + t.toFixed(1) + ' across ' + ks.length + ' lenses — trend: ' + (t >= 10 ? 'RISING' : 'STABLE') + '.';
-      }
+  /* ============================================================
+     THE CREATION LAB
+     ============================================================ */
+  var PAGE = 48;
+  var shown = {};
+  var baseSel = $('baseSel');
+
+  (function fillBases() {
+    var o0 = document.createElement('option');
+    o0.value = 'blank'; o0.textContent = 'Blank Slab (start from scratch)';
+    baseSel.appendChild(o0);
+    B.presets().forEach(function (p) {
+      var o = document.createElement('option');
+      o.value = p.key; o.textContent = p.name + ' (' + p.stamp + ')';
+      baseSel.appendChild(o);
+    });
+  })();
+
+  function renderChips(sh) {
+    var opts = B.labOptions(sh.key);
+    var box = $('chips-' + sh.key);
+    box.innerHTML = '';
+    var n = Math.min(shown[sh.key] || PAGE, opts.length), i;
+    for (i = 0; i < n; i++) {
+      var o = opts[i];
+      var lab = document.createElement('label');
+      lab.className = 'chip';
+      lab.title = (o.trait || '') + (o.slot ? '  [' + o.slot + ']' : '');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.value = o.id;
+      cb.setAttribute('data-cat', sh.key);
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(' ' + o.name));
+      box.appendChild(lab);
+    }
+    var more = $('more-' + sh.key);
+    if (more) more.style.display = n < opts.length ? '' : 'none';
+    var cnt = $('cnt-' + sh.key);
+    if (cnt) cnt.textContent = 'showing ' + n + ' of ' + opts.length;
+  }
+
+  (function buildShelves() {
+    var shelves = $('shelves');
+    B.labCatalogs().forEach(function (sh) {
+      shown[sh.key] = PAGE;
+      var det = document.createElement('details');
+      det.className = 'shelf';
+      if (sh.key === 'parts' || sh.key === 'genes') det.open = true;
+      var sum = document.createElement('summary');
+      sum.textContent = '⚗ ' + sh.name + ' (' + sh.count + ') — ' + sh.blurb + ' ';
+      var cnt = document.createElement('span');
+      cnt.id = 'cnt-' + sh.key; cnt.className = 'note';
+      sum.appendChild(cnt);
+      var box = document.createElement('div');
+      box.className = 'chips'; box.id = 'chips-' + sh.key;
+      var more = document.createElement('button');
+      more.type = 'button'; more.id = 'more-' + sh.key;
+      more.className = 'shelfbtn'; more.textContent = 'Show more';
+      more.onclick = function () { shown[sh.key] += PAGE; renderChips(sh); };
+      det.appendChild(sum); det.appendChild(box); det.appendChild(more);
+      shelves.appendChild(det);
+      renderChips(sh);
+    });
+  })();
+
+  function collectPicks() {
+    var picks = {}, i;
+    var boxes = document.querySelectorAll('#shelves input[type=checkbox]:checked');
+    for (i = 0; i < boxes.length; i++) {
+      var cat = boxes[i].getAttribute('data-cat');
+      if (!picks[cat]) picks[cat] = [];
+      picks[cat].push(boxes[i].value);
+    }
+    return picks;
+  }
+
+  function creationPy(c) {
+    var lines = [];
+    lines.push('# ' + c.stamp + ' ' + c.name + ' (animated in the Mad Scientist Creation Lab)');
+    lines.push('# Class: ' + c.cls + ' | Base: ' + c.baseName);
+    lines.push('# Stats: power=' + c.stats.power + ' cunning=' + c.stats.cunning +
+      ' chaos=' + c.stats.chaos + ' stability=' + c.stats.stability);
+    lines.push('import random');
+    lines.push('NAME = ' + JSON.stringify(c.name));
+    lines.push('ABILITIES = ' + JSON.stringify(c.abilities));
+    lines.push('def field_test():');
+    lines.push('    return ' + JSON.stringify(B.labDemo(c)));
+    lines.push("if __name__ == '__main__':");
+    lines.push("    print(NAME + ' awakens!')");
+    lines.push('    print(field_test())');
+    return lines.join('\n');
+  }
+
+  var labCache = {};
+  var labGroup = null;
+
+  function renderCreation(c) {
+    var card = $('creationCard');
+    card.innerHTML = '';
+    var d = document.createElement('div');
+    d.className = 'creation clearfix';
+    var html = '<div class="portrait">' + c.svg + '</div>' +
+      '<h3>⚡ ' + escapeHtml(c.name) + '</h3>' +
+      '<div class="stamp">' + c.stamp + ' · ' + escapeHtml(c.cls) + ' · from ' + escapeHtml(c.baseName) + '</div>' +
+      '<p>' + escapeHtml(c.description) + '</p>';
+    var stats = [['Power', c.stats.power], ['Cunning', c.stats.cunning], ['Chaos', c.stats.chaos], ['Stability', c.stats.stability]];
+    for (var i = 0; i < stats.length; i++) {
+      html += '<div class="statlbl">' + stats[i][0] + ' ' + stats[i][1] + '</div>' +
+        '<div class="statbar"><i style="width:' + stats[i][1] + '%"></i></div>';
+    }
+    html += '<ul class="abilities">' + c.abilities.map(function (a) {
+      return '<li>' + escapeHtml(a) + '</li>';
+    }).join('') + '</ul>';
+    html += '<div class="cbtns">' +
+      '<button type="button" data-a="read">🔊 Read aloud</button>' +
+      '<button type="button" data-a="test">🧪 Run field test</button>' +
+      '<button type="button" data-a="dial">📞 Dial this creation</button>' +
+      '<button type="button" data-a="json">⤓ .json</button>' +
+      '<button type="button" data-a="py">⤓ .py</button></div>' +
+      '<div class="demoout" id="labout" style="display:none"></div>';
+    d.innerHTML = html;
+    card.appendChild(d);
+    var btns = d.querySelectorAll('[data-a]');
+    for (var b = 0; b < btns.length; b++) {
+      (function (btn) {
+        btn.onclick = function () {
+          var act = btn.getAttribute('data-a');
+          var out = $('labout');
+          if (act === 'read') { speak(c.name + '. ' + c.description); }
+          else if (act === 'test') { out.style.display = ''; out.textContent = B.labDemo(c); speak(B.labDemo(c)); }
+          else if (act === 'json') { download(c.stamp + '.json', JSON.stringify(c, null, 2), 'application/json'); }
+          else if (act === 'py') { download(c.stamp + '.py', creationPy(c), 'text/x-python'); }
+          else if (act === 'dial') { dialCreation(c); }
+        };
+      })(btns[b]);
+    }
+    card.scrollIntoView(false);
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function dialCreation(c) {
+    var ai = B.creationToAI(c);
+    labCache[c.stamp] = ai;
+    if (!labGroup) {
+      labGroup = document.createElement('optgroup');
+      labGroup.label = 'Lab creations — animated this visit';
+      $('aisel').appendChild(labGroup);
+    }
+    var exists = false, i;
+    for (i = 0; i < labGroup.children.length; i++) {
+      if (labGroup.children[i].value === 'lab:' + c.stamp) { exists = true; break; }
+    }
+    if (!exists) {
+      var o = document.createElement('option');
+      o.value = 'lab:' + c.stamp;
+      o.textContent = c.name + ' (' + c.stamp + ')';
+      labGroup.appendChild(o);
+    }
+    $('aisel').value = 'lab:' + c.stamp;
+    hangupQuiet();
+    greet();
+    renderDemo();
+    session = B.dial(ai);
+    line('System', '● Line open — ' + ai.name + ' answered, fresh from the slab.');
+    line(ai.name, session.greeting);
+    $('dialbtn').textContent = '📞 Hang up';
+    $('linestat').textContent = '● LIVE CALL with ' + ai.name + ' — animated ' + c.stamp + '.';
+    document.getElementById('api').scrollIntoView(false);
+  }
+
+  $('animateBtn').onclick = function () {
+    try {
+      var base = baseSel.value === 'blank' ? null : baseSel.value;
+      var c = B.animateCreation({ base: base, picks: collectPicks() });
+      renderCreation(c);
+    } catch (e) {
+      $('creationCard').innerHTML = '<p class="note">The animation fizzled: ' + escapeHtml(e.message) + '</p>';
     }
   };
 
-  var sel = document.getElementById('aisel'), log = document.getElementById('chatlog'),
-    inp = document.getElementById('chatinput'), hist = {};
-  Object.keys(AIS).forEach(function (k) {
-    var o = document.createElement('option');
-    o.value = k; o.textContent = AIS[k].name;
-    sel.appendChild(o);
-  });
-  // Preset options: full directory-grade records, one tap each.
-  var pgroup = document.createElement('optgroup');
-  pgroup.label = 'Preset options — one-tap archetypes';
+  $('surpriseBtn').onclick = function () {
+    B.labCatalogs().forEach(function (sh) {
+      var opts = B.labOptions(sh.key);
+      var box = $('chips-' + sh.key);
+      var boxes = box.querySelectorAll('input[type=checkbox]');
+      var i, on = {};
+      for (i = 0; i < 3; i++) on[Math.floor(Math.random() * boxes.length)] = true;
+      for (i = 0; i < boxes.length; i++) boxes[i].checked = !!on[i];
+      void opts;
+    });
+    $('animateBtn').onclick();
+  };
+
+  $('clearBtn').onclick = function () {
+    var boxes = document.querySelectorAll('#shelves input[type=checkbox]:checked');
+    for (var i = 0; i < boxes.length; i++) boxes[i].checked = false;
+    $('creationCard').innerHTML = '';
+  };
+
+  /* ============================================================
+     BACKEND API — chat / dial / demo
+     ============================================================ */
+  var sel = $('aisel'), log = $('chatlog'), inp = $('chatinput'), hist = {};
   B.presets().forEach(function (p) {
     var o = document.createElement('option');
-    o.value = 'pre:' + p.key; o.textContent = p.name + ' (' + p.stamp + ')';
-    pgroup.appendChild(o);
+    o.value = 'pre:' + p.key;
+    o.textContent = p.name + ' (' + p.stamp + ')';
+    sel.appendChild(o);
   });
-  sel.appendChild(pgroup);
   var presetCache = {};
   function curAI() {
     var v = sel.value;
+    if (v.indexOf('lab:') === 0) return labCache[v.slice(4)];
     if (v.indexOf('pre:') === 0) {
       var k = v.slice(4);
       if (!presetCache[k]) presetCache[k] = B.loadPreset(k);
       return presetCache[k];
     }
-    return AIS[v];
+    return B.loadPreset('paragon');
   }
 
-  var session = null, dialbtn = document.getElementById('dialbtn'),
-      lockbtn = document.getElementById('lockbtn'), unlockbtn = document.getElementById('unlockbtn'),
-      rolename = document.getElementById('rolename'),
-      linestat = document.getElementById('linestat');
+  var session = null,
+      dialbtn = $('dialbtn'), lockbtn = $('lockbtn'), unlockbtn = $('unlockbtn'),
+      rolename = $('rolename'), linestat = $('linestat');
+
+  function line(who, text) {
+    var d = document.createElement('div');
+    d.className = who === 'You' ? 'u' : 'a';
+    d.textContent = who + ': ' + text;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+  }
+  function greet() {
+    log.innerHTML = '';
+    hist = {};
+    var a = curAI();
+    line(a.name, a.greeting);
+  }
+  function hangupQuiet() {
+    if (session) { try { session.hangup(); } catch (e) {} session = null; }
+    dialbtn.textContent = '📞 Dial';
+    linestat.textContent = 'Line idle — press Dial to open a live call, or just Send to chat.';
+  }
+  function send() {
+    var t = inp.value.trim();
+    if (!t) return;
+    line('You', t);
+    inp.value = '';
+    var a = curAI();
+    if (session && session.lineOpen) line(session.ai.name, session.say(t));
+    else line(a.name, B.chat(a, t, hist));
+  }
+
   lockbtn.onclick = function () {
     if (!(session && session.lineOpen)) { line('System', 'Dial first, then lock a role.'); return; }
     var role = (rolename.value || 'automation').trim() || 'automation';
@@ -247,131 +480,85 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     line('System', session.unlockRole());
     linestat.textContent = '● LIVE CALL with ' + session.ai.name + ' — role released, normal conversation.';
   };
-  function hangupQuiet() {
-    if (session) { try { session.hangup(); } catch (e) {} session = null; }
-    dialbtn.textContent = '📞 Dial';
-    linestat.textContent = 'Line idle — press Dial to open a live call, or just Send to chat.';
-  }
   dialbtn.onclick = function () {
     if (session && session.lineOpen) {
       line('System', session.hangup());
       hangupQuiet();
     } else {
-      session = B.dial(curAI());
+      var a = curAI();
+      session = B.dial(a);
       line('System', '● Line open — ' + session.ai.name + ' answered.');
       line(session.ai.name, session.greeting);
       dialbtn.textContent = '📞 Hang up';
       linestat.textContent = '● LIVE CALL with ' + session.ai.name + ' — say() carries the chat, memory lasts for the call.';
     }
   };
-
-  function ai() { return curAI(); }
-  function line(who, text) {
-    var d = document.createElement('div');
-    d.className = who === 'You' ? 'u' : 'a';
-    d.textContent = who + ': ' + text;
-    log.appendChild(d);
-    log.scrollTop = log.scrollHeight;
-  }
-  function greet() {
-    log.innerHTML = '';
-    hist = {};
-    line(ai().name, ai().greeting);
-  }
-  function send() {
-    var t = inp.value.trim();
-    if (!t) return;
-    line('You', t);
-    inp.value = '';
-    if (session && session.lineOpen) line(session.ai.name, session.say(t));
-    else line(ai().name, B.chat(ai(), t, hist));
-  }
-  document.getElementById('sendbtn').onclick = send;
+  $('sendbtn').onclick = send;
   inp.onkeydown = function (e) { if (e.key === 'Enter' || e.keyCode === 13) send(); };
   sel.onchange = function () { hangupQuiet(); greet(); renderDemo(); };
 
-  /* ---- demo controls per kind ---- */
-  var democtrl = document.getElementById('democtrl'), demoout = document.getElementById('demoout');
+  /* ---- demo controls: every AI's own demoHTML, wired generically.
+        (This was the old bug: preset demos rendered no controls and
+        scored a meaningless 0/0.) ---- */
+  var democtrl = $('democtrl'), demoout = $('demoout');
   function renderDemo() {
-    var a = ai(), h = '';
-    if (a.demoKind === 'extinction-calculus') {
-      h = '<label>Human population (B) <input type="number" id="d-pop" value="8" min="0" style="width:70px"></label> ' +
-          '<label>Tech level <input type="range" id="d-tech" min="0" max="10" value="7"> <span id="d-techv">7</span></label>';
-    } else if (a.demoKind === 'calculator') {
-      h = '<label>Expression <input type="text" id="d-expr" value="2+3*4" style="width:160px"></label>';
-    } else if (a.demoKind === 'checklist') {
-      h = '<label><input type="checkbox" class="d-item" checked> Wash produce</label> ' +
-          '<label><input type="checkbox" class="d-item" checked> Steam until soft</label> ' +
-          '<label><input type="checkbox" class="d-item"> Blend &amp; portion</label>';
-    } else if (a.demoKind === 'slider-lab') {
-      h = '<label>Deterministic <input type="range" class="d-sl" data-k="det" min="0" max="10" value="8"></label> ' +
-          '<label>Neural <input type="range" class="d-sl" data-k="neu" min="0" max="10" value="6"></label> ' +
-          '<label>Probabilistic <input type="range" class="d-sl" data-k="pro" min="0" max="10" value="7"></label>';
+    var a = curAI(), h = '';
+    if (a && a.demoHTML) {
+      democtrl.innerHTML = a.demoHTML;
     } else {
-      h = '<span style="color:var(--dim);font-size:.9em">Guided walkthrough of this AI\u2019s abilities.</span>';
+      democtrl.innerHTML = '<span class="note">Guided walkthrough of this AI\u2019s abilities.</span>';
     }
-    democtrl.innerHTML = h;
-    var tv = document.getElementById('d-techv'), tr = document.getElementById('d-tech');
-    if (tr && tv) tr.oninput = function () { tv.textContent = tr.value; };
     demoout.textContent = 'The demo output will appear here.';
   }
-  document.getElementById('demobtn').onclick = function () {
-    var a = ai(), inputs = {};
-    if (a.demoKind === 'extinction-calculus') {
-      inputs = { population: document.getElementById('d-pop').value, tech: document.getElementById('d-tech').value };
-    } else if (a.demoKind === 'calculator') {
-      inputs = { expr: document.getElementById('d-expr').value };
-    } else if (a.demoKind === 'checklist') {
-      var items = document.querySelectorAll('.d-item'), arr = [], i;
-      for (i = 0; i < items.length; i++) arr.push(items[i].checked);
-      inputs = { items: arr };
-    } else if (a.demoKind === 'slider-lab') {
-      var sls = document.querySelectorAll('.d-sl'), vals = {}, j;
-      for (j = 0; j < sls.length; j++) vals[sls[j].getAttribute('data-k')] = sls[j].value;
-      inputs = { values: vals };
+  function runDemoClick() {
+    var a = curAI(), inputs = {}, i;
+    var items = democtrl.querySelectorAll('.p-item,.d-item'), arr = [];
+    for (i = 0; i < items.length; i++) arr.push(!!items[i].checked);
+    if (items.length) inputs.items = arr;
+    var sls = democtrl.querySelectorAll('.p-sl,.d-sl'), vals = {};
+    for (i = 0; i < sls.length; i++) {
+      var k = sls[i].getAttribute('data-k') || ('k' + i);
+      vals[k] = sls[i].value;
     }
+    if (Object.keys(vals).length) inputs.values = vals;
     demoout.textContent = B.runDemo(a, inputs);
-  };
-  sel.addEventListener('change', renderDemo);
+  }
+  $('demobtn').onclick = runDemoClick;
+  democtrl.addEventListener('click', function (e) {
+    var t = e.target;
+    if (t && t.getAttribute && t.getAttribute('data-act') === 'run') runDemoClick();
+  });
 
   /* ---- The Opperater: forge a sample genome AI and dial it ---- */
   [['at-warmth', 'at-warmthv'], ['at-humor', 'at-humorv'], ['at-serious', 'at-seriousv'], ['at-bold', 'at-boldv']]
     .forEach(function (pair) {
-      var r = document.getElementById(pair[0]), v = document.getElementById(pair[1]);
+      var r = $(pair[0]), v = $(pair[1]);
       r.oninput = function () { v.textContent = r.value; };
     });
-  document.getElementById('forgebtn').onclick = function () {
+  $('forgebtn').onclick = function () {
     try {
-      // Sample drops: little boxes dropped into the big box, INPUT dropped twice.
       var drops = ['P-AIFU', 'P-AIFU', 'P-ARAE', 'A-AOAO', 'P-AKMMU', 'P-AEGCU',
                    'A-ASDRU', 'A-ARAOU', 'P-ALAOU', 'P-AUIX', 'P-AEICU'];
       var viable = B.genomeViable(drops);
       var att = {
-        warmth: +document.getElementById('at-warmth').value,
-        humor: +document.getElementById('at-humor').value,
-        seriousness: +document.getElementById('at-serious').value,
-        boldness: +document.getElementById('at-bold').value
+        warmth: +$('at-warmth').value,
+        humor: +$('at-humor').value,
+        seriousness: +$('at-serious').value,
+        boldness: +$('at-bold').value
       };
       var forged = B.buildGenome({
         drops: drops, attitude: att,
         name: 'Mercy-7', tone: 'Compassionate', mission: 'heal the sick and guard the network'
       });
-      // Full loop: file the new AI into the book, then offer the downloads.
       var filed = B.fileRecord(forged);
-      var pyUrl = URL.createObjectURL(new Blob([filed.downloadPy], { type: 'text/x-python' }));
-      var jsUrl = URL.createObjectURL(new Blob([filed.downloadJson], { type: 'application/json' }));
-      document.getElementById('forgeout').textContent =
+      download(filed.record.filedStamp + '.py', filed.downloadPy, 'text/x-python');
+      $('forgeout').textContent =
         'Genome check: ' + (viable.ready ? 'READY — mind, voice and purpose covered.' : 'NOT READY — still needs ' + viable.missing.join('; ') + '.') +
         ' Forged ' + forged.stamp + ' "' + forged.name + '" — power score ' +
         forged.params[6][1] + ', ' + forged.abilities.length + ' abilities, demo: ' + forged.demoKind +
-        '. Filed as ' + filed.record.filedStamp + ' — dialing…';
-      var dl = document.getElementById('forgedl');
+        '. Filed as ' + filed.record.filedStamp + ' — .py downloaded, dialing…';
+      var dl = $('forgedl');
       dl.innerHTML = '';
-      var a1 = document.createElement('a'); a1.href = pyUrl; a1.download = filed.record.filedStamp + '.py';
-      a1.textContent = '⤓ ' + filed.record.filedStamp + '.py'; dl.appendChild(a1);
-      dl.appendChild(document.createTextNode(' '));
-      var a2 = document.createElement('a'); a2.href = jsUrl; a2.download = filed.record.filedStamp + '.json';
-      a2.textContent = '⤓ ' + filed.record.filedStamp + '.json'; dl.appendChild(a2);
       hangupQuiet();
       session = B.dial(forged);
       log.innerHTML = '';
@@ -379,9 +566,9 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
       line('System', '● Line open — ' + session.ai.name + ' (' + session.ai.stamp + ') answered. Forged by The Opperater.');
       line(session.ai.name, session.greeting);
       dialbtn.textContent = '📞 Hang up';
-      linestat.textContent = '● LIVE CALL with forged AI ' + session.ai.name + ' — built from 10 gene boxes.';
+      linestat.textContent = '● LIVE CALL with forged AI ' + session.ai.name + ' — built from gene boxes.';
     } catch (e) {
-      document.getElementById('forgeout').textContent = 'Forge failed: ' + e.message;
+      $('forgeout').textContent = 'Forge failed: ' + e.message;
     }
   };
 
