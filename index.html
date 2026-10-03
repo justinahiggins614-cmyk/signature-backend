@@ -37,6 +37,7 @@ body{margin:0;background:var(--bg);color:var(--txt);font-family:Georgia,'Times N
 .pass{color:var(--grn);font-weight:700}
 .fail{color:var(--red);font-weight:700}
 .stamped{opacity:.65;font-weight:400;font-size:.85em}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 .checks{font-size:.85em;color:var(--dim);margin-top:6px}
 .checks span{margin-right:12px;white-space:nowrap}
 select,input[type=text],input[type=number]{background:#0a1226;border:1px solid var(--line);color:var(--txt);padding:8px 10px;border-radius:6px;font-family:Georgia,serif;font-size:.95em}
@@ -162,6 +163,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
       <button type="button" id="dialbtn" title="Dial this AI like a phone call">📞 Dial</button>
       <button type="button" id="lockbtn" title="Lock the call into an automation role">🔒 Lock role</button>
       <button type="button" id="unlockbtn" title="Release the role lock">🔓 Unlock</button>
+      <button type="button" id="transbtn" title="Download this call's transcript (JSON)">⤓ Transcript</button>
     </div>
     <div style="margin-top:6px;font-size:.85em;color:var(--dim)">Role: <input type="text" id="rolename" value="semiconductor replacement" size="26" style="font-size:1em"> <span style="opacity:.8">e.g. semiconductor replacement, auto-pen</span></div>
     <div id="linestat" style="font-size:.85em;color:var(--dim);margin-top:6px">Line idle — press Dial to open a live call, or just Send to chat.</div>
@@ -185,6 +187,8 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
     <div><button type="button" id="forgebtn" style="margin-top:10px">⚙ Forge a sample genome AI &amp; dial it</button></div>
     <div class="demoout" id="forgeout">No forged AI yet — press the button.</div>
     <div id="forgedl" style="margin-top:8px;font-size:.9em"></div>
+    <div style="margin-top:8px;font-size:.9em">Genome: <button type="button" id="genomeexpbtn" title="Download the last forged genome as JSON">⤓ Export last forged genome (.json)</button> &nbsp;·&nbsp; <label>Import AI JSON: <input type="file" id="aiimport" accept="application/json,.json"></label></div>
+    <div id="importout" style="margin-top:6px;font-size:.9em;color:var(--dim)"></div>
   </div>
 
   <div class="panel docs">
@@ -201,7 +205,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
 
 </div>
 
-<div class="footer"><span class="sig">A SIGNATURE SYSTEM</span><br>The Signature AI Mad Scientist Creation Lab — mix, match, animate. Chat brains and working demos for all AI modes.<br><span style="font-size:.9em">Developers: <a href="docs/API.md">API docs</a> · <a href="api-manifest.json">api-manifest.json</a> · <a href="engine-manifest.json">engine-manifest.json</a> · <a href="llms.txt">llms.txt</a></span></div>
+<div class="footer"><span class="sig">A SIGNATURE SYSTEM</span><br>The Signature AI Mad Scientist Creation Lab — mix, match, animate. Chat brains and working demos for all AI modes.<br><span style="font-size:.9em">Developers: <a href="docs/API.md">API docs</a> · <a href="api-manifest.json">api-manifest.json</a> · <a href="engine-manifest.json">engine-manifest.json</a> · <a href="llms.txt">llms.txt</a></span><br><span id="speakstat" aria-live="polite" style="font-size:.85em"></span></div>
 
 <script src="js/jah-talk-fallback.js"></script>
 <script src="signature-backend.js"></script>
@@ -339,13 +343,25 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
     }).join(' · ');
   } catch (e) { $('st-apis').textContent = 'unavailable'; }
 
+  var speakTimer = null;
+  function speakDone() {
+    try { if (speakTimer) { clearTimeout(speakTimer); speakTimer = null; } } catch (e) {}
+    var el = $('speakstat'); if (el) el.textContent = '';
+  }
+  /* Speech state: shows a small "reading…" note while audio plays and can
+     never stick — cleared on end, on error, and by a 20s fail-safe timer. */
   function speak(t) {
+    speakDone();
     try {
       if ('speechSynthesis' in window && t) {
+        var u = new SpeechSynthesisUtterance(String(t).slice(0, 1200));
+        var el = $('speakstat'); if (el) el.textContent = '🔊 reading…';
+        u.onend = speakDone; u.onerror = speakDone;
         window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance(String(t).slice(0, 1200)));
+        window.speechSynthesis.speak(u);
+        speakTimer = setTimeout(speakDone, 20000);
       }
-    } catch (e) { /* audio is a bonus, never a blocker */ }
+    } catch (e) { speakDone(); }
   }
   function download(name, text, type) {
     try {
@@ -355,6 +371,23 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
       document.body.appendChild(a); a.click();
       setTimeout(function () { document.body.removeChild(a); }, 500);
     } catch (e) { /* ignore */ }
+  }
+  /* Shareable ?creation= links. A stamp alone cannot rebuild a creation (the
+     hash is one-way), so the link carries the base64url-encoded lab spec —
+     deterministic, so the same link always opens the same creation. */
+  function encodeSpec(spec) {
+    try {
+      var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(spec))));
+      return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    } catch (e) { return ''; }
+  }
+  function decodeSpec(s) {
+    var b64 = String(s).replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    return JSON.parse(decodeURIComponent(escape(atob(b64))));
+  }
+  function creationURL(spec) {
+    return location.origin + location.pathname + '?creation=' + encodeSpec(spec);
   }
 
   /* ============================================================
@@ -534,9 +567,11 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
             info.setAttribute('data-k', 'ver');
           }
           else if (r === 'share') {
-            var txt = c.stamp + ' — ' + c.name + ' (' + c.cls + '), animated in the Mad Scientist Creation Lab from ' + c.baseName + '. ' + c.description;
-            if (navigator.share) { try { navigator.share({ title: c.stamp + ' ' + c.name, text: txt }); } catch (e) {} }
-            else { try { if (navigator.clipboard) navigator.clipboard.writeText(txt); } catch (e) {} show('<b>SHARE</b> — creation summary copied: ' + escapeHtml(txt)); info.setAttribute('data-k', 'share'); }
+            var curl = '';
+            try { curl = creationURL(window._lastLabSpec || { base: null, picks: {} }); } catch (e) {}
+            var txt = c.stamp + ' — ' + c.name + ' (' + c.cls + '), animated in the Mad Scientist Creation Lab. Open it: ' + curl;
+            if (navigator.share) { try { navigator.share({ title: c.stamp + ' ' + c.name, text: txt, url: curl }); } catch (e) {} }
+            else { try { if (navigator.clipboard) navigator.clipboard.writeText(curl); } catch (e) {} show('<b>SHARE</b> — creation link copied: ' + escapeHtml(curl)); info.setAttribute('data-k', 'share'); }
           }
         };
       })(rbtns[rb]);
@@ -587,6 +622,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
       var c = B.animateCreation(spec);
       window._lastLabSpec = spec; /* CONSISTENCY PASS: OPEN re-runs this saved spec (deterministic) */
       renderCreation(c);
+      try { history.replaceState(null, '', '?creation=' + encodeSpec(spec)); } catch (e) {}
     } catch (e) {
       $('creationCard').innerHTML = '<p class="note">The animation fizzled: ' + escapeHtml(e.message) + '</p>';
     }
@@ -693,6 +729,14 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
     line('System', session.unlockRole());
     linestat.textContent = '● LIVE CALL with ' + session.ai.name + ' — role released, normal conversation.';
   };
+  $('transbtn').onclick = function () {
+    try {
+      if (!session || typeof session.transcript !== 'function') { linestat.textContent = 'No live call — press Dial first.'; return; }
+      var t = session.transcript();
+      download((t.session_id || 'transcript') + '.json', JSON.stringify(t, null, 2), 'application/json');
+      linestat.textContent = 'Transcript downloaded: ' + t.session_id + ' (' + t.turn_count + ' turns).';
+    } catch (e) { linestat.textContent = 'Transcript failed: ' + e.message; }
+  };
   dialbtn.onclick = function () {
     if (session && session.lineOpen) {
       line('System', session.hangup());
@@ -764,6 +808,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
         name: 'Mercy-7', tone: 'Compassionate', mission: 'heal the sick and guard the network'
       });
       var filed = B.fileRecord(forged);
+      window._lastForged = forged;
       download(filed.record.filedStamp + '.py', filed.downloadPy, 'text/x-python');
       var forgedTxt =
         'Genome check: ' + (viable.ready ? 'READY — mind, voice and purpose covered.' : 'NOT READY — still needs ' + viable.missing.join('; ') + '.') +
@@ -790,6 +835,59 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
       $('forgeout').textContent = 'Forge failed: ' + e.message;
     }
   };
+
+  /* Genome export: download the last forged genome as JSON (genome schema). */
+  $('genomeexpbtn').onclick = function () {
+    var g = window._lastForged;
+    if (!g) { $('importout').textContent = 'Nothing forged yet — press "Forge a sample genome AI" first.'; return; }
+    download((g.genome_id || 'genome') + '.json', JSON.stringify(g, null, 2), 'application/json');
+    $('importout').textContent = 'Exported ' + g.genome_id + ' (' + g.name + ').';
+  };
+
+  /* AI import with validation: schema-shaped record, prototype-pollution guard. */
+  $('aiimport').addEventListener('change', function (ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var raw = String(rd.result || '');
+        if (/\"__proto__\"/.test(raw)) throw new Error('rejected: forbidden key "__proto__"');
+        var rec = JSON.parse(raw);
+        if (!rec || typeof rec !== 'object' || Array.isArray(rec)) throw new Error('not a JSON object');
+        if (typeof rec.name !== 'string' || !rec.name.trim()) throw new Error('AI record needs a name');
+        if (typeof rec.stamp === 'string' && !/^JAH-(?:[A-Z]+-)*[0-9A-Z]{4,6}$/.test(rec.stamp) && !/^JAH-AI-PRE-\d{3}$/.test(rec.stamp))
+          throw new Error('stamp does not look like a JAH record stamp');
+        if (!Array.isArray(rec.fallback) || !rec.fallback.length) rec.fallback = ['Tell me more.'];
+        if (typeof rec.greeting !== 'string' || !rec.greeting) rec.greeting = 'I am ' + rec.name.trim() + '.';
+        if (!Array.isArray(rec.rules)) rec.rules = [];
+        hangupQuiet();
+        session = B.dial(rec);
+        log.innerHTML = '';
+        hist = {};
+        line('System', '● Line open — imported AI ' + session.ai.name + ' answered.');
+        line(session.ai.name, session.greeting);
+        dialbtn.textContent = '📞 Hang up';
+        linestat.textContent = '● LIVE CALL with imported AI ' + session.ai.name + ' — validated on import.';
+        $('importout').textContent = 'Imported "' + rec.name.trim() + '" — validated, dialed.';
+      } catch (e) {
+        $('importout').textContent = 'Import failed: ' + e.message;
+      }
+      ev.target.value = '';
+    };
+    rd.readAsText(f);
+  });
+
+  /* ?creation= deep link: open a shared creation straight from the URL.
+     A bad link is ignored — the page still works. */
+  try {
+    var cm = /[?&]creation=([^&]+)/.exec(location.search);
+    if (cm && cm[1]) {
+      var dspec = decodeSpec(cm[1]);
+      window._lastLabSpec = dspec;
+      renderCreation(B.animateCreation(dspec));
+    }
+  } catch (e) { /* ignore malformed links */ }
 
   greet();
   renderDemo();

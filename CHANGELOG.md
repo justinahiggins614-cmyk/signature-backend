@@ -46,10 +46,17 @@ Engine: `signature-backend.js` · backend_id `JAH-BACKEND-1` · api_version pinn
 - `capabilities()` / `health()` live discovery endpoints.
 
 ### P3 — UX (additive only)
-- Creation detail panel: `?creation=` deep-link support (planned — engine ready).
+- Creation detail panel: `?creation=` deep-link support shipped — ANIMATE writes
+  the link (base64url-encoded lab spec; a stamp alone can't rebuild a creation),
+  SHARE copies the link, loading `?creation=` opens that exact creation.
+- Genome export button (downloads the last forged genome as JSON) and
+  AI import with validation (schema-shaped record, `__proto__` rejection,
+  JAH stamp format check) in the forge panel.
+- Session transcript download button (⤓ Transcript) in the dial panel.
 - 8-shelves vs 10-slots explainer sentence; serums safety note
   (speculative concepts, not medical advice/devices).
-- Reduced-motion respect (planned); speech state hardening (planned).
+- `prefers-reduced-motion` respected in CSS; speech state hardens to a
+  "🔊 reading…" indicator with end/error/20s-fail-safe clearing — never stuck.
 
 ### Visible-surface naming
 - "backend"/"back end" removed from all visible titles/headers per the owner's
