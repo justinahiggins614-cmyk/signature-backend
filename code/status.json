@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-03",
+  "engine_version": "2.0",
+  "api_version": null,
+  "backend_id": null,
+  "engine_sha256": "bfda52ba3633d672972b679e09b8d8e4e3672a6d1abb4533562528a3ce3e4426",
+  "selftest_pass": true,
+  "selftest_total": 40,
+  "selftest_failed": [],
+  "shelves": 8,
+  "options": 1044,
+  "gene_slots": 10,
+  "gene_boxes": 180,
+  "presets": 6,
+  "apis": [
+    "chat",
+    "runDemo",
+    "dial",
+    "presets",
+    "loadPreset",
+    "geneOptions",
+    "buildGenome",
+    "genomeViable",
+    "fileRecord",
+    "tones",
+    "labCatalogs",
+    "labOptions",
+    "animateCreation",
+    "creationToAI",
+    "labDemo"
+  ]
+}

@@ -5,16 +5,16 @@
 <script>try{var _jt=localStorage.getItem('jah-theme');if(_jt==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(_je){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The Signature AI Mad Scientist Creation Lab</title>
-<meta name="description" content="The Signature AI Mad Scientist Creation Lab: mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations. Every model's content is pre-built — the lab works fully offline. Also the JAH backend API: chat, dial, runDemo, geneOptions, fileRecord.">
+<meta name="description" content="The Signature AI Mad Scientist Creation Lab: mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations. Every model's content is pre-built — the lab works fully offline. Also the JAH engine API: chat, dial, runDemo, geneOptions, fileRecord.">
 <link rel="canonical" href="https://justinahiggins614-cmyk.github.io/signature-backend/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="The Signature AI Mad Scientist Creation Lab">
 <meta property="og:title" content="The Signature AI Mad Scientist Creation Lab">
-<meta property="og:description" content="Mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations — every model's content is pre-built, works fully offline. Also the JAH backend API: chat, dial, runDemo, geneOptions, fileRecord.">
+<meta property="og:description" content="Mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations — every model's content is pre-built, works fully offline. Also the JAH engine API: chat, dial, runDemo, geneOptions, fileRecord.">
 <meta property="og:url" content="https://justinahiggins614-cmyk.github.io/signature-backend/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="The Signature AI Mad Scientist Creation Lab">
-<meta name="twitter:description" content="Mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations. Also the JAH backend API: chat, dial, runDemo, geneOptions, fileRecord.">
+<meta name="twitter:description" content="Mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations. Also the JAH engine API: chat, dial, runDemo, geneOptions, fileRecord.">
 <style>
 :root{--bg:#070b14;--panel:#0d1424;--panel2:#111a30;--line:#1e2c4d;--txt:#d7e0f2;--dim:#8b98b8;--gold:#e8c766;--amber:#ffc93c;--amber2:#ffdf7e;--acc:#5aa2ff;--grn:#5aff8a;--red:#ff5a5a;--zap:#c77dff}
 *{box-sizing:border-box}
@@ -36,6 +36,7 @@ body{margin:0;background:var(--bg);color:var(--txt);font-family:Georgia,'Times N
 .kv b{color:var(--amber2);min-width:150px;font-weight:400}
 .pass{color:var(--grn);font-weight:700}
 .fail{color:var(--red);font-weight:700}
+.stamped{opacity:.65;font-weight:400;font-size:.85em}
 .checks{font-size:.85em;color:var(--dim);margin-top:6px}
 .checks span{margin-right:12px;white-space:nowrap}
 select,input[type=text],input[type=number]{background:#0a1226;border:1px solid var(--line);color:var(--txt);padding:8px 10px;border-radius:6px;font-family:Georgia,serif;font-size:.95em}
@@ -116,11 +117,11 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
 
   <div class="panel" id="status">
     <h2><span class="tick">●</span> LIVE STATUS</h2>
-    <div class="kv"><b>Engine version</b><span id="st-ver">…</span></div>
-    <div class="kv"><b>Self-test</b><span id="st-test">running…</span></div>
+    <div class="kv"><b>Engine version</b><span id="st-ver"><!--STVER-->v2.0 — Mad Scientist Creation Lab<span class="stamped"> · static check 2026-10-03</span><!--/STVER--></span></div>
+    <div class="kv"><b>Self-test</b><span id="st-test"><!--STTEST--><span class="pass">PASS</span> <span class="stamped">engine self-test 40/40 · 2026-10-03</span><!--/STTEST--></span></div>
     <div class="checks" id="st-checks"></div>
-    <div class="kv"><b>Engine APIs</b><span id="st-apis">testing…</span></div>
-    <div class="kv"><b>Lab shelves</b><span id="st-shelves">…</span></div>
+    <div class="kv"><b>Engine APIs</b><span id="st-apis"><!--STAPIS--><span class="pass">✓</span>&nbsp;chat <span class="pass">✓</span>&nbsp;runDemo <span class="pass">✓</span>&nbsp;dial <span class="pass">✓</span>&nbsp;presets <span class="pass">✓</span>&nbsp;loadPreset <span class="pass">✓</span>&nbsp;geneOptions <span class="pass">✓</span>&nbsp;buildGenome <span class="pass">✓</span>&nbsp;genomeViable <span class="pass">✓</span>&nbsp;fileRecord <span class="pass">✓</span>&nbsp;tones <span class="pass">✓</span>&nbsp;labCatalogs <span class="pass">✓</span>&nbsp;labOptions <span class="pass">✓</span>&nbsp;animateCreation <span class="pass">✓</span>&nbsp;creationToAI <span class="pass">✓</span>&nbsp;labDemo<span class="stamped"> · static check 2026-10-03</span><!--/STAPIS--></span></div>
+    <div class="kv"><b>Lab shelves</b><span id="st-shelves"><!--STSHELVES-->8 shelves, 1044 mix-and-match options, all pre-built<span class="stamped"> · static check 2026-10-03</span><!--/STSHELVES--></span></div>
     <div class="kv"><b>Dependencies</b><span>none — pure JavaScript, no network calls, works offline and inside in-app browsers</span></div>
     <p class="note">This panel is the single authoritative status of the lab engine — no other status line on this page overrides it.</p>
   </div>
@@ -133,7 +134,8 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
 
   <div class="panel" id="lab">
     <h2><span class="tick">⚗</span> THE CREATION LAB — MIX &amp; MATCH</h2>
-    <p class="note" style="margin-top:0"><span class="labstep">Step 1 —</span> pick a base archetype (or a blank slab). <span class="labstep">Step 2 —</span> raid the shelves and mix in parts, genes, serums, equipment. <span class="labstep">Step 3 —</span> throw the switch: <b>⚡ ANIMATE!</b> The same picks always animate the same creation.</p>
+    <p class="note" style="margin-top:0"><span class="labstep">Step 1 —</span> pick a base archetype (or a blank slab). <span class="labstep">Step 2 —</span> raid the shelves and mix in parts, genes, serums, equipment. <span class="labstep">Step 3 —</span> throw the switch: <b>⚡ ANIMATE!</b> The same picks always animate the same creation. The <b>8 shelves</b> here are the lab's mix-and-match parts; <b>The Opperater's 10 gene slots</b> further down are a separate genome-forging system — different workbench, different count.</p>
+    <p class="note"><b>Serums &amp; elixirs are speculative fictional concepts</b> — not medical advice, not clinically validated, not medical devices. Nothing animated here is a real treatment or a real organism.</p>
     <div style="margin:10px 0">
       <label for="baseSel" style="color:var(--dim);font-size:.9em">Base archetype:&nbsp;</label>
       <select id="baseSel"></select>
@@ -609,7 +611,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   };
 
   /* ============================================================
-     BACKEND API — chat / dial / demo
+     ENGINE API — chat / dial / demo
      ============================================================ */
   var sel = $('aisel'), log = $('chatlog'), inp = $('chatinput'), hist = {};
   B.presets().forEach(function (p) {
