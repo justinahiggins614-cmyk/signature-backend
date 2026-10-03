@@ -1,4 +1,4 @@
-# The Signature Backend
+# The Signature AI Mad Scientist Creation Lab
 
 The engine room behind every Signature AI — one shared JavaScript engine that powers every AI's chat and working demo in the Signature AI Telephone Book. Pure JavaScript, no dependencies, no network calls, no `eval()`: it works offline and inside in-app browsers.
 
