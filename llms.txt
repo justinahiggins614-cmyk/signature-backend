@@ -1,0 +1,55 @@
+# The Signature AI Mad Scientist Creation Lab — Signature Engine
+
+> The Signature Engine is a dependency-free, offline JavaScript engine for
+> chattable AI records, dial-up AI sessions, genome forging (The Opperater),
+> and a mix-and-match Mad Scientist Creation Lab. No network calls, no build
+> step, no API keys. Works from a file:// page.
+
+- Site: https://justinahiggins614-cmyk.github.io/signature-backend/
+- Engine: https://justinahiggins614-cmyk.github.io/signature-backend/signature-backend.js
+- API manifest (formal per-function docs): https://justinahiggins614-cmyk.github.io/signature-backend/api-manifest.json
+- Engine manifest (identity, hashes): https://justinahiggins614-cmyk.github.io/signature-backend/engine-manifest.json
+- TypeScript declarations: signature-backend.d.ts
+- Full API docs: docs/API.md
+- JSON schemas: schemas/ (ai-record, genome, creation, demo, session, error)
+
+## Identity
+
+- backend_id: JAH-BACKEND-1 (machine-readable; visible UI says "engine")
+- engine_version: 2.0 · api_version: 2.0 (pinned) · schema_version: 1.0
+- self-test: 53 checks, run via `SignatureBackend.selfTest()`
+
+## Quick use
+
+```html
+<script src="signature-backend.js"></script>
+<script>
+  var B = window.SignatureBackend;
+  var s = B.dial(B.loadPreset('Universal Problem Solver'));
+  console.log(s.greeting, s.say('hello'));
+  s.lockRole('weld monitor');   // concise machine channel
+  var t = s.transcript();       // labeled GENERATED_CONVERSATION
+  s.hangup();
+  var genome = B.buildGenome({genes: {INPUT: 'F-IFU', REASON: 'F-RAE'}, name: 'My AI', kind: 'domain'});
+  var filed = B.fileRecord(genome); // JAH-AI-OP-###### + downloadable .py/.json
+  console.log(B.capabilities(), B.health());
+</script>
+```
+
+## ID schemes
+
+- JAH-SESSION-###### — dial-up sessions (sequential, in-memory)
+- JAH-AI-OP-###### — filed AI records (sequential, in-memory)
+- JAH-GENOME-XXXXXX — genome IDs (content-derived; same genes => same ID)
+- JAH-DEMO-###### — demo receipts
+- JAH-LAB-XXXXXX — creations (content-derived; same picks => same creation)
+- JAH-AI-OPR-XXXX — genome stamps
+
+## Rules for AI consumers
+
+- Deterministic: buildGenome, runDemo, animateCreation, recordHash, presets,
+  geneOptions, labCatalogs/labOptions, capabilities, health, selfTest.
+  Non-deterministic by design: chat() replies, dial() sessions, JAH-AI-OP stamps.
+- A role lock never grants capabilities (role != permission).
+- Session memory dies at hangup; nothing leaves the browser unless the user exports a file.
+- Serums & elixirs are speculative fictional concepts — not medical advice.
