@@ -50,7 +50,7 @@ try {
 } catch (e) { out.selftest = {pass: false, total: 0, failed: ['selftest-threw: ' + String(e && e.message || e)]}; }
 try {
   var cats = B.labCatalogs();
-  out.shelves = cats.length;
+  out.shelfes = cats.length;
   out.options = cats.reduce(function (n, c) { return n + c.count; }, 0);
   var go = B.geneOptions();
   out.gene_slots = go.length;
@@ -104,12 +104,12 @@ def main():
         '<span class="pass">✓</span>&nbsp;' + a for a in apis)
         + '<span class="stamped"> · static check ' + today + "</span>") if apis else "unavailable"
 
-    if info.get("shelves") is not None:
-        shelves_html = ("%d shelves, %d mix-and-match options, all pre-built"
+    if info.get("shelfes") is not None:
+        shelfes_html = ("%d shelfes, %d mix-and-match options, all pre-built"
                         '<span class="stamped"> · static check %s</span>'
-                        % (info["shelves"], info["options"], today))
+                        % (info["shelfes"], info["options"], today))
     else:
-        shelves_html = "unavailable"
+        shelfes_html = "unavailable"
 
     with open(INDEX, encoding="utf-8") as f:
         html = f.read()
@@ -129,7 +129,7 @@ def main():
     html = stamp("STVER", ver_html)
     html = stamp("STTEST", test_html)
     html = stamp("STAPIS", apis_html)
-    html = stamp("STSHELVES", shelves_html)
+    html = stamp("STSHELVES", shelfes_html)
 
     with open(INDEX, "w", encoding="utf-8") as f:
         f.write(html)
@@ -143,7 +143,7 @@ def main():
         "selftest_pass": ok,
         "selftest_total": total,
         "selftest_failed": failed,
-        "shelves": info.get("shelves"),
+        "shelfes": info.get("shelfes"),
         "options": info.get("options"),
         "gene_slots": info.get("gene_slots"),
         "gene_boxes": info.get("gene_boxes"),

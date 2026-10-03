@@ -41,7 +41,7 @@ V.gene_slots = B.geneOptions(false).map(function (s) { return s.key; });
 V.gene_counts = B.geneOptions(false).map(function (s) { return s.options.length; });
 V.gene_counts_adv = B.geneOptions(true).map(function (s) { return s.options.length; });
 var cats = B.labCatalogs();
-V.shelves = cats.map(function (c) { return c.name + ':' + c.count; });
+V.shelfes = cats.map(function (c) { return c.name + ':' + c.count; });
 V.shelf_total = cats.reduce(function (n, c) { return n + c.count; }, 0);
 var c = B.animateCreation({base:'paragon', picks:{parts:['BP00-00'],brains:['BR-00'],power:['PW-00']}});
 V.creation = {stamp: c.stamp, name: c.name};
@@ -58,7 +58,7 @@ V.error_shape = (function () { try { B.buildGenome({genes:{BOGUS:'F-IFU'}}); ret
   catch (e) { return {error_code: e.error_code, engine_version: e.engine_version,
     api_version: e.api_version, recoverable: e.recoverable, is_error: (e instanceof Error)}; } })();
 V.caps = (function () { var c = B.capabilities();
-  return {ops: c.operations.length, shelves: c.catalogs.shelves, slots: c.catalogs.gene_slots,
+  return {ops: c.operations.length, shelfes: c.catalogs.shelfes, slots: c.catalogs.gene_slots,
     offline: c.offline, net: c.network_calls.length}; })();
 V.versions = {version: B.version, apiVersion: B.apiVersion, backendId: B.backendId,
   schemaVersion: B.schemaVersion};

@@ -790,7 +790,12 @@
   function hashStr(s) {
     var h = 5381, i;
     for (i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) >>> 0; }
-    return h.toString(36).toUpperCase();
+    /* base36 of a uint32 can be 1-7 chars; stamps need a fixed 6-char
+       minimum (schemas require ^JAH-(LAB|GENOME)-[0-9A-Z]{6}$). Left-pad
+       with zeros: parseInt(h,36) is unchanged, so RNG seeds are untouched. */
+    var b36 = h.toString(36).toUpperCase();
+    while (b36.length < 6) b36 = '0' + b36;
+    return b36;
   }
 
   // pad6: ES5-safe zero pad (String.padStart is ES2017 — old in-app
@@ -1162,7 +1167,7 @@
         trait: 'certified by ' + labPick(rng, LAB_PROTO_CERT), power: 1 + Math.floor(rng() * 10) });
   })();
 
-  // labCatalogs(): the eight mix-and-match shelves with live counts.
+  // labCatalogs(): the eight mix-and-match shelfes with live counts.
   function labCatalogs() {
     var geneCount = geneOptions(false).reduce(function (n, sl) { return n + sl.options.length; }, 0);
     return [
@@ -1357,7 +1362,7 @@
           note: 'Stamp + filedAt differ per call; record content otherwise stable. Local-first: nothing saved or published.' },
         { name: 'tones', version: '2.0', deterministic: true, side_effects: 'none', note: '' },
         { name: 'labCatalogs', version: '2.0', deterministic: true, side_effects: 'none',
-          note: '8 Creation Lab shelves (separate from the 10 Opperater gene slots).' },
+          note: '8 Creation Lab shelfes (separate from the 10 Opperater gene slots).' },
         { name: 'labOptions', version: '2.0', deterministic: true, side_effects: 'none', note: '' },
         { name: 'animateCreation', version: '2.0', deterministic: true, side_effects: 'none',
           note: 'Same base + picks => byte-identical creation record and stamp.' },
@@ -1382,7 +1387,7 @@
       schema_version: SCHEMA_VERSION,
       operations: ops(),
       catalogs: {
-        shelves: cats.length,
+        shelfes: cats.length,
         shelf_options: cats.reduce(function (n, c) { return n + c.count; }, 0),
         gene_slots: go.length,
         gene_boxes: go.reduce(function (n, s) { return n + s.options.length; }, 0),
@@ -1561,7 +1566,7 @@
     var caps = capabilities();
     out.push(['capabilities', caps.backend_id === 'JAH-BACKEND-1' && caps.offline === true &&
       caps.network_calls.length === 0 && caps.operations.length === 21 &&
-      caps.catalogs.shelves === 8 && caps.catalogs.gene_slots === 10]);
+      caps.catalogs.shelfes === 8 && caps.catalogs.gene_slots === 10]);
     var h = health();
     out.push(['health', h.status === 'UP' && h.version === VERSION && h.api_version === API_VERSION]);
     // demo receipts: sequential JAH-DEMO-######

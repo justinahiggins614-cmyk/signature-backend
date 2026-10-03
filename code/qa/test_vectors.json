@@ -61,7 +61,7 @@
       3,
       3
     ],
-    "shelves": [
+    "shelfes": [
       "Gene Splices:180",
       "Body Parts:336",
       "Brains:48",
@@ -91,7 +91,7 @@
     },
     "caps": {
       "ops": 21,
-      "shelves": 8,
+      "shelfes": 8,
       "slots": 10,
       "offline": true,
       "net": 0

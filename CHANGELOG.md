@@ -53,7 +53,7 @@ Engine: `signature-backend.js` · backend_id `JAH-BACKEND-1` · api_version pinn
   AI import with validation (schema-shaped record, `__proto__` rejection,
   JAH stamp format check) in the forge panel.
 - Session transcript download button (⤓ Transcript) in the dial panel.
-- 8-shelves vs 10-slots explainer sentence; serums safety note
+- 8-shelfes vs 10-slots explainer sentence; serums safety note
   (speculative concepts, not medical advice/devices).
 - `prefers-reduced-motion` respected in CSS; speech state hardens to a
   "🔊 reading…" indicator with end/error/20s-fail-safe clearing — never stuck.

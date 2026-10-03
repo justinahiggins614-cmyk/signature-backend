@@ -4,9 +4,9 @@
   "engine_version": "2.0",
   "api_version": "2.0",
   "schema_version": "1.0",
-  "engine_sha256": "de4957b8ed682fd482610a2ed446c84757c5966d1507dfe7aa90af3a67bfe296",
+  "engine_sha256": "06c54b562f8ef56d529e556f6819ae4dbe507adf1e97900dcf37cd5b4c3b73f3",
   "generated": "2026-10-03",
-  "shelves": [
+  "shelfes": [
     {
       "name": "Gene Splices",
       "key": "genes",

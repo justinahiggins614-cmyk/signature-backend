@@ -39,7 +39,7 @@ Full per-function formal docs live in `api-manifest.json`. Summary:
   content-derived; same inputs ⇒ same genome, byte-for-byte.
 - **genomeViable(drops)** — coverage check over viability groups.
 - **fileRecord(rec)** — stamps a genome/preset as a filed AI record.
-- **labCatalogs() / labOptions(key)** — the 8 Creation Lab shelves, 1,044 options.
+- **labCatalogs() / labOptions(key)** — the 8 Creation Lab shelfes, 1,044 options.
 - **animateCreation({base, picks})** — animates a creation; deterministic:
   same base + picks ⇒ same record and `JAH-LAB-XXXXXX` stamp.
 - **creationToAI(creation)** / **labDemo(creation)** — dialable AI from a creation;

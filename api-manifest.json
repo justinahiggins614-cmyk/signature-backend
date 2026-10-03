@@ -157,7 +157,7 @@
     },
     {
       "name": "labCatalogs",
-      "purpose": "List the 8 Creation Lab shelves (separate from the 10 Opperater gene slots).",
+      "purpose": "List the 8 Creation Lab shelfes (separate from the 10 Opperater gene slots).",
       "input": "none",
       "output": "array of {name, count}",
       "errors": [],
@@ -165,7 +165,7 @@
       "side_effects": "none",
       "permissions": "none",
       "version": "2.0",
-      "note": "8 Creation Lab shelves (separate from the 10 Opperater gene slots)."
+      "note": "8 Creation Lab shelfes (separate from the 10 Opperater gene slots)."
     },
     {
       "name": "labOptions",
@@ -281,7 +281,7 @@
     }
   ],
   "catalogs": {
-    "shelves": 8,
+    "shelfes": 8,
     "shelf_options": 1044,
     "gene_slots": 10,
     "gene_boxes": 180,

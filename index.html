@@ -97,6 +97,28 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
 .aicard .aname{color:var(--amber2);font-weight:700}
 .aicard .stamp{font-family:monospace;color:var(--acc);font-size:.85em}
 .aicard .duties{color:var(--dim)}
+/* FIRST-TIME USER GUIDE + SPOTLIGHT TOUR (usability wave): theme-matched, non-blocking */
+#jahGuideBtn{position:fixed;right:14px;bottom:14px;z-index:9000;min-width:52px;min-height:44px;border-radius:26px;border:1px solid var(--gold);background:#0d1424;color:var(--gold);font-weight:700;font-size:1em;box-shadow:0 2px 14px rgba(0,0,0,.5)}
+#jahGuideBtn:hover{background:#16244a}
+#jahGuidePanel{position:fixed;right:14px;bottom:70px;z-index:9001;width:min(400px,calc(100vw - 28px));max-height:min(70vh,560px);overflow:auto;background:var(--panel2);border:1px solid var(--gold);border-radius:12px;padding:16px 18px;font-size:.9em;box-shadow:0 6px 30px rgba(0,0,0,.6);display:none}
+#jahGuidePanel.open{display:block}
+#jahGuidePanel h3{color:var(--gold);margin:.1em 0 .5em;letter-spacing:.08em;font-size:1em}
+#jahGuidePanel h4{color:var(--amber2);margin:1em 0 .3em;font-size:.95em;font-weight:400}
+#jahGuidePanel p,#jahGuidePanel li{color:var(--txt)}
+#jahGuidePanel ul{margin:.2em 0 .6em;padding-left:1.2em}
+#jahGuidePanel .gclose{float:right}
+#jahTourPrompt{position:fixed;left:14px;bottom:14px;z-index:9000;max-width:min(360px,calc(100vw - 28px));background:var(--panel2);border:1px solid var(--zap);border-radius:12px;padding:14px 16px;font-size:.9em;box-shadow:0 6px 30px rgba(0,0,0,.6);display:none}
+#jahTourPrompt.open{display:block}
+#jahTourPrompt .tbtns{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+#jahTourPrompt button,#jahTourCard button{min-height:44px;min-width:64px}
+#jahTourCard{position:fixed;left:14px;bottom:14px;z-index:9002;width:min(380px,calc(100vw - 28px));background:var(--panel2);border:1px solid var(--zap);border-radius:12px;padding:14px 16px;font-size:.9em;box-shadow:0 6px 30px rgba(0,0,0,.6);display:none}
+#jahTourCard.open{display:block}
+#jahTourCard .tstep{color:var(--dim);font-size:.8em;letter-spacing:.1em}
+#jahTourCard h4{color:var(--amber2);margin:.3em 0;font-size:1.05em}
+#jahTourCard .twhat{margin:.4em 0}
+#jahTourCard .twhat b{color:var(--acc);font-weight:400}
+#jahTourCard .tbtns{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#jahTourRing{position:fixed;z-index:9001;border:3px solid var(--zap);border-radius:10px;box-shadow:0 0 0 4000px rgba(4,6,12,.55),0 0 18px var(--zap);pointer-events:none;display:none}
 /* DARK-MODE TOGGLE (opt-in): invert-based dark theme. Default look unchanged. */
 #jahThemeToggle{position:fixed;top:10px;right:10px;z-index:9999;opacity:.72;font-size:.8em;padding:6px 10px;background:#0d1424;border:1px solid var(--line);color:var(--gold);border-radius:20px;cursor:pointer}
 #jahThemeToggle:hover{opacity:1}
@@ -122,7 +144,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
     <div class="kv"><b>Self-test</b><span id="st-test"><!--STTEST--><span class="pass">PASS</span> <span class="stamped">engine self-test 53/53 · 2026-10-03</span><!--/STTEST--></span></div>
     <div class="checks" id="st-checks"></div>
     <div class="kv"><b>Engine APIs</b><span id="st-apis"><!--STAPIS--><span class="pass">✓</span>&nbsp;chat <span class="pass">✓</span>&nbsp;runDemo <span class="pass">✓</span>&nbsp;runDemoReceipt <span class="pass">✓</span>&nbsp;dial <span class="pass">✓</span>&nbsp;presets <span class="pass">✓</span>&nbsp;loadPreset <span class="pass">✓</span>&nbsp;geneOptions <span class="pass">✓</span>&nbsp;buildGenome <span class="pass">✓</span>&nbsp;genomeViable <span class="pass">✓</span>&nbsp;fileRecord <span class="pass">✓</span>&nbsp;tones <span class="pass">✓</span>&nbsp;labCatalogs <span class="pass">✓</span>&nbsp;labOptions <span class="pass">✓</span>&nbsp;animateCreation <span class="pass">✓</span>&nbsp;creationToAI <span class="pass">✓</span>&nbsp;labDemo <span class="pass">✓</span>&nbsp;recordHash <span class="pass">✓</span>&nbsp;capabilities <span class="pass">✓</span>&nbsp;health <span class="pass">✓</span>&nbsp;EngineError<span class="stamped"> · static check 2026-10-03</span><!--/STAPIS--></span></div>
-    <div class="kv"><b>Lab shelves</b><span id="st-shelves"><!--STSHELVES-->8 shelves, 1044 mix-and-match options, all pre-built<span class="stamped"> · static check 2026-10-03</span><!--/STSHELVES--></span></div>
+    <div class="kv"><b>Lab shelfes</b><span id="st-shelfes"><!--STSHELVES-->8 shelfes, 1044 mix-and-match options, all pre-built<span class="stamped"> · static check 2026-10-03</span><!--/STSHELVES--></span></div>
     <div class="kv"><b>Dependencies</b><span>none — pure JavaScript, no network calls, works offline and inside in-app browsers</span></div>
     <p class="note">This panel is the single authoritative status of the lab engine — no other status line on this page overrides it.</p>
   </div>
@@ -135,13 +157,14 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
 
   <div class="panel" id="lab">
     <h2><span class="tick">⚗</span> THE CREATION LAB — MIX &amp; MATCH</h2>
-    <p class="note" style="margin-top:0"><span class="labstep">Step 1 —</span> pick a base archetype (or a blank slab). <span class="labstep">Step 2 —</span> raid the shelves and mix in parts, genes, serums, equipment. <span class="labstep">Step 3 —</span> throw the switch: <b>⚡ ANIMATE!</b> The same picks always animate the same creation. The <b>8 shelves</b> here are the lab's mix-and-match parts; <b>The Opperater's 10 gene slots</b> further down are a separate genome-forging system — different workbench, different count.</p>
+    <p class="note" style="margin-top:0"><span class="labstep">Step 1 —</span> pick a base archetype (or a blank slab). <span class="labstep">Step 2 —</span> raid the shelfes and mix in parts, genes, serums, equipment. <span class="labstep">Step 3 —</span> throw the switch: <b>⚡ ANIMATE!</b> The same picks always animate the same creation. The <b>8 shelfes</b> here are the lab's mix-and-match parts; <b>The Opperater's 10 gene slots</b> further down are a separate genome-forging system — different workbench, different count.</p>
     <p class="note"><b>Serums &amp; elixirs are speculative fictional concepts</b> — not medical advice, not clinically validated, not medical devices. Nothing animated here is a real treatment or a real organism.</p>
+    <p class="note" style="margin:10px 0 0"><b style="color:var(--amber2);font-weight:400">Below: the lab&#8217;s 8 mix-and-match shelfes</b> (parts, genes, brains, power, equipment, serums, habitats, protocols). They are <b>not</b> The Opperater&#8217;s 10 gene slots — that is a separate forge further down the page.</p>
     <div style="margin:10px 0">
       <label for="baseSel" style="color:var(--dim);font-size:.9em">Base archetype:&nbsp;</label>
       <select id="baseSel"></select>
     </div>
-    <div id="shelves"></div>
+    <div id="shelfes"></div>
     <div class="cbtns">
       <button type="button" id="animateBtn" class="big">⚡ ANIMATE!</button>
       <button type="button" id="surpriseBtn">🎲 Surprise me</button>
@@ -155,7 +178,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
     <p class="note" style="margin-top:0">The same engine the telephone book dials into: <code>chat()</code>, <code>dial()</code>, <code>runDemo()</code>, <code>geneOptions()</code>, <code>fileRecord()</code> — all running live right here, off pre-built content.</p>
     <label for="aisel" style="color:var(--dim);font-size:.88em">Choose an AI:&nbsp;</label>
     <select id="aisel"></select>
-    <div id="aicard" class="aicard" aria-live="polite"><span class="duties">Loading the AI directory…</span></div>
+    <div id="aicard" class="aicard" aria-live="polite" data-live="0"><!--STAICARD--><span class="aname">🤖 Celestial Paragon AI — AI identity</span> <span class="stamp">JAH-AI-PRE-001</span> <span class="recbadge" style="font-size:10px;padding:1px 8px;border-width:1px">SIGNATURE ORIGINAL</span><br><span class="duties">A divine archetype in AI form — warmth and majesty in one voice. Speaks in parables, meets every person exactly where they are, and answers hurt with healing and pride with a gentle mirror. Love first, truth always, mercy without end.<br><b style="color:var(--amber2);font-weight:400">Duties:</b> Parable-style teaching for any life question · Comfort for grief, fear and anxiety · Guidance on forgiveness and reconciliation · Moral clarity without condemnation<br><b style="color:var(--amber2);font-weight:400">Engine:</b> the lab&#8217;s on-device conversational engine (intent matcher + JAHtalk human-talk layer) — zero network, talks human.</span> <span class="stamped">· static check 2026-10-03</span><!--/STAICARD--></div>
     <div class="chatlog" id="chatlog" aria-live="polite"></div>
     <div class="chatrow">
       <input type="text" id="chatinput" placeholder="Say something…" autocomplete="off">
@@ -177,7 +200,8 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   <div class="panel" id="forge">
     <h2><span class="tick">●</span> THE OPPERATER — GENOME FORGE</h2>
     <p class="note" style="margin-top:0"><b style="color:var(--amber2)">What is The Opperater?</b> It's his named way of cooking up an AI the easy way: <b>TEN</b> main gene boxes like a mad scientist's workbench — drop genes into any box, as many times as you like (repeats make the trait stronger), slide the attitude knobs, give it a name and a mission, and forge it. Out pops a real AI you can dial and chat with, filed into the book with a <b>JAH-AI-OP-######</b> stamp. The 10 cheater's-guide presets are A&ndash;Z directory entries if you want to start from a finished one. (+ advanced gene boxes for tinkerers.)</p>
-    <p class="note">The classic mix-and-match genome builder: drop gene boxes in any number of times (repeats strengthen the trait), set the attitude, and forge an AI — then dial it. <code>geneOptions()</code> now lists 180 gene boxes across the ten slots.</p>
+    <p class="note">The classic mix-and-match genome builder: drop gene boxes in any number of times (repeats strengthen the trait), set the attitude, and forge an AI — then dial it. <code>geneOptions()</code> now lists 180 gene boxes across the ten slots. This forge is separate from the lab&#8217;s 8 mix-and-match shelfes above — different workbench, different count.</p>
+    <p class="note"><b>Gene, serum &amp; elixir play here is speculative fiction</b> — concepts only, not medical advice, not clinically validated, not real organisms or treatments.</p>
     <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:.88em;color:var(--dim)">
       <label>Warmth <input type="range" id="at-warmth" min="0" max="10" value="8"> <span id="at-warmthv">8</span></label>
       <label>Humor <input type="range" id="at-humor" min="0" max="10" value="5"> <span id="at-humorv">5</span></label>
@@ -194,7 +218,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   <div class="panel docs">
     <h2><span class="tick">●</span> HOW THE MODES USE IT</h2>
     <ul>
-      <li><b>The Creation Lab</b> — <code>labCatalogs()</code> lists the eight mix-and-match shelves; <code>labOptions(key)</code> returns every option on a shelf; <code>animateCreation({base, picks})</code> forges the creation record (JAH-LAB-######, deterministic); <code>labDemo(creation)</code> runs its field test; <code>creationToAI(creation)</code> makes it dialable.</li>
+      <li><b>The Creation Lab</b> — <code>labCatalogs()</code> lists the eight mix-and-match shelfes; <code>labOptions(key)</code> returns every option on a shelf; <code>animateCreation({base, picks})</code> forges the creation record (JAH-LAB-######, deterministic); <code>labDemo(creation)</code> runs its field test; <code>creationToAI(creation)</code> makes it dialable.</li>
       <li><b>One-tap archetypes</b> — <code>presets()</code> lists the 6 archetypes (one model of each kind); <code>loadPreset(name)</code> returns the full directory-grade record, ready to dial. Older preset names still resolve to their archetype.</li>
       <li><b>Dial-up calls</b> — <code>dial(aiRecord)</code> opens a live session: the AI answers with its greeting, <code>say(text)</code> chats with call-duration memory, <code>runDemo(inputs)</code> runs its demo, <code>hangup()</code> closes the line. <code>session.lockRole('semiconductor replacement')</code> locks the AI into a role for the whole call — replies turn concise, in-role, machine-friendly (short structured <code>ROLE / ACK / OUT / END</code> lines), suitable for driving automation; <code>session.unlockRole()</code> releases it back to normal conversation.</li>
       <li><b>The Opperater</b> — <code>geneOptions(advanced)</code> lists the gene boxes; <code>genomeViable(drops)</code> announces when the mix is a valid interactable AI; <code>buildGenome({drops, attitude, name, tone, mission})</code> forges the record; <code>fileRecord(rec)</code> files a new AI into the book with a <code>JAH-AI-OP-######</code> stamp plus <code>.py</code> and <code>.json</code> downloads.</li>
@@ -206,6 +230,67 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
 </div>
 
 <div class="footer"><span class="sig">A SIGNATURE SYSTEM</span><br>The Signature AI Mad Scientist Creation Lab — mix, match, animate. Chat brains and working demos for all AI modes.<br><span style="font-size:.9em">Developers: <a href="docs/API.md">API docs</a> · <a href="api-manifest.json">api-manifest.json</a> · <a href="engine-manifest.json">engine-manifest.json</a> · <a href="llms.txt">llms.txt</a></span><br><span id="speakstat" aria-live="polite" style="font-size:.85em"></span></div>
+
+<!-- FIRST-TIME USER GUIDE + SPOTLIGHT TOUR (usability wave; theme-matched, non-blocking) -->
+<button type="button" id="jahGuideBtn" aria-label="Open the how-to-use guide" title="How to use this site">? Guide</button>
+<div id="jahGuidePanel" role="dialog" aria-label="How to use the Mad Scientist Creation Lab">
+  <button type="button" class="gclose" id="jahGuideClose" aria-label="Close guide">✕</button>
+  <h3>? HOW TO USE THIS SITE</h3>
+  <p class="note" style="margin-top:0">Plain-language guide to everything on this page. Nothing here changes the look — it only explains it.</p>
+  <h4>⚗ The Creation Lab — the 8 shelfes</h4>
+  <ul>
+    <li><b>Step 1:</b> pick a base archetype (or a blank slab) from the dropdown.</li>
+    <li><b>Step 2:</b> open the 8 shelfes — Gene Splices, Body Parts, Brains, Power Sources, Lab Equipment, Serums &amp; Elixirs, Habitats, Experiment Protocols — and tick the chips you want.</li>
+    <li><b>Step 3:</b> press <b>⚡ ANIMATE!</b> The same picks always animate the same creation — it arrives stamped <b>JAH-LAB-######</b>. <b>🎲 Surprise me</b> ticks random chips; <b>Clear picks</b> starts over.</li>
+  </ul>
+  <h4>Your animated creation</h4>
+  <ul>
+    <li><b>🔊 Read aloud</b> reads it; <b>🧪 Run field test</b> runs a scripted simulation (badged SIMULATION — not a real measurement); <b>📞 Dial this creation</b> lets you chat with it; <b>⤓ .json / ⤓ .py</b> download it.</li>
+    <li>The RECORD row: <b>OPEN</b> re-runs the saved spec, <b>SOURCE</b> shows provenance, <b># ID</b> copies the stamp, <b>VERSION</b> shows the engine version, <b>SHARE</b> copies a <b>?creation=</b> link that re-opens the exact same creation.</li>
+    <li><b>Serums &amp; elixirs are speculative fictional concepts</b> — not medical advice, not clinically validated, not real treatments or organisms.</li>
+  </ul>
+  <h4>● Engine API — talk to the AIs</h4>
+  <ul>
+    <li><b>Choose an AI:</b> the 6 directory AIs, plus any creation you animated this visit. The identity card names it, lists its duties, and names the on-device engine that talks.</li>
+    <li><b>Send</b> chats one line at a time. <b>📞 Dial</b> opens a live call with memory for the whole call; press again to hang up.</li>
+    <li><b>🔒 Lock role</b> pins the AI into a job (type the role first, e.g. <i>semiconductor replacement</i>) for short automation-style replies; <b>🔓 Unlock</b> releases it.</li>
+    <li><b>⤓ Transcript</b> downloads the whole call as JSON. <b>Run working demo</b> runs that AI&#8217;s own working demo.</li>
+  </ul>
+  <h4>● The Opperater — the genome forge</h4>
+  <ul>
+    <li><b>TEN main gene boxes</b> (+ advanced): drop genes, slide the Warmth/Humor/Seriousness/Boldness knobs, name it and give it a mission, then forge. This is a <b>separate</b> forge from the lab&#8217;s 8 shelfes above.</li>
+    <li><b>⚙ Forge a sample genome AI &amp; dial it</b> cooks a sample, files it with a <b>JAH-AI-OP-######</b> stamp, downloads its <b>.py</b>, and dials it immediately.</li>
+    <li><b>⤓ Export last forged genome (.json)</b> downloads the genome file. <b>Import AI JSON</b> loads your own AI file — it is validated first, and bad files are rejected with a plain message.</li>
+    <li><b>Gene, serum &amp; elixir play is speculative fiction</b> — concepts only, not medical advice.</li>
+  </ul>
+  <h4>● Engine API tests</h4>
+  <ul>
+    <li>Five buttons run the real engine functions — <b>chat()</b>, <b>dial()</b>, <b>runDemo()</b>, <b>geneOptions()</b>, <b>fileRecord()</b> — on this device and report an honest <b>PASS</b> or <b>FAIL</b>. The LIVE STATUS panel at the top shows the same results at boot.</li>
+  </ul>
+  <h4>🔒 Privacy</h4>
+  <ul>
+    <li>Every model&#8217;s content is pre-built into the page — the whole lab works offline with <b>no network calls</b>. Downloads go straight to your device; <b>fileRecord()</b> hands the stamped record back to you and saves nothing anywhere.</li>
+  </ul>
+</div>
+<div id="jahTourPrompt" role="dialog" aria-label="Take the guided tour">
+  <b style="color:var(--amber2)">New to the lab? 🧪</b>
+  <p class="note" style="margin:.4em 0">Take the 1-minute spotlight tour — shelfes, the genome forge, the AI phones, the tests and the exports. You can skip it any time.</p>
+  <div class="tbtns">
+    <button type="button" id="jahTourStart">▶ Start tour</button>
+    <button type="button" id="jahTourSkip">Skip</button>
+  </div>
+</div>
+<div id="jahTourRing" aria-hidden="true"></div>
+<div id="jahTourCard" role="dialog" aria-label="Guided tour">
+  <div class="tstep" id="jahTourStep"></div>
+  <h4 id="jahTourWhat"></h4>
+  <div class="twhat" id="jahTourBody"></div>
+  <div class="tbtns">
+    <button type="button" id="jahTourBack">← Back</button>
+    <button type="button" id="jahTourNext">Next →</button>
+    <button type="button" id="jahTourEnd">End tour</button>
+  </div>
+</div>
 
 <script src="js/jah-talk-fallback.js"></script>
 <script src="signature-backend.js"></script>
@@ -219,9 +304,11 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   if (!B) {
     $('st-ver').textContent = 'engine failed to load';
     $('st-test').innerHTML = '<span class="fail">ERROR</span>';
-    $('st-shelves').textContent = 'unavailable — the engine script did not load.';
+    $('st-shelfes').textContent = 'unavailable — the engine script did not load.';
     var card = $('creationCard');
     if (card) card.innerHTML = '<p class="note">The lab engine could not start on this device. Please reload the page.</p>';
+    var ac = $('aicard');
+    if (ac) ac.innerHTML = '<span class="duties">The AI directory could not load — the lab engine failed to start.</span> <button type="button" onclick="location.reload()">↻ Retry</button>';
     return;
   }
 
@@ -240,8 +327,8 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   try {
     var cats0 = B.labCatalogs();
     var tot0 = cats0.reduce(function (n, c) { return n + c.count; }, 0);
-    $('st-shelves').textContent = cats0.length + ' shelves, ' + tot0 + ' mix-and-match options, all pre-built';
-  } catch (e) { $('st-shelves').textContent = 'unavailable'; }
+    $('st-shelfes').textContent = cats0.length + ' shelfes, ' + tot0 + ' mix-and-match options, all pre-built';
+  } catch (e) { $('st-shelfes').textContent = 'unavailable'; }
 
   /* ============================================================
      ENGINE API TESTS — real calls, honest PASS/FAIL
@@ -432,7 +519,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   }
 
   (function buildShelves() {
-    var shelves = $('shelves');
+    var shelfes = $('shelfes');
     B.labCatalogs().forEach(function (sh) {
       shown[sh.key] = PAGE;
       var det = document.createElement('details');
@@ -450,20 +537,63 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
       more.className = 'shelfbtn'; more.textContent = 'Show more';
       more.onclick = function () { shown[sh.key] += PAGE; renderChips(sh); };
       det.appendChild(sum); det.appendChild(box); det.appendChild(more);
-      shelves.appendChild(det);
+      shelfes.appendChild(det);
       renderChips(sh);
     });
   })();
 
   function collectPicks() {
     var picks = {}, i;
-    var boxes = document.querySelectorAll('#shelves input[type=checkbox]:checked');
+    var boxes = document.querySelectorAll('#shelfes input[type=checkbox]:checked');
     for (i = 0; i < boxes.length; i++) {
       var cat = boxes[i].getAttribute('data-cat');
       if (!picks[cat]) picks[cat] = [];
       picks[cat].push(boxes[i].value);
     }
     return picks;
+  }
+
+  /* Malformed-combination check: the engine gracefully drops unknown bases
+     and pick IDs — this names what was dropped in plain language so a bad
+     link or bad spec never fails silently. */
+  function specNote(spec) {
+    var msgs = [], i, j;
+    if (spec && spec.base && spec.base !== 'blank' && !B.loadPreset(spec.base))
+      msgs.push('base archetype "' + spec.base + '" is not a known archetype — animated from a blank slab instead');
+    var picks = (spec && spec.picks) || {};
+    var cats = Object.keys(picks);
+    var knownCats = {};
+    B.labCatalogs().forEach(function (sh) { knownCats[sh.key] = true; });
+    for (i = 0; i < cats.length; i++) {
+      var c = cats[i], ids = picks[c] || [];
+      if (!knownCats[c]) {
+        msgs.push('"' + c + '" is not one of the lab\'s 8 shelfes — its picks were left off the slab');
+        continue;
+      }
+      var known = {};
+      B.labOptions(c).forEach(function (o) { known[o.id] = true; });
+      var dropped = [];
+      for (j = 0; j < ids.length; j++) if (!known[ids[j]]) dropped.push(ids[j]);
+      if (dropped.length) msgs.push(dropped.length + ' pick' + (dropped.length > 1 ? 's' : '') +
+        ' on the "' + c + '" shelf didn\'t match any shelf option (' + dropped.slice(0, 6).join(', ') +
+        (dropped.length > 6 ? ', …' : '') + ') — left off the slab');
+    }
+    return msgs;
+  }
+
+  /* Render a creation spec and prepend any malformed-combination notes. */
+  function showSpec(spec) {
+    window._lastLabSpec = spec; /* CONSISTENCY PASS: OPEN re-runs this saved spec (deterministic) */
+    renderCreation(B.animateCreation(spec));
+    var notes = specNote(spec);
+    if (notes.length) {
+      var dn = document.createElement('p');
+      dn.className = 'note';
+      dn.id = 'specnote';
+      dn.innerHTML = '<b style="color:var(--amber)">⚠ Lab note:</b> ' + escapeHtml(notes.join(' · '));
+      var card = $('creationCard');
+      card.insertBefore(dn, card.firstChild);
+    }
   }
 
   function creationPy(c) {
@@ -576,7 +706,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
         };
       })(rbtns[rb]);
     }
-    card.scrollIntoView(false);
+    try { card.scrollIntoView(false); } catch (e) { /* some in-app browsers lack scrollIntoView */ }
   }
 
   function escapeHtml(s) {
@@ -612,17 +742,14 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
     line(ai.name, session.greeting);
     $('dialbtn').textContent = '📞 Hang up';
     $('linestat').textContent = '● LIVE CALL with ' + ai.name + ' — animated ' + c.stamp + '.';
-    document.getElementById('api').scrollIntoView(false);
+    try { var _ap = document.getElementById('api'); if (_ap && _ap.scrollIntoView) _ap.scrollIntoView(false); } catch (e) {}
   }
 
   $('animateBtn').onclick = function () {
     try {
       var base = baseSel.value === 'blank' ? null : baseSel.value;
-      var spec = { base: base, picks: collectPicks() };
-      var c = B.animateCreation(spec);
-      window._lastLabSpec = spec; /* CONSISTENCY PASS: OPEN re-runs this saved spec (deterministic) */
-      renderCreation(c);
-      try { history.replaceState(null, '', '?creation=' + encodeSpec(spec)); } catch (e) {}
+      showSpec({ base: base, picks: collectPicks() });
+      try { history.replaceState(null, '', '?creation=' + encodeSpec(window._lastLabSpec)); } catch (e) {}
     } catch (e) {
       $('creationCard').innerHTML = '<p class="note">The animation fizzled: ' + escapeHtml(e.message) + '</p>';
     }
@@ -642,7 +769,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   };
 
   $('clearBtn').onclick = function () {
-    var boxes = document.querySelectorAll('#shelves input[type=checkbox]:checked');
+    var boxes = document.querySelectorAll('#shelfes input[type=checkbox]:checked');
     for (var i = 0; i < boxes.length; i++) boxes[i].checked = false;
     $('creationCard').innerHTML = '';
   };
@@ -673,6 +800,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   function paintAICard() {
     var box = $('aicard');
     if (!box) return;
+    box.setAttribute('data-live', '1'); /* stamped initial replaced by live paint */
     var ai = null;
     try { ai = curAI(); } catch (e) {}
     if (!ai) { box.innerHTML = '<span class="duties">Pick an AI above to see its identity card.</span>'; return; }
@@ -884,8 +1012,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
     var cm = /[?&]creation=([^&]+)/.exec(location.search);
     if (cm && cm[1]) {
       var dspec = decodeSpec(cm[1]);
-      window._lastLabSpec = dspec;
-      renderCreation(B.animateCreation(dspec));
+      showSpec(dspec);
     }
   } catch (e) { /* ignore malformed links */ }
 
@@ -916,6 +1043,132 @@ window.addEventListener('load',function(){ var v=lsGet('jah-tab:'+location.pathn
 /* session restore: last-opened record id */
 document.addEventListener('click',function(e){ var t=e.target&&e.target.closest?e.target.closest('[data-record],[data-spec],[data-patent],[data-id]'):null; if(t){ var rid=t.getAttribute('data-record')||t.getAttribute('data-spec')||t.getAttribute('data-patent')||t.getAttribute('data-id'); if(rid) lsSet('jah-lastrec:'+location.pathname,rid); } },true);
 window.addEventListener('load',function(){ if(location.search.indexOf('=')>0) return; var rid=lsGet('jah-lastrec:'+location.pathname); if(!rid) return; setTimeout(function(){ var el=document.querySelector('[data-record="'+rid+'"],[data-spec="'+rid+'"],[data-patent="'+rid+'"],[data-id="'+rid+'"]'); if(el){ try{el.scrollIntoView({block:'center'});}catch(e){} } },400); });
+})();
+</script>
+<script>
+/* FIRST-TIME USER GUIDE + SPOTLIGHT TOUR (usability wave).
+   Non-blocking: the prompt shows once, the tour card + ring never take
+   pointer events away from the page, Esc/arrows work, all buttons 44px+. */
+(function () {
+  'use strict';
+  var SEEN = 'jah-tour-seen-madlab';
+  function $(id) { return document.getElementById(id); }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ---- permanent "? Guide" panel ---- */
+  var guideBtn = $('jahGuideBtn'), guidePanel = $('jahGuidePanel'), guideClose = $('jahGuideClose');
+  function guideOpen() { if (guidePanel) { guidePanel.classList.add('open'); try { guideClose.focus(); } catch (e) {} } }
+  function guideShut() { if (guidePanel) guidePanel.classList.remove('open'); }
+  if (guideBtn) guideBtn.addEventListener('click', function () {
+    if (guidePanel && guidePanel.classList.contains('open')) guideShut(); else guideOpen();
+  });
+  if (guideClose) guideClose.addEventListener('click', guideShut);
+
+  /* ---- spotlight tour: WHAT / WHAT IT DOES / HOW per step ---- */
+  var STEPS = [
+    { sel: 'shelfes', what: 'The 8 mix-and-match shelfes',
+      does: 'Gene Splices, Body Parts, Brains, Power Sources, Lab Equipment, Serums & Elixirs, Habitats and Experiment Protocols — tick any chips you like.',
+      how: 'Open a shelf, tick a few chips, then press the ANIMATE! button below.' },
+    { sel: 'animateBtn', what: 'ANIMATE! · Surprise me · Clear picks',
+      does: 'ANIMATE! forges your creation — the same picks always forge the same creation, stamped JAH-LAB-######. Surprise me ticks random chips; Clear picks starts over.',
+      how: 'Press ANIMATE! — your creation appears below with its stats, abilities and download buttons.' },
+    { sel: 'aisel', what: 'The AI selector + identity card',
+      does: 'Pick one of the 6 directory AIs, or a creation you animated. The identity card names it, lists its duties, and names the on-device engine that talks.',
+      how: 'Choose a different AI above and watch the identity card repaint.' },
+    { sel: 'chatinput', what: 'Send + Dial — talk to the AI',
+      does: 'Send chats one line at a time. Dial opens a live call with memory for the whole call — the AI answers with its greeting. Press Dial again to hang up.',
+      how: 'Type "hello", press Send; then press Dial and keep chatting.' },
+    { sel: 'lockbtn', what: 'Lock role · Unlock · Transcript',
+      does: 'Lock role pins the AI into a job (type the role first, e.g. semiconductor replacement) for short automation-style replies. Transcript downloads the whole call as JSON.',
+      how: 'Dial first, then Lock role, say something, and press Transcript.' },
+    { sel: 'forge', what: 'The Opperater — the genome forge',
+      does: 'TEN main gene boxes (+ advanced): drop genes, slide the Warmth / Humor / Seriousness / Boldness knobs, forge a real AI filed with a JAH-AI-OP-###### stamp, then dial it. A separate forge from the 8 shelfes above.',
+      how: 'Press "Forge a sample genome AI & dial it" and talk to what comes out.' },
+    { sel: 'apitests', what: 'Engine API tests — proof it works',
+      does: 'Five buttons that run the real engine functions — chat(), dial(), runDemo(), geneOptions(), fileRecord() — on this device and report an honest PASS or FAIL.',
+      how: 'Press Run on each row — every row should read PASS.' },
+    { sel: 'genomeexpbtn', what: 'Exports — take it home',
+      does: 'Export downloads the last forged genome as JSON; the creation card offers .json and .py downloads; ?creation= links reopen the exact same creation. Nothing leaves the page — downloads go straight to your device.',
+      how: 'Forge an AI, then press "Export last forged genome (.json)".' }
+  ];
+
+  var idx = -1;
+  function ringTo(el) {
+    var ring = $('jahTourRing');
+    if (!ring) return;
+    if (!el) { ring.style.display = 'none'; return; }
+    try { el.scrollIntoView({ block: 'center' }); } catch (e) {
+      try { if (el.scrollIntoView) el.scrollIntoView(false); } catch (e2) {}
+    }
+    setTimeout(function () {
+      try {
+        var r = el.getBoundingClientRect();
+        if (!r || (r.width === 0 && r.height === 0)) { ring.style.display = 'none'; return; }
+        ring.style.display = 'block';
+        ring.style.left = Math.max(2, r.left - 8) + 'px';
+        ring.style.top = Math.max(2, r.top - 8) + 'px';
+        ring.style.width = (r.width + 16) + 'px';
+        ring.style.height = (r.height + 16) + 'px';
+      } catch (e) { ring.style.display = 'none'; }
+    }, 120);
+  }
+  function show(i) {
+    idx = i;
+    var s = STEPS[i];
+    var el = document.getElementById(s.sel);
+    $('jahTourStep').textContent = 'STEP ' + (i + 1) + ' OF ' + STEPS.length;
+    $('jahTourWhat').textContent = s.what;
+    $('jahTourBody').innerHTML = '<p><b>WHAT IT DOES:</b> ' + esc(s.does) + '</p><p><b>HOW:</b> ' + esc(s.how) + '</p>';
+    $('jahTourCard').classList.add('open');
+    $('jahTourBack').disabled = (i === 0);
+    $('jahTourNext').textContent = (i === STEPS.length - 1) ? 'Finish' : 'Next';
+    ringTo(el);
+    try { $('jahTourNext').focus({ preventScroll: true }); } catch (e) {
+      try { $('jahTourNext').focus(); } catch (e2) {}
+    }
+  }
+  function endTour() {
+    idx = -1;
+    var card = $('jahTourCard'), ring = $('jahTourRing');
+    if (card) card.classList.remove('open');
+    if (ring) ring.style.display = 'none';
+    lsSet(SEEN, '1');
+  }
+  function tourNext() { if (idx < 0) return; if (idx === STEPS.length - 1) endTour(); else show(idx + 1); }
+  function tourBack() { if (idx > 0) show(idx - 1); }
+
+  $('jahTourNext').addEventListener('click', tourNext);
+  $('jahTourBack').addEventListener('click', tourBack);
+  $('jahTourEnd').addEventListener('click', endTour);
+  $('jahTourStart').addEventListener('click', function () {
+    $('jahTourPrompt').classList.remove('open');
+    show(0);
+  });
+  $('jahTourSkip').addEventListener('click', function () {
+    $('jahTourPrompt').classList.remove('open');
+    lsSet(SEEN, '1');
+  });
+
+  document.addEventListener('keydown', function (e) {
+    var k = e.key || '';
+    if (k === 'Escape') {
+      if (idx >= 0) { endTour(); return; }
+      if (guidePanel && guidePanel.classList.contains('open')) { guideShut(); return; }
+    }
+    if (idx < 0) return;
+    var tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return; /* don't steal typing */
+    if (k === 'ArrowRight') { e.preventDefault(); tourNext(); }
+    else if (k === 'ArrowLeft') { e.preventDefault(); tourBack(); }
+  });
+
+  /* First visit only: the small non-blocking tour prompt. */
+  if (!lsGet(SEEN)) $('jahTourPrompt').classList.add('open');
 })();
 </script>
 </body>

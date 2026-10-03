@@ -23,11 +23,11 @@ eval(require('fs').readFileSync(%s, 'utf8'));
 var B = global.window.SignatureBackend;
 var crypto = require('crypto');
 var out = {version: B.version, api_version: B.apiVersion, backend_id: B.backendId,
-  schema_version: B.schemaVersion, shelves: [], gene_slots: [], presets: []};
+  schema_version: B.schemaVersion, shelfes: [], gene_slots: [], presets: []};
 B.labCatalogs().forEach(function (c) {
   var items = B.labOptions(c.key);
   var names = items.map(function (it) { return it.name || it.label || it.code || it.id || ''; });
-  out.shelves.push({name: c.name, key: c.key, count: c.count,
+  out.shelfes.push({name: c.name, key: c.key, count: c.count,
     sha256: crypto.createHash('sha256').update(names.join('\n')).digest('hex')});
 });
 B.geneOptions(true).forEach(function (s) {
@@ -60,7 +60,7 @@ def main():
         "schema_version": info["schema_version"],
         "engine_sha256": engine_sha,
         "generated": datetime.date.today().isoformat(),
-        "shelves": info["shelves"],
+        "shelfes": info["shelfes"],
         "gene_slots": info["gene_slots"],
         "presets": info["presets"],
         "selftest": info["selftest"],

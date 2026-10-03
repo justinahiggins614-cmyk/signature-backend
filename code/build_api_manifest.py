@@ -94,7 +94,7 @@ FORMAL = {
         "permissions": "none",
     },
     "labCatalogs": {
-        "purpose": "List the 8 Creation Lab shelves (separate from the 10 Opperater gene slots).",
+        "purpose": "List the 8 Creation Lab shelfes (separate from the 10 Opperater gene slots).",
         "input": "none",
         "output": "array of {name, count}",
         "errors": [],
