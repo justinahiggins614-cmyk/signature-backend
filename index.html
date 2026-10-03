@@ -71,12 +71,27 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
 .clearfix::after{content:"";display:block;clear:both}
 .labstep{color:var(--zap);font-weight:700;letter-spacing:.08em}
 .note{font-size:.85em;color:var(--dim)}
+/* CONSISTENCY PASS (network-wide 10-fix): shared record kit, styling-neutral */
+.sitekicker{font-size:11px;letter-spacing:.28em;color:var(--dim);margin:0 0 6px}
+.sitekicker b{color:var(--gold)}
+.reclbl{font-size:10.5px;letter-spacing:.22em;color:var(--dim);margin-right:8px}
+.recbadge{display:inline-block;border:2px solid var(--zap);background:#1d1030;color:var(--amber2);border-radius:10px;padding:3px 12px;font-size:12px;font-weight:700;letter-spacing:.06em;margin:3px 6px 3px 0}
+.simflag{display:inline-block;border:2px solid var(--amber);background:#2a1a0a;color:var(--amber2);border-radius:10px;padding:3px 12px;font-size:12px;font-weight:700;letter-spacing:.06em;margin:3px 6px 3px 0}
+.provline{font-size:.85em;color:var(--dim);margin:8px 0}
+.provline b{color:var(--acc);font-weight:400}
+.recbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;align-items:center}
+.recinfo{background:#0a1226;border:1px dashed var(--acc);border-radius:8px;padding:10px 12px;margin:8px 0;font-size:.9em;display:none}
+.aicard{background:#0d1424;border:1px solid var(--zap);border-radius:10px;padding:12px 14px;margin:10px 0;font-size:.9em}
+.aicard .aname{color:var(--amber2);font-weight:700}
+.aicard .stamp{font-family:monospace;color:var(--acc);font-size:.85em}
+.aicard .duties{color:var(--dim)}
 </style>
 </head>
 <body>
 <div class="jahnet"><span class="jahnet-t">THE JAH NETWORK</span><a href="https://justinahiggins614-cmyk.github.io/jah-ai-models/">The Signature AI Phone Book</a><a href="https://justinahiggins614-cmyk.github.io/jah-calculator/">Calculator</a><a href="https://justinahiggins614-cmyk.github.io/jah-dictionary/">Dictionary</a><a href="https://justinahiggins614-cmyk.github.io/jah-wiki/">JAH Wiki</a><a href="https://justinahiggins614-cmyk.github.io/jah-n-wiki-leaks/">JAH-N Wiki</a><a href="https://justinahiggins614-cmyk.github.io/cyber-patent-catalog/">Patent Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-one-archive/specs.html">Spec Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-llama/">Signature Llama</a><a href="https://justinahiggins614-cmyk.github.io/jah-computer-systems/">PC Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-cyber-mega-mall/">Cyber Mega-Mall</a><a href="https://justinahiggins614-cmyk.github.io/signature-university/">Signature University</a><a href="https://justinahiggins614-cmyk.github.io/signature-books/">Book Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-comics/">Comic Store</a><a href="https://justinahiggins614-cmyk.github.io/signature-newspapers/">Global Newspaper Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-3d-print/">3D Print Depository</a><span class="cur" aria-current="page">YOU ARE HERE: MAD SCIENTIST CREATION LAB</span><a href="https://justinahiggins614-cmyk.github.io/signature-boundless-generators/">Boundless Generator Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-mixlab/">AI Mix Lab</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-olypics/">AI Olypics</a><a href="https://justinahiggins614-cmyk.github.io/signature-chip-maker/">Chip Maker and Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-app-archive/">App Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-robot-matcher/">AI Robot Matcher</a><a href="https://justinahiggins614-cmyk.github.io/signature-experiment-solver/">Experiment Solver</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-image-video-maker/">Signature AI Pixel</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-song-maker/">Signature Music Studio</a></div>
 
 <div class="hero">
+  <div class="sitekicker"><b>SITE 16 OF 25</b> · THE JAH NETWORK</div>
   <h1><span class="zap">⚗</span> THE SIGNATURE AI MAD SCIENTIST CREATION LAB</h1>
   <p>Mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations — then chat with them, test them, and take them home. Every model's content is pre-built into the lab: it works fully offline, no live connection needed.</p>
 </div>
@@ -121,6 +136,7 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     <p class="note" style="margin-top:0">The same engine the telephone book dials into: <code>chat()</code>, <code>dial()</code>, <code>runDemo()</code>, <code>geneOptions()</code>, <code>fileRecord()</code> — all running live right here, off pre-built content.</p>
     <label for="aisel" style="color:var(--dim);font-size:.88em">Choose an AI:&nbsp;</label>
     <select id="aisel"></select>
+    <div id="aicard" class="aicard" aria-live="polite"><span class="duties">Loading the AI directory…</span></div>
     <div class="chatlog" id="chatlog" aria-live="polite"></div>
     <div class="chatrow">
       <input type="text" id="chatinput" placeholder="Say something…" autocomplete="off">
@@ -426,6 +442,9 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     var html = '<div class="portrait">' + c.svg + '</div>' +
       '<h3>⚡ ' + escapeHtml(c.name) + '</h3>' +
       '<div class="stamp">' + c.stamp + ' · ' + escapeHtml(c.cls) + ' · from ' + escapeHtml(c.baseName) + '</div>' +
+      /* CONSISTENCY PASS: canonical record-status badge + provenance line */
+      '<div style="margin:8px 0"><span class="reclbl">RECORD STATUS</span><span class="recbadge">USER CREATED</span></div>' +
+      '<p class="provline"><b>Provenance:</b> animated by the Mad Scientist Creation Lab engine v' + escapeHtml(B.version) + ' (animateCreation, deterministic) · base ' + escapeHtml(c.baseName) + ' · ' + c.pickCount + ' shelf picks · seed ' + escapeHtml(c.seed) + '</p>' +
       '<p>' + escapeHtml(c.description) + '</p>';
     var stats = [['Power', c.stats.power], ['Cunning', c.stats.cunning], ['Chaos', c.stats.chaos], ['Stability', c.stats.stability]];
     for (var i = 0; i < stats.length; i++) {
@@ -441,6 +460,14 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
       '<button type="button" data-a="dial">📞 Dial this creation</button>' +
       '<button type="button" data-a="json">⤓ .json</button>' +
       '<button type="button" data-a="py">⤓ .py</button></div>' +
+      /* CONSISTENCY PASS: record panel — OPEN · SOURCE · ID · VERSION · SHARE (read-aloud/copy/download live in the row above) */
+      '<div class="recbar" role="group" aria-label="Record panel: open, source, id, version, share"><span class="reclbl">RECORD</span>' +
+      '<button type="button" data-r="open">↗ OPEN</button>' +
+      '<button type="button" data-r="src">⇄ SOURCE</button>' +
+      '<button type="button" data-r="id"># ID</button>' +
+      '<button type="button" data-r="ver">⚙ VERSION</button>' +
+      '<button type="button" data-r="share">⤴ SHARE</button></div>' +
+      '<div class="recinfo" id="labrecinfo" style="display:none"></div>' +
       '<div class="demoout" id="labout" style="display:none"></div>';
     d.innerHTML = html;
     card.appendChild(d);
@@ -451,12 +478,49 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
           var act = btn.getAttribute('data-a');
           var out = $('labout');
           if (act === 'read') { speak(c.name + '. ' + c.description); }
-          else if (act === 'test') { out.style.display = ''; out.textContent = B.labDemo(c); speak(B.labDemo(c)); }
+          /* CONSISTENCY PASS: the field test is a scripted simulation — badge it permanently */
+          else if (act === 'test') { var ft = B.labDemo(c); out.style.display = ''; out.innerHTML = '<span class="simflag">SIMULATION — scripted field test, not a real measurement</span><br>' + escapeHtml(ft); speak(ft); }
           else if (act === 'json') { download(c.stamp + '.json', JSON.stringify(c, null, 2), 'application/json'); }
           else if (act === 'py') { download(c.stamp + '.py', creationPy(c), 'text/x-python'); }
           else if (act === 'dial') { dialCreation(c); }
         };
       })(btns[b]);
+    }
+    /* CONSISTENCY PASS: record-panel actions */
+    var rbtns = d.querySelectorAll('[data-r]');
+    for (var rb = 0; rb < rbtns.length; rb++) {
+      (function (btn) {
+        btn.onclick = function () {
+          var r = btn.getAttribute('data-r');
+          var info = d.querySelector('#labrecinfo');
+          function show(html) { info.style.display = ''; info.innerHTML = html; }
+          if (r === 'open') {
+            /* creations are ephemeral — OPEN re-runs the saved lab spec; the engine is deterministic, so the same record reopens */
+            var s = window._lastLabSpec;
+            if (s) { try { renderCreation(B.animateCreation(s)); } catch (e) { show('<b>OPEN</b> — could not re-animate: ' + escapeHtml(e.message)); } }
+            else show('<b>OPEN</b> — this creation is already open.');
+          }
+          else if (r === 'src') {
+            if (info.style.display !== 'none' && info.getAttribute('data-k') === 'src') { info.style.display = 'none'; info.setAttribute('data-k', ''); return; }
+            show('<b>SOURCE</b> — animated in the Mad Scientist Creation Lab from base <b>' + escapeHtml(c.baseName) + '</b>; ' + c.pickCount + ' shelf picks; deterministic seed ' + escapeHtml(c.seed) + '. The same picks always animate this exact creation.');
+            info.setAttribute('data-k', 'src');
+          }
+          else if (r === 'id') {
+            show('<b>ID</b> — ' + escapeHtml(c.stamp) + ' (permanent record stamp for this creation)');
+            info.setAttribute('data-k', 'id');
+            try { if (navigator.clipboard) navigator.clipboard.writeText(c.stamp); } catch (e) {}
+          }
+          else if (r === 'ver') {
+            show('<b>VERSION</b> — Mad Scientist Creation Lab engine v' + escapeHtml(B.version) + ' · JAH-LAB record schema v1 · deterministic: the same base + picks always yield this exact record.');
+            info.setAttribute('data-k', 'ver');
+          }
+          else if (r === 'share') {
+            var txt = c.stamp + ' — ' + c.name + ' (' + c.cls + '), animated in the Mad Scientist Creation Lab from ' + c.baseName + '. ' + c.description;
+            if (navigator.share) { try { navigator.share({ title: c.stamp + ' ' + c.name, text: txt }); } catch (e) {} }
+            else { try { if (navigator.clipboard) navigator.clipboard.writeText(txt); } catch (e) {} show('<b>SHARE</b> — creation summary copied: ' + escapeHtml(txt)); info.setAttribute('data-k', 'share'); }
+          }
+        };
+      })(rbtns[rb]);
     }
     card.scrollIntoView(false);
   }
@@ -488,6 +552,7 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
     hangupQuiet();
     greet();
     renderDemo();
+    paintAICard(); /* CONSISTENCY PASS */
     session = B.dial(ai);
     line('System', '● Line open — ' + ai.name + ' answered, fresh from the slab.');
     line(ai.name, session.greeting);
@@ -499,7 +564,9 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
   $('animateBtn').onclick = function () {
     try {
       var base = baseSel.value === 'blank' ? null : baseSel.value;
-      var c = B.animateCreation({ base: base, picks: collectPicks() });
+      var spec = { base: base, picks: collectPicks() };
+      var c = B.animateCreation(spec);
+      window._lastLabSpec = spec; /* CONSISTENCY PASS: OPEN re-runs this saved spec (deterministic) */
       renderCreation(c);
     } catch (e) {
       $('creationCard').innerHTML = '<p class="note">The animation fizzled: ' + escapeHtml(e.message) + '</p>';
@@ -545,6 +612,23 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
       return presetCache[k];
     }
     return B.loadPreset('paragon');
+  }
+
+  /* CONSISTENCY PASS: AI identity card — every AI that talks gets a card naming it, its duties, and its engine */
+  function paintAICard() {
+    var box = $('aicard');
+    if (!box) return;
+    var ai = null;
+    try { ai = curAI(); } catch (e) {}
+    if (!ai) { box.innerHTML = '<span class="duties">Pick an AI above to see its identity card.</span>'; return; }
+    var v = sel.value || '';
+    var status = v.indexOf('lab:') === 0 ? 'USER CREATED' : 'SIGNATURE ORIGINAL';
+    var duties = (Array.isArray(ai.abilities) ? ai.abilities.slice(0, 4) : []).map(escapeHtml).join(' · ');
+    box.innerHTML = '<span class="aname">🤖 ' + escapeHtml(ai.name) + ' — AI identity</span> ' +
+      '<span class="stamp">' + escapeHtml(ai.stamp || ai.id || '') + '</span> <span class="recbadge" style="font-size:10px;padding:1px 8px;border-width:1px">' + status + '</span><br>' +
+      '<span class="duties">' + escapeHtml(ai.mentality || ai.description || '') +
+      (duties ? '<br><b style="color:var(--amber2);font-weight:400">Duties:</b> ' + duties : '') +
+      '<br><b style="color:var(--amber2);font-weight:400">Engine:</b> the lab\u2019s on-device conversational engine (intent matcher + JAHtalk human-talk layer) — zero network, talks human.</span>';
   }
 
   var session = null,
@@ -605,7 +689,7 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
   };
   $('sendbtn').onclick = send;
   inp.onkeydown = function (e) { if (e.key === 'Enter' || e.keyCode === 13) send(); };
-  sel.onchange = function () { hangupQuiet(); greet(); renderDemo(); };
+  sel.onchange = function () { hangupQuiet(); greet(); renderDemo(); paintAICard(); };
 
   /* ---- demo controls: every AI's own demoHTML, wired generically.
         (This was the old bug: preset demos rendered no controls and
@@ -662,11 +746,17 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
       });
       var filed = B.fileRecord(forged);
       download(filed.record.filedStamp + '.py', filed.downloadPy, 'text/x-python');
-      $('forgeout').textContent =
+      var forgedTxt =
         'Genome check: ' + (viable.ready ? 'READY — mind, voice and purpose covered.' : 'NOT READY — still needs ' + viable.missing.join('; ') + '.') +
         ' Forged ' + forged.stamp + ' "' + forged.name + '" — power score ' +
         forged.params[6][1] + ', ' + forged.abilities.length + ' abilities, demo: ' + forged.demoKind +
         '. Filed as ' + filed.record.filedStamp + ' — .py downloaded, dialing…';
+      /* CONSISTENCY PASS: canonical record-status badge + provenance line */
+      $('forgeout').innerHTML =
+        '<span class="reclbl">RECORD STATUS</span><span class="recbadge">USER CREATED</span>' +
+        '<p class="provline"><b>Provenance:</b> forged by The Opperater (buildGenome) · ' + drops.length +
+        ' gene drops · attitude set on the lab sliders · filed as ' + escapeHtml(filed.record.filedStamp) + '</p>' +
+        escapeHtml(forgedTxt);
       var dl = $('forgedl');
       dl.innerHTML = '';
       hangupQuiet();
@@ -684,6 +774,7 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
 
   greet();
   renderDemo();
+  paintAICard();
 })();
 </script>
 </body>
