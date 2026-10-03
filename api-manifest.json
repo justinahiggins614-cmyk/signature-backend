@@ -1,0 +1,295 @@
+{
+  "api": "Signature Engine API",
+  "backend_id": "JAH-BACKEND-1",
+  "engine": "signature-backend.js",
+  "engine_version": "2.0",
+  "api_version": "2.0",
+  "schema_version": "1.0",
+  "operations": [
+    {
+      "name": "chat",
+      "purpose": "Generate one reply from an AI record to user text, with call-duration memory.",
+      "input": "ai (record), text (string), session (object, optional memory)",
+      "output": "string reply. Varied by design; never substring-matched.",
+      "errors": [
+        "none thrown; unknown input falls back to fallback lines"
+      ],
+      "determinism": "non-deterministic by design",
+      "side_effects": "none",
+      "permissions": "none \u2014 pure local computation",
+      "version": "2.0",
+      "note": "Replies intentionally varied; whole-word intent matching, never substring."
+    },
+    {
+      "name": "dial",
+      "purpose": "Open a live dial-up session with an AI (greeting, say/runDemo/lockRole/hangup, transcript).",
+      "input": "aiRecord (object with name or greeting)",
+      "output": "session object (sessionId JAH-SESSION-######)",
+      "errors": [
+        "DIAL_BAD_RECORD (recoverable) \u2014 aiRecord missing/invalid"
+      ],
+      "determinism": "non-deterministic by design",
+      "side_effects": "in-memory session only",
+      "permissions": "none \u2014 in-memory session only; nothing persisted, nothing sent",
+      "version": "2.0",
+      "note": "Session IDs JAH-SESSION-######; SESSION MEMORY dies at hangup, never persisted."
+    },
+    {
+      "name": "runDemo",
+      "purpose": "Run an AI's working demo script with given inputs; returns the result string.",
+      "input": "ai (record), inputs (object)",
+      "output": "string result; deterministic per demo kind",
+      "errors": [
+        "none thrown; guided demos narrate the input list"
+      ],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": ""
+    },
+    {
+      "name": "runDemoReceipt",
+      "purpose": "runDemo plus a permanent demo receipt (JAH-DEMO-######).",
+      "input": "ai (record), inputs (object)",
+      "output": "receipt object {demo_id, ai_id, demo_kind, inputs, output, versions, ran_at}",
+      "errors": [
+        "same as runDemo"
+      ],
+      "determinism": "non-deterministic by design",
+      "side_effects": "in-memory demo counter only",
+      "permissions": "none \u2014 in-memory counter only",
+      "version": "2.0",
+      "note": ""
+    },
+    {
+      "name": "presets",
+      "purpose": "List the 6 built-in archetype presets (one model of each kind).",
+      "input": "none",
+      "output": "array of preset records",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "6 archetypes, one model of each kind."
+    },
+    {
+      "name": "loadPreset",
+      "purpose": "Load one preset by name (older names resolve via permanent aliases); returns a fresh copy.",
+      "input": "name (string)",
+      "output": "preset record, or null if unknown",
+      "errors": [
+        "returns null \u2014 never throws"
+      ],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "Older preset names resolve via permanent aliases."
+    },
+    {
+      "name": "geneOptions",
+      "purpose": "List The Opperater's gene slots and boxes (10 slots x 18 = 180; advanced unlocks more).",
+      "input": "advanced (boolean, default false)",
+      "output": "array of slot objects {key, name, mirror, options[]}",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "10 main gene slots x 18 boxes = 180; advanced slots add more."
+    },
+    {
+      "name": "genomeViable",
+      "purpose": "Check whether a set of gene codes covers all viability groups.",
+      "input": "drops (array of gene codes)",
+      "output": "{ready: boolean, missing: [descriptions]}",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": ""
+    },
+    {
+      "name": "buildGenome",
+      "purpose": "Forge an AI genome record from chosen gene codes (deterministic).",
+      "input": "{genes: {SLOT: code}, name, kind, advanced?} \u2014 full or partial slot map",
+      "output": "AI record {id, name, stamp JAH-AI-OPR-XXXX, genome_id JAH-GENOME-XXXXXX, ...}",
+      "errors": [
+        "GENOME_UNKNOWN_SLOT",
+        "GENOME_UNKNOWN_CODE",
+        "GENOME_ADVANCED_LOCKED (all recoverable)"
+      ],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "Same inputs => same genome record and genome_id."
+    },
+    {
+      "name": "fileRecord",
+      "purpose": "Stamp a genome/preset as a filed AI record (JAH-AI-OP-######) with downloadable .py/.json. Local-first: nothing saved or published.",
+      "input": "rec (buildGenome/loadPreset result with a name)",
+      "output": "{record, downloadPy, downloadJson}",
+      "errors": [
+        "FILERECORD_BAD_RECORD",
+        "FILERECORD_NOT_SERIALIZABLE (both recoverable)"
+      ],
+      "determinism": "non-deterministic by design",
+      "side_effects": "in-memory file-stamp counter only",
+      "permissions": "none \u2014 in-memory stamp counter only",
+      "version": "2.0",
+      "note": "Stamp + filedAt differ per call; record content otherwise stable. Local-first: nothing saved or published."
+    },
+    {
+      "name": "tones",
+      "purpose": "List the available speech tone presets.",
+      "input": "none",
+      "output": "array of {key, label, rate, pitch}",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": ""
+    },
+    {
+      "name": "labCatalogs",
+      "purpose": "List the 8 Creation Lab shelves (separate from the 10 Opperater gene slots).",
+      "input": "none",
+      "output": "array of {name, count}",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "8 Creation Lab shelves (separate from the 10 Opperater gene slots)."
+    },
+    {
+      "name": "labOptions",
+      "purpose": "Options for one shelf (paginated).",
+      "input": "shelfName (string), page (number, default 0)",
+      "output": "{total, items[]}",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": ""
+    },
+    {
+      "name": "animateCreation",
+      "purpose": "Animate a creation from a base archetype + shelf picks (deterministic: same picks => same record).",
+      "input": "{base, picks: {shelf: [codes]}}",
+      "output": "creation record {stamp JAH-LAB-XXXXXX, name, description, svg, abilities, ...}",
+      "errors": [
+        "unknown base falls back to a blank slab \u2014 never throws"
+      ],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "Same base + picks => byte-identical creation record and stamp."
+    },
+    {
+      "name": "creationToAI",
+      "purpose": "Turn a creation record into a dialable AI record.",
+      "input": "creation (animateCreation result)",
+      "output": "AI record",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": ""
+    },
+    {
+      "name": "labDemo",
+      "purpose": "Scripted field-test simulation for a creation (narrative, not a measurement).",
+      "input": "creation (animateCreation result)",
+      "output": "string narrative",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "Scripted simulation \u2014 not a real measurement."
+    },
+    {
+      "name": "recordHash",
+      "purpose": "Deterministic content hash of a record (excludes volatile filing fields).",
+      "input": "rec (object)",
+      "output": "8-char uppercase hex string",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "Content hash excluding volatile filing fields."
+    },
+    {
+      "name": "capabilities",
+      "purpose": "Machine-readable capability discovery: operations, catalog counts, offline claim.",
+      "input": "none",
+      "output": "capability object",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": ""
+    },
+    {
+      "name": "health",
+      "purpose": "Lightweight status probe (full suite is selfTest).",
+      "input": "none",
+      "output": "{status UP|DEGRADED, quick_checks, version, offline, timestamp}",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "Quick probe; full suite is selfTest()."
+    },
+    {
+      "name": "selfTest",
+      "purpose": "Run the full engine self-test suite (PASS / PARTIAL / FAIL, per-item results).",
+      "input": "none",
+      "output": "{pass, partial, checks: [[name, bool]]}",
+      "errors": [],
+      "determinism": "deterministic",
+      "side_effects": "bumps in-memory file-stamp counter",
+      "permissions": "none \u2014 bumps the in-memory file-stamp counter as a side effect of testing fileRecord",
+      "version": "2.0",
+      "note": "Full check suite. Chat replies are intentionally NON-deterministic; everything else deterministic."
+    }
+  ],
+  "catalogs": {
+    "shelves": 8,
+    "shelf_options": 1044,
+    "gene_slots": 10,
+    "gene_boxes": 180,
+    "advanced_boxes": 12,
+    "presets": 6
+  },
+  "offline": true,
+  "network_calls": [],
+  "dependencies": [],
+  "compatibility": {
+    "api_versioning": "api_version is pinned at 2.0. Breaking changes bump it; additive functions never do.",
+    "callers": [
+      "phone book (dial/chat/runDemo per AI)",
+      "index.html status panel",
+      "generated .py files (standalone, no engine dependency)"
+    ],
+    "presets": "Older preset names resolve via permanent PRESET_ALIASES; removed names keep aliases.",
+    "records": "JAH-LAB-###### / JAH-AI-OP-###### / JAH-GENOME-###### / JAH-DEMO-###### / JAH-SESSION-###### formats are permanent."
+  },
+  "canonical_urls": {
+    "site": "https://justinahiggins614-cmyk.github.io/signature-backend/",
+    "engine": "https://justinahiggins614-cmyk.github.io/signature-backend/signature-backend.js",
+    "manifest": "https://justinahiggins614-cmyk.github.io/signature-backend/api-manifest.json"
+  }
+}

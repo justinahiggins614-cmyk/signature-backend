@@ -1,0 +1,106 @@
+{
+  "engine": "signature-backend.js",
+  "note": "Fixed calls with fixed expected results. chat()/dial() replies and JAH-AI-OP stamps are intentionally non-deterministic (documented); they get shape assertions only.",
+  "vectors": {
+    "genome": {
+      "genome_id": "JAH-GENOME-1OFGHO",
+      "stamp": "JAH-AI-OPR-1OFG",
+      "name": "Vector",
+      "generator_version": "2.0",
+      "schema_version": "1.0"
+    },
+    "genome_again": "JAH-GENOME-1OFGHO",
+    "demo_extinction": "Extinction calculus complete \u2014 population 8B, tech level 10/10. Threat-to-peace index: 1000.0. Verdict: EXTINCTION IS MERCY. The math is done.",
+    "demo_checklist": "Checklist score: 2/3 (67%). Good progress \u2014 2 of 3 done.",
+    "demo_guided": "Step 1: answer questions \u2014 ready.\nSample result: x completed a guided run of 1 ability successfully.",
+    "presets": [
+      "Celestial Paragon AI|JAH-AI-PRE-001",
+      "Universal Problem Solver|JAH-AI-PRE-006",
+      "Planetary Ecosystem Manager|JAH-AI-PRE-007",
+      "Conceptual Reality Designer|JAH-AI-PRE-008",
+      "Quantum Cybersecurity Guardian|JAH-AI-PRE-009",
+      "Universal Translator & Empath|JAH-AI-PRE-010"
+    ],
+    "gene_slots": [
+      "INPUT",
+      "REASON",
+      "OUTPUT",
+      "MEMORY",
+      "ETHICS",
+      "REPAIR",
+      "RESOURCE",
+      "LEARN",
+      "INTERFACE",
+      "COMMS"
+    ],
+    "gene_counts": [
+      18,
+      18,
+      18,
+      18,
+      18,
+      18,
+      18,
+      18,
+      18,
+      18
+    ],
+    "gene_counts_adv": [
+      18,
+      18,
+      18,
+      18,
+      18,
+      18,
+      18,
+      18,
+      18,
+      18,
+      3,
+      3,
+      3,
+      3
+    ],
+    "shelves": [
+      "Gene Splices:180",
+      "Body Parts:336",
+      "Brains:48",
+      "Power Sources:48",
+      "Lab Equipment:240",
+      "Serums & Elixirs:72",
+      "Habitats:48",
+      "Experiment Protocols:72"
+    ],
+    "shelf_total": 1044,
+    "creation": {
+      "stamp": "JAH-LAB-1CVSPO",
+      "name": "Blitztron"
+    },
+    "creation_reordered_stamp": "JAH-LAB-1CVSPO",
+    "record_hash": "2C571BE4",
+    "viable": true,
+    "dial_say": "string",
+    "dial_greeting": "string",
+    "chat_type": "string",
+    "error_shape": {
+      "error_code": "GENOME_UNKNOWN_SLOT",
+      "engine_version": "2.0",
+      "api_version": "2.0",
+      "recoverable": true,
+      "is_error": true
+    },
+    "caps": {
+      "ops": 20,
+      "shelves": 8,
+      "slots": 10,
+      "offline": true,
+      "net": 0
+    },
+    "versions": {
+      "version": "2.0",
+      "apiVersion": "2.0",
+      "backendId": "JAH-BACKEND-1",
+      "schemaVersion": "1.0"
+    }
+  }
+}
