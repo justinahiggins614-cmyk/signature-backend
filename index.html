@@ -118,9 +118,9 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   <div class="panel" id="status">
     <h2><span class="tick">●</span> LIVE STATUS</h2>
     <div class="kv"><b>Engine version</b><span id="st-ver"><!--STVER-->v2.0 — Mad Scientist Creation Lab<span class="stamped"> · static check 2026-10-03</span><!--/STVER--></span></div>
-    <div class="kv"><b>Self-test</b><span id="st-test"><!--STTEST--><span class="pass">PASS</span> <span class="stamped">engine self-test 40/40 · 2026-10-03</span><!--/STTEST--></span></div>
+    <div class="kv"><b>Self-test</b><span id="st-test"><!--STTEST--><span class="pass">PASS</span> <span class="stamped">engine self-test 53/53 · 2026-10-03</span><!--/STTEST--></span></div>
     <div class="checks" id="st-checks"></div>
-    <div class="kv"><b>Engine APIs</b><span id="st-apis"><!--STAPIS--><span class="pass">✓</span>&nbsp;chat <span class="pass">✓</span>&nbsp;runDemo <span class="pass">✓</span>&nbsp;dial <span class="pass">✓</span>&nbsp;presets <span class="pass">✓</span>&nbsp;loadPreset <span class="pass">✓</span>&nbsp;geneOptions <span class="pass">✓</span>&nbsp;buildGenome <span class="pass">✓</span>&nbsp;genomeViable <span class="pass">✓</span>&nbsp;fileRecord <span class="pass">✓</span>&nbsp;tones <span class="pass">✓</span>&nbsp;labCatalogs <span class="pass">✓</span>&nbsp;labOptions <span class="pass">✓</span>&nbsp;animateCreation <span class="pass">✓</span>&nbsp;creationToAI <span class="pass">✓</span>&nbsp;labDemo<span class="stamped"> · static check 2026-10-03</span><!--/STAPIS--></span></div>
+    <div class="kv"><b>Engine APIs</b><span id="st-apis"><!--STAPIS--><span class="pass">✓</span>&nbsp;chat <span class="pass">✓</span>&nbsp;runDemo <span class="pass">✓</span>&nbsp;runDemoReceipt <span class="pass">✓</span>&nbsp;dial <span class="pass">✓</span>&nbsp;presets <span class="pass">✓</span>&nbsp;loadPreset <span class="pass">✓</span>&nbsp;geneOptions <span class="pass">✓</span>&nbsp;buildGenome <span class="pass">✓</span>&nbsp;genomeViable <span class="pass">✓</span>&nbsp;fileRecord <span class="pass">✓</span>&nbsp;tones <span class="pass">✓</span>&nbsp;labCatalogs <span class="pass">✓</span>&nbsp;labOptions <span class="pass">✓</span>&nbsp;animateCreation <span class="pass">✓</span>&nbsp;creationToAI <span class="pass">✓</span>&nbsp;labDemo <span class="pass">✓</span>&nbsp;recordHash <span class="pass">✓</span>&nbsp;capabilities <span class="pass">✓</span>&nbsp;health <span class="pass">✓</span>&nbsp;EngineError<span class="stamped"> · static check 2026-10-03</span><!--/STAPIS--></span></div>
     <div class="kv"><b>Lab shelves</b><span id="st-shelves"><!--STSHELVES-->8 shelves, 1044 mix-and-match options, all pre-built<span class="stamped"> · static check 2026-10-03</span><!--/STSHELVES--></span></div>
     <div class="kv"><b>Dependencies</b><span>none — pure JavaScript, no network calls, works offline and inside in-app browsers</span></div>
     <p class="note">This panel is the single authoritative status of the lab engine — no other status line on this page overrides it.</p>
@@ -225,7 +225,8 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   $('st-ver').textContent = 'v' + B.version + ' — Mad Scientist Creation Lab';
   try {
     var st = B.selfTest();
-    $('st-test').innerHTML = st.pass ? '<span class="pass">PASS</span>' : '<span class="fail">FAIL</span>';
+    $('st-test').innerHTML = st.pass ? '<span class="pass">PASS</span>'
+      : (st.partial ? '<span style="color:var(--amber);font-weight:700">PARTIAL</span>' : '<span class="fail">FAIL</span>');
     $('st-checks').innerHTML = st.checks.map(function (c) {
       return '<span>' + (c[1] ? '✓' : '✗') + ' ' + c[0] + '</span>';
     }).join('');

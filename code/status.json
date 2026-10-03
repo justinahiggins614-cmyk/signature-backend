@@ -1,11 +1,11 @@
 {
   "date": "2026-10-03",
   "engine_version": "2.0",
-  "api_version": null,
-  "backend_id": null,
-  "engine_sha256": "bfda52ba3633d672972b679e09b8d8e4e3672a6d1abb4533562528a3ce3e4426",
+  "api_version": "2.0",
+  "backend_id": "JAH-BACKEND-1",
+  "engine_sha256": "f384a82a9d2a28ca27ebf3cdac25887101a1920f34dbc474b0927453eed6bb01",
   "selftest_pass": true,
-  "selftest_total": 40,
+  "selftest_total": 53,
   "selftest_failed": [],
   "shelves": 8,
   "options": 1044,
@@ -15,6 +15,7 @@
   "apis": [
     "chat",
     "runDemo",
+    "runDemoReceipt",
     "dial",
     "presets",
     "loadPreset",
@@ -27,6 +28,10 @@
     "labOptions",
     "animateCreation",
     "creationToAI",
-    "labDemo"
+    "labDemo",
+    "recordHash",
+    "capabilities",
+    "health",
+    "EngineError"
   ]
 }

@@ -12,7 +12,28 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.0';
+  var VERSION = '2.0';            // engine version
+  var API_VERSION = '2.0';        // public API version — pinned; breaking changes bump this
+  var SCHEMA_VERSION = '1.0';     // record schema version
+  // Permanent backend identity. Machine-readable only — every visible
+  // surface calls this the engine, per the owner's naming order.
+  var BACKEND_ID = 'JAH-BACKEND-1';
+
+  // In-memory per-page-load counters: live sessions (dial) and filed records.
+  var sessionCounter = 0;
+
+  /* Structured engine errors: every throw carries a machine-readable code.
+     Still an Error instance, so existing try/catch keeps working. */
+  function engineError(code, message, operation, recoverable) {
+    var e = new Error('SignatureBackend[' + code + ']: ' + message);
+    e.error_code = code;
+    e.message_text = message;
+    e.operation = operation || '';
+    e.engine_version = VERSION;
+    e.api_version = API_VERSION;
+    e.recoverable = !!recoverable;
+    return e;
+  }
 
   /* ---------- tiny helpers ---------- */
 
@@ -265,28 +286,53 @@
   }
 
   function dial(aiRecord) {
-    var ai = aiRecord || {};
+    if (!aiRecord || (typeof aiRecord !== 'object'))
+      throw engineError('DIAL_BAD_RECORD', 'dial() needs an AI record object.', 'dial', true);
+    var ai = aiRecord;
     var lockedRole = null;
     var session = {
+      sessionId: 'JAH-SESSION-' + pad6(++sessionCounter),
+      state: 'OPENING', // IDLE -> OPENING -> ACTIVE -> LOCKED_ROLE -> ACTIVE -> HANGUP -> CLOSED
+      openedAt: new Date().toISOString(),
+      closedAt: null,
+      turnCount: 0,
       ai: ai,
       history: {},
+      turns: [], // session memory: dies with hangup, never persisted
       lineOpen: true,
       greeting: beGuard(ai, ai.greeting || fallbackLine(ai, {})),
       say: function (text) {
         if (!session.lineOpen) return 'The line is closed. Dial again to start a new call.';
         var reply = chat(ai, text, session.history);
+        session.turnCount++;
+        session.turns.push({ n: session.turnCount, at: new Date().toISOString(),
+          input: String(text), reply: String(reply),
+          role: lockedRole });
+        if (session.turns.length > 200) session.turns.shift(); // cap session memory
         if (lockedRole) return frameRoleLocked(lockedRole, text, reply);
         return reply;
       },
       // Lock the AI into a role for the whole call (automation mode).
+      // Role grammar: ROLE: <role>\nACK: <input>\nOUT: <reply>\nEND
+      // (single line each, no newlines inside fields, each line <= 220 chars).
+      // A role NEVER grants capabilities — role != permission.
       lockRole: function (roleName) {
-        lockedRole = String(roleName || 'automation').slice(0, 60);
+        var role = String(roleName == null ? '' : roleName);
+        if (!role.trim())
+          throw engineError('ROLE_EMPTY', 'lockRole() needs a non-empty role name.', 'lockRole', true);
+        if (role.length > 120)
+          throw engineError('ROLE_TOO_LONG', 'Role names are capped at 120 characters.', 'lockRole', true);
+        if (/[\x00-\x1F\x7F]/.test(role))
+          throw engineError('ROLE_INVALID_CHARS', 'Role names may not contain control characters.', 'lockRole', true);
+        lockedRole = role.trim();
+        session.state = 'LOCKED_ROLE';
         return 'ROLE LOCKED: ' + lockedRole + ' — machine channel open. Short structured replies engaged for the rest of this call.';
       },
       // Release back to normal conversation.
       unlockRole: function () {
         var was = lockedRole;
         lockedRole = null;
+        if (session.lineOpen) session.state = 'ACTIVE';
         return was ? 'ROLE RELEASED: ' + was + ' — normal conversation resumed.'
                    : 'No role is locked on this call.';
       },
@@ -297,12 +343,33 @@
       hangup: function () {
         session.lineOpen = false;
         lockedRole = null;
+        session.state = 'HANGUP';
+        session.closedAt = new Date().toISOString();
+        session.state = 'CLOSED';
         return 'Call ended. ' + (ai.name || 'The AI') + ' is back on the hook. Dial again any time.';
+      },
+      // Exportable session transcript. Labeled as a generated conversation,
+      // never an official source document.
+      transcript: function () {
+        return {
+          transcript_kind: 'GENERATED_CONVERSATION',
+          session_id: session.sessionId,
+          ai_id: ai.stamp || ai.ai_id || ai.id || '',
+          ai_name: ai.name || '',
+          opened_at: session.openedAt,
+          closed_at: session.closedAt,
+          turn_count: session.turnCount,
+          role_state: lockedRole ? 'LOCKED_ROLE:' + lockedRole : 'UNLOCKED',
+          engine_version: VERSION,
+          api_version: API_VERSION,
+          turns: session.turns.slice()
+        };
       }
     };
     // The AI "answers" with its greeting; the engine knows it was just given.
     session.history.lastReply = session.greeting;
     session.history.lastTopic = 'dial';
+    session.state = 'ACTIVE';
     return session;
   }
 
@@ -681,17 +748,34 @@
     return 'JAH-AI-OP-' + pad6(FILE_COUNTER);
   }
   function filePy(rec) {
-    return '# ' + rec.filedStamp + ' ' + rec.name + ' — filed in The Opperater\n' +
+    return '# GENERATED BY THE SIGNATURE ENGINE (signature-backend.js v' + VERSION + ', API v' + API_VERSION + ')\n' +
+      '# AI RECORD: ' + rec.filedStamp + ' — ' + rec.name + '\n' +
+      '# Generator: The Opperater genome forge · filed ' + (rec.filedAt || 'unknown') + '\n' +
+      '# WHAT THIS FILE IS: a generated AI configuration/persona record (rules, fallbacks,\n' +
+      '#   greeting, demo). It is NOT a trained model and NOT affiliated with any real product.\n' +
+      '# WHAT IT DOES: defines a chattable AI for the Signature engine. The reply() function\n' +
+      '#   below is pure local pattern matching — no network calls, no external packages,\n' +
+      '#   runs offline. Treat downloaded code as data: read it before running.\n' +
       '# Original: ' + rec.stamp + ' (' + (rec.filedFrom || 'record') + ')\n' +
       (rec.py ? rec.py : '# mission: ' + (rec.mentality || '') + '\n') +
       '\n# Filed by The Opperater — dial this AI any time.';
   }
+  // fileRecord(rec): stamp a buildGenome/loadPreset result as a filed AI record.
+  // WHAT IT WRITES: a stamped in-memory copy of the record (+ filedStamp
+  // JAH-AI-OP-######, filed=true, filedAt timestamp) plus two download
+  // strings: downloadJson (the full record) and downloadPy (a standalone
+  // .py carrying the record's rules/fallbacks + a local reply() shim).
+  // LOCAL-FIRST: nothing is saved or published anywhere — the record is
+  // handed back to you. CREATE RECORD (buildGenome) -> EXPORT (download
+  // the files here) -> PUBLISH (you place it in the phone book yourself).
   function fileRecord(rec) {
     if (!rec || typeof rec.name !== 'string' || !rec.name)
-      throw new Error('SignatureBackend.fileRecord: pass a buildGenome/loadPreset record.');
+      throw engineError('FILERECORD_BAD_RECORD',
+        'fileRecord: pass a buildGenome/loadPreset record with a name.', 'fileRecord', true);
     var copy;
     try { copy = JSON.parse(JSON.stringify(rec)); }
-    catch (e) { throw new Error('SignatureBackend.fileRecord: record is not serializable.'); }
+    catch (e) { throw engineError('FILERECORD_NOT_SERIALIZABLE',
+      'fileRecord: record is not JSON-serializable.', 'fileRecord', true); }
     copy.filedStamp = fileStamp();
     copy.filed = true;
     copy.filedFrom = rec.stamp || rec.id || 'record';
@@ -812,17 +896,21 @@
     for (i = 0; i < slots.length; i++) byKey[slots[i].key] = slots[i];
     var inGenes = opts.genes || {};
     Object.keys(inGenes).forEach(function (k) {
-      if (!byKey[k]) throw new Error('The Opperater: unknown gene slot "' + k + '".');
+      if (!byKey[k]) throw engineError('GENOME_UNKNOWN_SLOT',
+        'The Opperater: unknown gene slot "' + k + '".', 'buildGenome', true);
       var ok = byKey[k].options.some(function (o) { return o.code === inGenes[k]; });
-      if (!ok) throw new Error('The Opperater: unknown gene code "' + inGenes[k] + '" for slot ' + k + '.');
+      if (!ok) throw engineError('GENOME_UNKNOWN_CODE',
+        'The Opperater: unknown gene code "' + inGenes[k] + '" for slot ' + k + '.', 'buildGenome', true);
     });
     // drops[]: multiset of gene codes. Highest layer wins per slot; repeats counted.
     var repeatCount = {};
     (opts.drops || []).forEach(function (code) {
       var hit = codeIndex()[code];
-      if (!hit) throw new Error('The Opperater: unknown gene code "' + code + '".');
+      if (!hit) throw engineError('GENOME_UNKNOWN_CODE',
+        'The Opperater: unknown gene code "' + code + '".', 'buildGenome', true);
       if (!advanced && !byKey[hit.slot.key])
-        throw new Error('The Opperater: "' + code + '" is an advanced gene — enable advanced mode.');
+        throw engineError('GENOME_ADVANCED_LOCKED',
+        'The Opperater: "' + code + '" is an advanced gene — enable advanced mode.', 'buildGenome', true);
       var k = hit.slot.key;
       var cur = inGenes[k] ? codeIndex()[inGenes[k]].opt : null;
       if (!cur || LAYER_VAL[hit.opt.layer] > LAYER_VAL[cur.layer]) inGenes[k] = code;
@@ -938,6 +1026,9 @@
       id: 'opperater-' + sig.toLowerCase(),
       name: name,
       stamp: 'JAH-AI-OPR-' + sig.slice(0, 4),
+      genome_id: 'JAH-GENOME-' + sig.slice(0, 6).toUpperCase(),
+      generator_version: VERSION,
+      schema_version: SCHEMA_VERSION,
       kind: kind,
       rate: opts.rate || 1.0,
       pitch: opts.pitch || 1.0,
@@ -1237,6 +1328,124 @@
     };
   }
 
+  /* ---------- capability discovery, health, hashing ---------- */
+
+  var demoCounter = 0;
+
+  // capabilities(): machine-readable list of exactly what this engine build supports.
+  function capabilities() {
+    var cats = labCatalogs();
+    var go = geneOptions(false);
+    var goAdv = geneOptions(true);
+    function ops() {
+      return [
+        { name: 'chat', version: '2.0', deterministic: false, side_effects: 'none',
+          note: 'Replies intentionally varied; whole-word intent matching, never substring.' },
+        { name: 'dial', version: '2.0', deterministic: false, side_effects: 'in-memory session only',
+          note: 'Session IDs JAH-SESSION-######; SESSION MEMORY dies at hangup, never persisted.' },
+        { name: 'runDemo', version: '2.0', deterministic: true, side_effects: 'none', note: '' },
+        { name: 'runDemoReceipt', version: '2.0', deterministic: false, side_effects: 'in-memory demo counter only', note: '' },
+        { name: 'presets', version: '2.0', deterministic: true, side_effects: 'none', note: '6 archetypes, one model of each kind.' },
+        { name: 'loadPreset', version: '2.0', deterministic: true, side_effects: 'none',
+          note: 'Older preset names resolve via permanent aliases.' },
+        { name: 'geneOptions', version: '2.0', deterministic: true, side_effects: 'none',
+          note: '10 main gene slots x 18 boxes = 180; advanced slots add more.' },
+        { name: 'genomeViable', version: '2.0', deterministic: true, side_effects: 'none', note: '' },
+        { name: 'buildGenome', version: '2.0', deterministic: true, side_effects: 'none',
+          note: 'Same inputs => same genome record and genome_id.' },
+        { name: 'fileRecord', version: '2.0', deterministic: false, side_effects: 'in-memory file-stamp counter only',
+          note: 'Stamp + filedAt differ per call; record content otherwise stable. Local-first: nothing saved or published.' },
+        { name: 'tones', version: '2.0', deterministic: true, side_effects: 'none', note: '' },
+        { name: 'labCatalogs', version: '2.0', deterministic: true, side_effects: 'none',
+          note: '8 Creation Lab shelves (separate from the 10 Opperater gene slots).' },
+        { name: 'labOptions', version: '2.0', deterministic: true, side_effects: 'none', note: '' },
+        { name: 'animateCreation', version: '2.0', deterministic: true, side_effects: 'none',
+          note: 'Same base + picks => byte-identical creation record and stamp.' },
+        { name: 'creationToAI', version: '2.0', deterministic: true, side_effects: 'none', note: '' },
+        { name: 'labDemo', version: '2.0', deterministic: true, side_effects: 'none',
+          note: 'Scripted simulation — not a real measurement.' },
+        { name: 'recordHash', version: '2.0', deterministic: true, side_effects: 'none',
+          note: 'Content hash excluding volatile filing fields.' },
+        { name: 'capabilities', version: '2.0', deterministic: true, side_effects: 'none', note: '' },
+        { name: 'health', version: '2.0', deterministic: true, side_effects: 'none', note: 'Quick probe; full suite is selfTest().' },
+        { name: 'selfTest', version: '2.0', deterministic: true, side_effects: 'bumps in-memory file-stamp counter',
+          note: 'Full check suite. Chat replies are intentionally NON-deterministic; everything else deterministic.' }
+      ];
+    }
+    return {
+      backend_id: BACKEND_ID,
+      engine: 'signature-backend.js',
+      engine_version: VERSION,
+      api_version: API_VERSION,
+      schema_version: SCHEMA_VERSION,
+      operations: ops(),
+      catalogs: {
+        shelves: cats.length,
+        shelf_options: cats.reduce(function (n, c) { return n + c.count; }, 0),
+        gene_slots: go.length,
+        gene_boxes: go.reduce(function (n, s) { return n + s.options.length; }, 0),
+        advanced_boxes: goAdv.reduce(function (n, s) { return n + s.options.length; }, 0) -
+          go.reduce(function (n, s) { return n + s.options.length; }, 0),
+        presets: presets().length
+      },
+      offline: true,
+      network_calls: [],
+      dependencies: []
+    };
+  }
+
+  // health(): lightweight status probe. Full suite is selfTest().
+  function health() {
+    var checks = [];
+    function ck(name, fn) { try { checks.push([name, !!fn()]); } catch (e) { checks.push([name, false]); } }
+    ck('engine-loaded', function () { return typeof chat === 'function' && typeof dial === 'function'; });
+    ck('catalogs-load', function () { return labCatalogs().length === 8; });
+    ck('genes-load', function () { return geneOptions(false).length === 10; });
+    ck('presets-load', function () { return presets().length === 6; });
+    ck('chat-answers', function () {
+      return typeof chat({ name: 'h', kind: 'domain', fallback: ['x'] }, 'hi', {}) === 'string';
+    });
+    var pass = checks.every(function (c) { return c[1]; });
+    return {
+      backend_id: BACKEND_ID, engine: 'signature-backend.js', version: VERSION,
+      api_version: API_VERSION, schema_version: SCHEMA_VERSION,
+      status: pass ? 'UP' : 'DEGRADED', quick_checks: checks,
+      offline: true, network_calls: [],
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // recordHash(rec): deterministic content hash of a record, excluding the
+  // volatile filing fields (stamp + filedAt differ per filing by design).
+  function recordHash(rec) {
+    var copy = {}, keys, i;
+    rec = rec || {};
+    keys = Object.keys(rec).sort();
+    for (i = 0; i < keys.length; i++) {
+      if (keys[i] === 'filedAt' || keys[i] === 'filedStamp') continue;
+      copy[keys[i]] = rec[keys[i]];
+    }
+    var s = JSON.stringify(copy), h = 0x811c9dc5;
+    for (i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return ('0000000' + h.toString(16)).slice(-8).toUpperCase();
+  }
+
+  // runDemoReceipt(ai, inputs): runDemo plus a permanent demo receipt ID.
+  function runDemoReceipt(ai, inputs) {
+    var output = runDemo(ai, inputs);
+    demoCounter++;
+    return {
+      demo_id: 'JAH-DEMO-' + pad6(demoCounter),
+      ai_id: (ai && (ai.stamp || ai.ai_id || ai.id)) || '',
+      demo_kind: (ai && ai.demoKind) || '',
+      inputs: inputs || {},
+      output: output,
+      engine_version: VERSION,
+      api_version: API_VERSION,
+      ran_at: new Date().toISOString()
+    };
+  }
+
   /* ---------- self test ---------- */
 
   function selfTest() {
@@ -1302,8 +1511,71 @@
     var cs = dial(creationToAI(c1));
     out.push(['lab-dialable', typeof cs.say('hello') === 'string' && cs.say('hello').length > 0]);
     out.push(['lab-demo', labDemo(c1).indexOf('Field test') === 0]);
+    // --- P1/P2 hardening checks ---
+    // sessions: unique sequential IDs, lifecycle OPENING -> ACTIVE -> LOCKED_ROLE -> ACTIVE -> CLOSED
+    var sa = dial({ name: 'sA', kind: 'domain', fallback: ['x'] });
+    var sb = dial({ name: 'sB', kind: 'domain', fallback: ['x'] });
+    out.push(['session-ids-unique', /^JAH-SESSION-\d{6}$/.test(sa.sessionId) && /^JAH-SESSION-\d{6}$/.test(sb.sessionId) && sa.sessionId !== sb.sessionId]);
+    var lifeOk = (sa.state === 'ACTIVE');
+    sa.lockRole('weld monitor'); lifeOk = lifeOk && (sa.state === 'LOCKED_ROLE');
+    sa.unlockRole(); lifeOk = lifeOk && (sa.state === 'ACTIVE');
+    sa.hangup(); lifeOk = lifeOk && (sa.state === 'CLOSED') && (sa.closedAt !== null);
+    out.push(['session-lifecycle', lifeOk]);
+    sb.hangup();
+    // session transcript carries the session id and is a generated conversation
+    var st2 = dial({ name: 'sC', kind: 'domain', fallback: ['x'] });
+    st2.say('ping'); var tr = st2.transcript();
+    out.push(['session-transcript', tr.session_id === st2.sessionId && tr.turn_count === 1 && tr.transcript_kind === 'GENERATED_CONVERSATION']);
+    st2.hangup();
+    // role lock validation: empty / too-long / control chars are structured errors
+    function errCode(fn) { try { fn(); return null; } catch (e) { return e.error_code || null; } }
+    var sv = dial({ name: 'sD', kind: 'domain', fallback: ['x'] });
+    var vEmpty = errCode(function () { sv.lockRole(''); });
+    var vLong = errCode(function () { sv.lockRole(new Array(122).join('x')); });
+    var vCtrl = errCode(function () { sv.lockRole('bad\tx'); });
+    out.push(['role-validation', vEmpty === 'ROLE_EMPTY' && vLong === 'ROLE_TOO_LONG' && vCtrl === 'ROLE_INVALID_CHARS']);
+    sv.hangup();
+    // dial with no record is a structured error
+    out.push(['dial-badrecord', errCode(function () { dial(null); }) === 'DIAL_BAD_RECORD']);
+    // structured error object shape
+    var se = null;
+    try { fileRecord({}); } catch (e) { se = e; }
+    out.push(['error-shape', !!se && se.error_code === 'FILERECORD_BAD_RECORD' &&
+      se.engine_version === VERSION && se.api_version === API_VERSION &&
+      typeof se.recoverable === 'boolean' && se instanceof Error]);
+    // genome IDs are content-derived: same inputs => same genome_id + stamp
+    var gd1 = { INPUT: 'F-IFU', REASON: 'F-RAE', OUTPUT: 'F-OAO', MEMORY: 'F-KMMU', ETHICS: 'F-EGCU',
+      REPAIR: 'F-SDR', RESOURCE: 'F-RM', LEARN: 'F-ALAOU', INTERFACE: 'F-AUIX', COMMS: 'F-ECU' };
+    var gg1 = buildGenome({ genes: gd1, name: 'det', kind: 'domain' });
+    var gg2 = buildGenome({ genes: gd1, name: 'det', kind: 'domain' });
+    out.push(['genome-deterministic', gg1.genome_id === gg2.genome_id && gg1.stamp === gg2.stamp &&
+      /^JAH-GENOME-[0-9A-Z]{6}$/.test(gg1.genome_id)]);
+    // recordHash stable and excludes volatile filing fields
+    out.push(['recordhash', recordHash(gg1) === recordHash(gg2) && recordHash(gg1) !== recordHash(buildGenome({ genes: gd1, name: 'det2', kind: 'domain' }))]);
+    // genome validation errors are structured
+    out.push(['genome-errors', errCode(function () { buildGenome({ genes: { BOGUS: 'F-IFU' } }); }) === 'GENOME_UNKNOWN_SLOT' &&
+      errCode(function () { buildGenome({ genes: { INPUT: 'ZZ-999' } }); }) === 'GENOME_UNKNOWN_CODE']);
+    // capabilities + health
+    var caps = capabilities();
+    out.push(['capabilities', caps.backend_id === 'JAH-BACKEND-1' && caps.offline === true &&
+      caps.network_calls.length === 0 && caps.operations.length === 20 &&
+      caps.catalogs.shelves === 8 && caps.catalogs.gene_slots === 10]);
+    var h = health();
+    out.push(['health', h.status === 'UP' && h.version === VERSION && h.api_version === API_VERSION]);
+    // demo receipts: sequential JAH-DEMO-######
+    var rd1 = runDemoReceipt(loadPreset('Universal Problem Solver'), { problem: 'x' });
+    var rd2 = runDemoReceipt(loadPreset('Universal Problem Solver'), { problem: 'x' });
+    out.push(['demo-receipts', /^JAH-DEMO-\d{6}$/.test(rd1.demo_id) && rd1.demo_id !== rd2.demo_id &&
+      typeof rd1.output === 'string' && rd1.output.length > 0 &&
+      typeof rd1.demo_kind === 'string' && rd1.demo_kind.length > 0 &&
+      rd1.api_version === API_VERSION]);
+    // identity fields on exports
+    var exp = window.SignatureBackend;
+    out.push(['identity-fields', exp.apiVersion === API_VERSION && exp.backendId === BACKEND_ID &&
+      exp.schemaVersion === SCHEMA_VERSION && gg1.generator_version === VERSION]);
     var pass = out.every(function (x) { return x[1]; });
-    return { pass: pass, checks: out };
+    var any = out.some(function (x) { return x[1]; });
+    return { pass: pass, partial: !pass && any, checks: out };
   }
 
   // The Opperater self-tests (appended to the main selfTest).
@@ -1382,8 +1654,12 @@
 
   window.SignatureBackend = {
     version: VERSION,
+    apiVersion: API_VERSION,
+    backendId: BACKEND_ID,
+    schemaVersion: SCHEMA_VERSION,
     chat: chat,
     runDemo: runDemo,
+    runDemoReceipt: runDemoReceipt,
     dial: dial,
     presets: presets,
     loadPreset: loadPreset,
@@ -1397,6 +1673,10 @@
     animateCreation: animateCreation,
     creationToAI: creationToAI,
     labDemo: labDemo,
+    recordHash: recordHash,
+    capabilities: capabilities,
+    health: health,
+    EngineError: engineError,
     selfTest: selfTest
   };
 })();
