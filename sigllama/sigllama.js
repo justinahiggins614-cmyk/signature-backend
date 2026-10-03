@@ -14,6 +14,7 @@ var SigLlama = (function () {
 
   var V = 0, D = 0, NL = 0, NH = 0, SEQ = 0, THETA = 10000, MLP = 0, HD = 0;
   var itos = [], stoi = {}, BOS = 0, EOS = 1, UNK = 3;
+  var WORD_MODE = false;   // v2 chat model: word-level tokenizer
   var T = {};            // tensors, Float32Array, row-major
   var ready = false;
   var modelInfo = {};
@@ -221,18 +222,41 @@ var SigLlama = (function () {
     return topK > 0 && topK < n ? idx[take - 1] : take - 1;
   }
 
+  var WORD_RE = /[A-Za-z]+(?:'[a-z]+)?|[0-9]+(?:\.[0-9]+)?|[^\sA-Za-z0-9]/g;
   function encode(str) {
-    var ids = [];
-    for (var i = 0; i < str.length; i++) {
+    var ids = [], i, m;
+    if (WORD_MODE) {
+      WORD_RE.lastIndex = 0;
+      while ((m = WORD_RE.exec(String(str))) !== null) {
+        var t = m[0];
+        ids.push(stoi[t] !== undefined ? stoi[t] : UNK);
+      }
+      return ids;
+    }
+    for (i = 0; i < str.length; i++) {
       var ch = str[i];
       ids.push(stoi[ch] !== undefined ? stoi[ch] : UNK);
     }
     return ids;
   }
   function decode(ids) {
-    var s = "";
-    for (var i = 0; i < ids.length; i++) s += itos[ids[i]] || "";
-    return s;
+    var i, t;
+    if (WORD_MODE) {
+      var toks = [];
+      for (i = 0; i < ids.length; i++) {
+        t = itos[ids[i]];
+        if (t === undefined || t === "<BOS>" || t === "<EOS>" || t === "<PAD>") continue;
+        toks.push(t === "<UNK>" ? "?" : t);
+      }
+      var s = toks.join(" ");
+      s = s.replace(/\s+([.,!?;:)\]}])/g, "$1");          // no space before punctuation
+      s = s.replace(/\s+'(s|t|re|ve|ll|d|m)\b/g, "'$1");  // contractions
+      s = s.replace(/\(\s+/g, "(").replace(/\s+\)/g, ")"); // parens
+      return s.replace(/\s+/g, " ");
+    }
+    var s2 = "";
+    for (i = 0; i < ids.length; i++) s2 += itos[ids[i]] || "";
+    return s2;
   }
 
   function fetchBin(url) {
@@ -243,16 +267,20 @@ var SigLlama = (function () {
   }
 
   return {
-    load: function (baseUrl) {
+    load: function (baseUrl, vocabFile, binFile) {
       var base = baseUrl.replace(/\/$/, "");
-      return fetch(base + "/vocab.json").then(function (r) {
-        if (!r.ok) throw new Error("vocab.json not found at " + base);
+      vocabFile = vocabFile || "vocab.json";
+      binFile = binFile || "sigllama-v1.bin";
+      return fetch(base + "/" + vocabFile).then(function (r) {
+        if (!r.ok) throw new Error(vocabFile + " not found at " + base);
         return r.json();
       }).then(function (vocab) {
         itos = vocab.itos; stoi = vocab.stoi || {};
         if (!vocab.stoi) { for (var i = 0; i < itos.length; i++) stoi[itos[i]] = i; }
         BOS = vocab.bos_id || 0; EOS = vocab.eos_id || 1; UNK = vocab.unk_id || 3;
-        return fetchBin(base + "/sigllama-v1.bin");
+        WORD_MODE = vocab.mode === "word";
+        ready = false;
+        return fetchBin(base + "/" + binFile);
       }).then(function (buf) {
         parseWeights(buf);
         buildRope(); allocTmp(); resetCache();
@@ -264,6 +292,8 @@ var SigLlama = (function () {
     },
     loaded: function () { return ready; },
     info: function () { return modelInfo; },
+    vocabList: function () { return itos.slice(); },
+    wordMode: function () { return WORD_MODE; },
     encode: encode,
     decode: decode,
     generate: function (prompt, opts) {
