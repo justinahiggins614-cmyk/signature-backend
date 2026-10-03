@@ -156,6 +156,13 @@ FORMAL = {
         "errors": [],
         "permissions": "none — bumps the in-memory file-stamp counter as a side effect of testing fileRecord",
     },
+    "EngineError": {
+        "purpose": "Structured error factory: every throw is an Error carrying a machine-readable code.",
+        "input": "code (string), message (string), operation (string), recoverable (boolean)",
+        "output": "Error with error_code/message_text/operation/engine_version/api_version/recoverable",
+        "errors": ["known codes documented in schemas/error.schema.json"],
+        "permissions": "none",
+    },
 }
 
 

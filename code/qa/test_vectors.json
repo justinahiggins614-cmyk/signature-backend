@@ -90,7 +90,7 @@
       "is_error": true
     },
     "caps": {
-      "ops": 20,
+      "ops": 21,
       "shelves": 8,
       "slots": 10,
       "offline": true,

@@ -1369,7 +1369,9 @@
         { name: 'capabilities', version: '2.0', deterministic: true, side_effects: 'none', note: '' },
         { name: 'health', version: '2.0', deterministic: true, side_effects: 'none', note: 'Quick probe; full suite is selfTest().' },
         { name: 'selfTest', version: '2.0', deterministic: true, side_effects: 'bumps in-memory file-stamp counter',
-          note: 'Full check suite. Chat replies are intentionally NON-deterministic; everything else deterministic.' }
+          note: 'Full check suite. Chat replies are intentionally NON-deterministic; everything else deterministic.' },
+        { name: 'EngineError', version: '2.0', deterministic: true, side_effects: 'none',
+          note: 'Structured error factory: an Error carrying error_code/message_text/operation/engine_version/api_version/recoverable.' }
       ];
     }
     return {
@@ -1558,7 +1560,7 @@
     // capabilities + health
     var caps = capabilities();
     out.push(['capabilities', caps.backend_id === 'JAH-BACKEND-1' && caps.offline === true &&
-      caps.network_calls.length === 0 && caps.operations.length === 20 &&
+      caps.network_calls.length === 0 && caps.operations.length === 21 &&
       caps.catalogs.shelves === 8 && caps.catalogs.gene_slots === 10]);
     var h = health();
     out.push(['health', h.status === 'UP' && h.version === VERSION && h.api_version === API_VERSION]);

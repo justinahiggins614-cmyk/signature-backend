@@ -264,6 +264,20 @@
       "permissions": "none \u2014 bumps the in-memory file-stamp counter as a side effect of testing fileRecord",
       "version": "2.0",
       "note": "Full check suite. Chat replies are intentionally NON-deterministic; everything else deterministic."
+    },
+    {
+      "name": "EngineError",
+      "purpose": "Structured error factory: every throw is an Error carrying a machine-readable code.",
+      "input": "code (string), message (string), operation (string), recoverable (boolean)",
+      "output": "Error with error_code/message_text/operation/engine_version/api_version/recoverable",
+      "errors": [
+        "known codes documented in schemas/error.schema.json"
+      ],
+      "determinism": "deterministic",
+      "side_effects": "none",
+      "permissions": "none",
+      "version": "2.0",
+      "note": "Structured error factory: an Error carrying error_code/message_text/operation/engine_version/api_version/recoverable."
     }
   ],
   "catalogs": {
