@@ -2,9 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>try{var _jt=localStorage.getItem('jah-theme');if(_jt==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(_je){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The Signature AI Mad Scientist Creation Lab</title>
 <meta name="description" content="The Signature AI Mad Scientist Creation Lab: mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations. Every model's content is pre-built — the lab works fully offline. Also the JAH backend API: chat, dial, runDemo, geneOptions, fileRecord.">
+<link rel="canonical" href="https://justinahiggins614-cmyk.github.io/signature-backend/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Signature AI Mad Scientist Creation Lab">
+<meta property="og:title" content="The Signature AI Mad Scientist Creation Lab">
+<meta property="og:description" content="Mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations — every model's content is pre-built, works fully offline. Also the JAH backend API: chat, dial, runDemo, geneOptions, fileRecord.">
+<meta property="og:url" content="https://justinahiggins614-cmyk.github.io/signature-backend/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Signature AI Mad Scientist Creation Lab">
+<meta name="twitter:description" content="Mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations. Also the JAH backend API: chat, dial, runDemo, geneOptions, fileRecord.">
 <style>
 :root{--bg:#070b14;--panel:#0d1424;--panel2:#111a30;--line:#1e2c4d;--txt:#d7e0f2;--dim:#8b98b8;--gold:#e8c766;--amber:#ffc93c;--amber2:#ffdf7e;--acc:#5aa2ff;--grn:#5aff8a;--red:#ff5a5a;--zap:#c77dff}
 *{box-sizing:border-box}
@@ -85,9 +95,15 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
 .aicard .aname{color:var(--amber2);font-weight:700}
 .aicard .stamp{font-family:monospace;color:var(--acc);font-size:.85em}
 .aicard .duties{color:var(--dim)}
+/* DARK-MODE TOGGLE (opt-in): invert-based dark theme. Default look unchanged. */
+#jahThemeToggle{position:fixed;top:10px;right:10px;z-index:9999;opacity:.72;font-size:.8em;padding:6px 10px;background:#0d1424;border:1px solid var(--line);color:var(--gold);border-radius:20px;cursor:pointer}
+#jahThemeToggle:hover{opacity:1}
+html[data-theme="dark"]{filter:invert(1) hue-rotate(180deg)}
+html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"] canvas,html[data-theme="dark"] svg{filter:invert(1) hue-rotate(180deg)}
 </style>
 </head>
 <body>
+<button type="button" id="jahThemeToggle" aria-label="Toggle dark mode" title="Dark mode">◐</button>
 <div class="jahnet"><span class="jahnet-t">THE JAH NETWORK</span><a href="https://justinahiggins614-cmyk.github.io/jah-ai-models/">The Signature AI Phone Book</a><a href="https://justinahiggins614-cmyk.github.io/jah-calculator/">Calculator</a><a href="https://justinahiggins614-cmyk.github.io/jah-dictionary/">Dictionary</a><a href="https://justinahiggins614-cmyk.github.io/jah-wiki/">JAH Wiki</a><a href="https://justinahiggins614-cmyk.github.io/jah-n-wiki-leaks/">JAH-N Wiki</a><a href="https://justinahiggins614-cmyk.github.io/cyber-patent-catalog/">Patent Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-one-archive/specs.html">Spec Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-llama/">Signature Llama</a><a href="https://justinahiggins614-cmyk.github.io/jah-computer-systems/">PC Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-cyber-mega-mall/">Cyber Mega-Mall</a><a href="https://justinahiggins614-cmyk.github.io/signature-university/">Signature University</a><a href="https://justinahiggins614-cmyk.github.io/signature-books/">Book Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-comics/">Comic Store</a><a href="https://justinahiggins614-cmyk.github.io/signature-newspapers/">Global Newspaper Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-3d-print/">3D Print Depository</a><span class="cur" aria-current="page">YOU ARE HERE: MAD SCIENTIST CREATION LAB</span><a href="https://justinahiggins614-cmyk.github.io/signature-boundless-generators/">Boundless Generator Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-mixlab/">AI Mix Lab</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-olypics/">AI Olypics</a><a href="https://justinahiggins614-cmyk.github.io/signature-chip-maker/">Chip Maker and Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-app-archive/">App Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-robot-matcher/">AI Robot Matcher</a><a href="https://justinahiggins614-cmyk.github.io/signature-experiment-solver/">Experiment Solver</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-image-video-maker/">Signature AI Pixel</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-song-maker/">Signature Music Studio</a></div>
 
 <div class="hero">
@@ -775,6 +791,30 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
   greet();
   renderDemo();
   paintAICard();
+})();
+</script>
+<script>
+/* UX PASS: dark-mode toggle + session restore (localStorage only, nothing leaves this device) */
+(function(){
+'use strict';
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+/* dark-mode toggle */
+var tb=document.getElementById('jahThemeToggle');
+function paintToggle(){ if(tb) tb.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '◑' : '◐'; }
+if(tb){ paintToggle(); tb.onclick=function(){ var d=document.documentElement; if(d.getAttribute('data-theme')==='dark'){d.removeAttribute('data-theme');lsSet('jah-theme','light');} else {d.setAttribute('data-theme','dark');lsSet('jah-theme','dark');} paintToggle(); }; }
+/* session restore: scroll position per path (throttled) */
+var spk='jah-scroll:'+location.pathname;
+var st=null;
+window.addEventListener('scroll',function(){ if(st) return; st=setTimeout(function(){ st=null; lsSet(spk,String(window.scrollY|0)); },250); },{passive:true});
+window.addEventListener('load',function(){ var y=parseInt(lsGet(spk),10); if(y>0){ setTimeout(function(){ window.scrollTo(0,y); },60); } });
+/* session restore: active tab state (any buttons acting as tabs) */
+function tabBtns(){ var b=document.querySelectorAll('[data-tab],button.tab,.tabbtn'); return b.length?b:[]; }
+document.addEventListener('click',function(e){ var t=e.target&&e.target.closest?e.target.closest('[data-tab],button.tab,.tabbtn'):null; if(t) lsSet('jah-tab:'+location.pathname, t.getAttribute('data-tab')||t.textContent||''); },true);
+window.addEventListener('load',function(){ var v=lsGet('jah-tab:'+location.pathname); if(!v) return; var bs=tabBtns(); for(var i=0;i<bs.length;i++){ var b=bs[i]; if((b.getAttribute('data-tab')||b.textContent)===v){ try{b.click();}catch(e){} break; } } });
+/* session restore: last-opened record id */
+document.addEventListener('click',function(e){ var t=e.target&&e.target.closest?e.target.closest('[data-record],[data-spec],[data-patent],[data-id]'):null; if(t){ var rid=t.getAttribute('data-record')||t.getAttribute('data-spec')||t.getAttribute('data-patent')||t.getAttribute('data-id'); if(rid) lsSet('jah-lastrec:'+location.pathname,rid); } },true);
+window.addEventListener('load',function(){ if(location.search.indexOf('=')>0) return; var rid=lsGet('jah-lastrec:'+location.pathname); if(!rid) return; setTimeout(function(){ var el=document.querySelector('[data-record="'+rid+'"],[data-spec="'+rid+'"],[data-patent="'+rid+'"],[data-id="'+rid+'"]'); if(el){ try{el.scrollIntoView({block:'center'});}catch(e){} } },400); });
 })();
 </script>
 </body>
