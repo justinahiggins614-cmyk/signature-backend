@@ -2,4 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
   <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/api.json</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/api-manifest.json</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/engine-manifest.json</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/llms.txt</loc><changefreq>weekly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/signature-backend.d.ts</loc><changefreq>weekly</changefreq><priority>0.3</priority></url>
 </urlset>
