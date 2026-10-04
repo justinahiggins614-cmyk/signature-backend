@@ -265,12 +265,57 @@ var SigLlama = (function () {
       return r.arrayBuffer();
     });
   }
+  /* fetch with a streaming progress callback (page-visible download state).
+     onProgress(bytesLoaded, bytesTotal or 0) fires roughly every 64 KB. */
+  function fetchBinProgress(url, opts) {
+    opts = opts || {};
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error("fetch failed: " + url);
+      if (!r.body || !r.body.getReader || typeof opts.onProgress !== "function")
+        return r.arrayBuffer();
+      var total = 0;
+      try { total = parseInt(r.headers.get("Content-Length") || "", 10) || 0; } catch (e) {}
+      if (!total && opts.totalBytes) total = opts.totalBytes;
+      var reader = r.body.getReader(), chunks = [], got = 0, last = 0;
+      function pump(res) {
+        if (res.done) {
+          try { opts.onProgress(got, total); } catch (e) {} /* final tick: never stall at 99% */
+          var buf = new Uint8Array(got), off = 0, i;
+          for (i = 0; i < chunks.length; i++) { buf.set(chunks[i], off); off += chunks[i].length; }
+          return buf.buffer;
+        }
+        chunks.push(res.value); got += res.value.length;
+        if (got - last >= 65536) { last = got;
+          try { opts.onProgress(got, total); } catch (e) {} }
+        return reader.read().then(pump);
+      }
+      return reader.read().then(pump);
+    });
+  }
+  /* SHA-256 of a buffer, hex; null when the WebCrypto API is unavailable
+     (non-secure contexts) so the load degrades instead of dying. */
+  function sha256Hex(buf) {
+    try {
+      var subtle = (typeof window !== "undefined" && window.crypto && window.crypto.subtle) ||
+                    (typeof crypto !== "undefined" && crypto.subtle);
+      if (!subtle || !subtle.digest) return Promise.resolve(null);
+      return subtle.digest("SHA-256", buf).then(function (d) {
+        var b = new Uint8Array(d), s = "", i;
+        for (i = 0; i < b.length; i++) s += ("0" + b[i].toString(16)).slice(-2);
+        return s;
+      }).catch(function () { return null; });
+    } catch (e) { return Promise.resolve(null); }
+  }
 
   return {
-    load: function (baseUrl, vocabFile, binFile) {
+    load: function (baseUrl, vocabFile, binFile, opts) {
       var base = baseUrl.replace(/\/$/, "");
       vocabFile = vocabFile || "vocab.json";
       binFile = binFile || "sigllama-v1.bin";
+      opts = opts || {};
+      if (typeof opts.onProgress === "function") {
+        try { opts.onProgress(0, opts.totalBytes || 0); } catch (e) {}
+      }
       return fetch(base + "/" + vocabFile).then(function (r) {
         if (!r.ok) throw new Error(vocabFile + " not found at " + base);
         return r.json();
@@ -280,7 +325,17 @@ var SigLlama = (function () {
         BOS = vocab.bos_id || 0; EOS = vocab.eos_id || 1; UNK = vocab.unk_id || 3;
         WORD_MODE = vocab.mode === "word";
         ready = false;
-        return fetchBin(base + "/" + binFile);
+        return fetchBinProgress(base + "/" + binFile, opts);
+      }).then(function (buf) {
+        /* optional full-file hash verification: the page passes the expected
+           SHA-256 from model-status.json. Mismatch -> named MODEL_CORRUPT. */
+        var want = opts.verifySha256;
+        if (!want) return buf;
+        return sha256Hex(buf).then(function (got) {
+          if (got && got !== String(want).toLowerCase())
+            throw new Error("MODEL_CORRUPT: sha256 mismatch");
+          return buf;
+        });
       }).then(function (buf) {
         parseWeights(buf);
         buildRope(); allocTmp(); resetCache();
