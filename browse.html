@@ -43,6 +43,19 @@ button:hover{background:#1d2f60}
 .shelf>summary{cursor:pointer;padding:12px 14px;font-size:1em;color:var(--amber2);min-height:44px;list-style:none}
 .shelf>summary::-webkit-details-marker{display:none}
 .shelf>summary:hover{color:var(--amber)}
+/* BEST OF THE BEST — Manon's 2026-10-04 archive pattern: the AI's top pick pinned above the A–Z list */
+.bestofbest{background:#1d1030;border:2px solid var(--zap);border-radius:12px;padding:20px;margin:18px 0}
+.bestofbest h2{margin:0 0 4px;color:var(--amber2);letter-spacing:.1em;font-size:1.15em}
+.bestofbest h2 .star{color:var(--zap)}
+.bestofbest .whybest{background:#0d1424;border-left:3px solid var(--zap);padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0;font-size:.92em}
+.bestofbest .beststats{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.bestofbest .beststat{background:#070b14;border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:.82em;color:var(--dim)}
+.bestofbest .beststat b{color:var(--amber2)}
+.bestofbest .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.bestflow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0;justify-content:center;font-size:.8em}
+.bestflow .bnode{background:#070b14;border:1px solid var(--zap);border-radius:8px;padding:8px 12px;text-align:center;max-width:150px}
+.bestflow .bnode b{display:block;color:var(--amber2);margin-bottom:2px}
+.bestflow .barrow{color:var(--zap);font-size:18px;font-weight:700}
 .shelf>summary .cnt{color:var(--acc);font-size:.85em;margin-left:8px}
 .shelf>summary .blurb{color:var(--dim);font-size:.82em;display:block;margin-top:2px}
 .shelf>summary::before{content:"▸ ";color:var(--zap)}
@@ -86,6 +99,53 @@ button:hover{background:#1d2f60}
     <div id="srchout" style="margin-top:10px"></div>
   </div>
 
+<section class="bestofbest" aria-labelledby="besth">
+<h2 id="besth"><span class="star">★</span> Best of the Best</h2>
+<p class="note" style="margin:4px 0">The AI's top pick from this archive — the single creation that best shows what the Mad Scientist Lab does. Popped open for you.</p>
+<details class="shelf" open style="margin:12px 0">
+<summary><b>Universal Problem Solver</b> <span class="cnt" style="color:var(--zap)">JAH-AI-PRE-006</span> <span class="blurb">system archetype — the lab's sharpest mind</span></summary>
+<div style="padding:14px">
+<p class="whybest"><b>Why this is the best:</b> the fullest forge archetype in the lab — eleven analytical lenses fused into one relentless problem engine, the richest rule set of the six presets. It embodies the lab's whole promise: give it anything, get the shortest path to solved.</p>
+<div class="bestflow" aria-hidden="true"><div class="bnode"><b>State it</b>any problem, any field</div><div class="barrow">→</div><div class="bnode"><b>Decompose</b>root causes + constraints</div><div class="barrow">→</div><div class="bnode"><b>Analyze</b>11 lenses, zero vagueness</div><div class="barrow">→</div><div class="bnode"><b>Verdict</b>SOLVED</div></div>
+<p><b>What it does:</b> takes any problem — technical, personal, organizational — and decomposes it into root causes, constraints, and the shortest path to solved. Root-cause decomposition, constraint mapping, trade-off analysis, step-by-step action sequences. Precise, tireless, allergic to vague answers.</p>
+<p><b>Implications:</b> this is what all <b>1,050</b> shelf records are building blocks for — one-tap archetypes like this one combine the lab's genes, brains, and protocols into a living AI you can dial and talk to.</p>
+<div class="beststats"><span class="beststat"><b>1,050</b> records in the archive</span><span class="beststat">Preset <b>006</b> of 6 archetypes</span><span class="beststat"><b>11</b> analytical lenses</span><span class="beststat">Tolerance: <b>zero vagueness</b></span></div>
+<div class="toolbar">
+<button id="best-speak" type="button">🔊 Read aloud</button>
+<button id="best-copy" type="button">⧉ Copy</button>
+<button id="best-dl" type="button">⤓ Download</button>
+<a href="index.html?preset=solver#api" style="color:#9fc2ff;font-size:.95em">⚡ Open in the lab →</a>
+</div>
+</div>
+</details>
+</section>
+<script>
+(function(){
+"use strict";
+var plain="Best of the Best — Universal Problem Solver, JAH-AI-PRE-006. The fullest forge archetype in the Mad Scientist Creation Lab: eleven analytical lenses fused into one relentless problem engine. It takes any problem — technical, personal, organizational — and decomposes it into root causes, constraints, and the shortest path to solved. Precise, tireless, allergic to vague answers.";
+var dl="THE SIGNATURE AI MAD SCIENTIST CREATION LAB — BEST OF THE BEST\nUniversal Problem Solver — JAH-AI-PRE-006 (archetype 006 of 6)\n\nWHY THIS IS THE BEST\nThe fullest forge archetype in the lab — eleven analytical lenses fused into one relentless problem engine, the richest rule set of the six presets.\n\nWHAT IT DOES\nRoot-cause decomposition, constraint mapping, shortest-path solution planning, trade-off analysis, step-by-step action sequences. Takes any problem and returns the shortest path to SOLVED.\n\nIMPLICATIONS\nAll 1,050 shelf records are building blocks for one-tap archetypes like this one — genes, brains, and protocols combined into a living AI you can dial.\n\nLab: https://justinahiggins614-cmyk.github.io/signature-backend/index.html?preset=solver#api";
+function copyText(t,btn){function done(ok){var o=btn.textContent;btn.textContent=ok?"Copied ✓":"Copy failed";setTimeout(function(){btn.textContent=o;},1500);}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done(true);},function(){done(false);});}else{var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done(true);}catch(e){done(false);}document.body.removeChild(ta);}}
+function download(name,text){try{var url=URL.createObjectURL(new Blob([text],{type:"text/plain"}));var a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);try{URL.revokeObjectURL(url);}catch(e){}},800);}catch(e){}}
+var speakTimer=null;
+function speakStop(){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}if(speakTimer){clearTimeout(speakTimer);speakTimer=null;}}
+var speakBtn=document.getElementById("best-speak");
+speakBtn.onclick=function(){
+  speakStop();
+  try{
+    if(!("speechSynthesis" in window)){speakBtn.textContent="No voice on this device";setTimeout(function(){speakBtn.textContent="🔊 Read aloud";},1800);return;}
+    if(window.speechSynthesis.speaking){speakBtn.textContent="🔊 Read aloud";return;}
+    var u=new SpeechSynthesisUtterance(plain);
+    speakBtn.textContent="⏹ Stop";
+    u.onend=function(){speakBtn.textContent="🔊 Read aloud";};
+    u.onerror=function(){speakBtn.textContent="🔊 Read aloud";};
+    window.speechSynthesis.speak(u);
+    speakTimer=setTimeout(function(){speakBtn.textContent="🔊 Read aloud";},30000);
+  }catch(e){speakBtn.textContent="🔊 Read aloud";}
+};
+document.getElementById("best-copy").onclick=function(){copyText(dl,this);};
+document.getElementById("best-dl").onclick=function(){download("JAH-AI-PRE-006-best.txt",dl);};
+})();
+</script>
   <div class="panel" id="catalog">
     <h2><span class="tick">⚗</span> FULL CATALOG — A–Z BY SHELF</h2>
     <p class="note">Open a shelf, then a letter. Lists render only when opened, so the page stays fast on phones. <b>⚡ Animate →</b> on any row opens that entry as a live animated creation on the lab bench (a shareable <code>?creation=</code> deep link).</p>
