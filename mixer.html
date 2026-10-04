@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mixer — The Signature AI Mix and Match Generator</title>
+<meta name="description" content="The Mixer: pick AIs from the Signature AI Phone Book or type plain words, and fuse them into a brand-new mind.">
+<link rel="canonical" href="https://justinahiggins614-cmyk.github.io/signature-backend/mixer.html">
+<style>
+:root{--bg:#0a0e1a;--panel:#101828;--panel2:#16203a;--line:#243357;--txt:#e2e9fa;--dim:#93a0c0;--gold:#e8c766;--amber:#ffc93c;--acc:#5aa2ff;--grn:#5aff8a;--red:#ff6a6a;--zap:#c77dff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+.jahnet{background:#070b16;color:#9aa4b2;font-size:.74em;padding:8px 10px;text-align:center;line-height:2;border-bottom:1px solid var(--line)}
+.jahnet-t{color:var(--gold);font-weight:700;letter-spacing:.22em;margin-right:8px}
+.jahnet a{color:#9fc2ff;text-decoration:none;margin:0 6px;white-space:nowrap}
+.jahnet a:hover{text-decoration:underline}
+.jahnet .here{color:#0a0e1a;background:var(--gold);font-weight:700;border-radius:20px;padding:3px 14px;margin:4px 6px;display:inline-block}
+.tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:16px 12px 4px}
+.tabs a{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:10px 26px;text-decoration:none;font-weight:700;font-size:1.02em}
+.tabs a.on{background:var(--gold);color:#0a0e1a;border-color:var(--gold)}
+.wrap{max-width:900px;margin:0 auto;padding:10px 16px 70px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:20px 0}
+.panel h2{color:var(--gold);letter-spacing:.06em;margin:.1em 0 .7em;font-size:1.25em}
+.panel h3{color:var(--amber);margin:1.2em 0 .5em}
+input[type=text],select{background:#0a1226;border:1px solid var(--line);color:var(--txt);padding:12px 14px;border-radius:10px;font-size:1.05em;width:100%}
+button{background:#16244a;border:1px solid var(--acc);color:#cfe2ff;padding:10px 20px;border-radius:999px;cursor:pointer;font-size:1em;font-weight:700}
+button:hover{border-color:var(--gold)}
+button.bigbtn{background:var(--gold);color:#0a0e1a;font-size:1.2em;padding:14px 40px;border:0}
+button.ghost{background:transparent}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.row input,.row select{flex:1;min-width:180px}
+.ailist{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
+.airow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.airow:last-child{border-bottom:0}
+.airow .nm{flex:1}
+.airow .nm b{color:var(--txt)}
+.airow .nm span{color:var(--dim);font-size:.85em;display:block}
+.airow button{flex:none;padding:8px 16px}
+.tray{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;min-height:52px}
+.chip{background:var(--panel2);border:2px solid var(--zap);border-radius:999px;padding:8px 8px 8px 16px;font-weight:700}
+.chip button{border:0;background:transparent;color:var(--red);font-size:1.1em;padding:4px 10px}
+.result{border:2px solid var(--gold);border-radius:14px;padding:20px;margin-top:16px;background:#0d1526}
+.result h3{color:var(--amber);font-size:1.4em;margin:.1em 0}
+.result .lin{color:var(--dim);font-size:.9em;margin:.4em 0}
+.result ul{margin:.4em 0;padding-left:1.2em}
+.result li{margin:.25em 0}
+.dim{color:var(--dim)}
+.readbtn{background:#16244a;border:1px solid var(--acc);color:#cfe2ff;padding:6px 14px;border-radius:999px;cursor:pointer;font-size:.9em}
+.hint{background:#0d1526;border-left:4px solid var(--zap);padding:10px 14px;border-radius:0 10px 10px 0;color:var(--dim);margin:10px 0}
+footer{border-top:1px solid var(--line);color:var(--dim);text-align:center;padding:22px 12px;font-size:.88em}
+footer a{color:#9fc2ff}
+.ex{color:var(--grn);font-size:.95em}
+</style>
+</head>
+<body>
+<div class="jahnet"><span class="jahnet-t">THE JAH NETWORK</span><a href="https://justinahiggins614-cmyk.github.io/signature-math/">1 Signature Math</a><a href="https://justinahiggins614-cmyk.github.io/jah-calculator/">2 Calculator</a><a href="https://justinahiggins614-cmyk.github.io/jah-dictionary/">3 Dictionary</a><a href="https://justinahiggins614-cmyk.github.io/jah-wiki/">4 JAH Wiki</a><a href="https://justinahiggins614-cmyk.github.io/jah-n-wiki-leaks/">5 JAH-N Wiki</a><a href="https://justinahiggins614-cmyk.github.io/signature-llama/">6 Signature Llama</a><a href="https://justinahiggins614-cmyk.github.io/jah-ai-models/">7 AI Phone Book</a><a href="https://justinahiggins614-cmyk.github.io/cyber-patent-catalog/">8 Patent Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-one-archive/specs.html">9 Spec Catalog</a><a href="https://justinahiggins614-cmyk.github.io/jah-computer-systems/">10 PC Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-books/">11 Book Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-comics/">12 Comic Store</a><a href="https://justinahiggins614-cmyk.github.io/signature-newspapers/">13 Newspaper Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-boundless-generators/">15 Boundless Generators</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-mixlab/">16 AI Mix Lab</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-olypics/">17 AI Olympics</a><a href="https://justinahiggins614-cmyk.github.io/signature-chip-maker/">18 Chip Maker</a><a href="https://justinahiggins614-cmyk.github.io/signature-app-archive/">19 App Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-robot-matcher/">20 Robot Matcher</a><a href="https://justinahiggins614-cmyk.github.io/signature-experiment-solver/">21 Experiment Solver</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-image-video-maker/">22 AI Pixel</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-song-maker/">23 Music Studio</a><a href="https://justinahiggins614-cmyk.github.io/signature-fixit/">24 Mr Fix-It</a><a href="https://justinahiggins614-cmyk.github.io/signature-university/">25 University</a><a href="https://justinahiggins614-cmyk.github.io/signature-cyber-mega-mall/">26 Cyber Mega-Mall</a><a href="https://justinahiggins614-cmyk.github.io/signature-3d-print/">27 3D Print Mega Mall</a><br><span class="here">14 The Signature AI Mix and Match Generator — YOU ARE HERE</span></div>
+
+<nav class="tabs" aria-label="Site sections">
+<a href="index.html">🏠 Main</a>
+<a class="on" href="mixer.html">🧪 Mixer</a>
+<a href="mixes.html">🗂 Mixes</a>
+</nav>
+
+<div class="wrap">
+<div class="panel">
+<h2>🧪 The Mixer</h2>
+<p class="dim">Two ways to mix — pick them, or just say it. Then hit the big gold button.</p>
+
+<h3>Way 1 · Pick from the phone book</h3>
+<div class="row">
+<input type="text" id="q" placeholder="Search AIs… e.g. cook, pilot, doctor" aria-label="Search AIs">
+<select id="cat" aria-label="Filter by category"><option value="">All categories</option></select>
+</div>
+<div class="ailist" id="ailist"><p class="dim" style="padding:12px">Loading the phone book…</p></div>
+
+<h3>Way 2 · Just type words</h3>
+<div class="hint">No phone book needed. Type what you want, like:<br><span class="ex">mix air coordinator ai with cook ai</span></div>
+<div class="row">
+<input type="text" id="phrase" placeholder='Try: mix airport navigator with date night cook' aria-label="Type your mix in plain words">
+<button id="phraseGo">🔍 Find them</button>
+</div>
+<p class="dim" id="phraseOut"></p>
+
+<h3>Your mix tray</h3>
+<div class="tray" id="tray"><span class="dim">Empty — add up to 4 AIs.</span></div>
+<div class="row">
+<button class="bigbtn" id="mixGo">⚡ Mix them!</button>
+<button class="ghost" id="clearTray">Clear</button>
+<button class="readbtn" id="readTray">🔊 Read tray</button>
+</div>
+<div class="result" id="result" hidden></div>
+</div>
+</div>
+
+<footer>
+The Signature AI Mix and Match Generator · Signature-made by Justin Addam Higgins<br>
+Part of <a href="https://justinahiggins614-cmyk.github.io/jah-ai-models/">THE JAH NETWORK</a>.
+</footer>
+
+<script src="js/mix.js"></script>
+<script>
+(function(){
+"use strict";
+var E = MixEngine, AIS = [], TRAY = [];
+var $ = function(id){ return document.getElementById(id); };
+function speak(t, l){ try{ E.speak(t, l); }catch(e){} }
+
+function saveTray(){ try{ localStorage.setItem("jah-mix-tray", JSON.stringify(TRAY.map(function(a){ return a.id; }))); }catch(e){} }
+function inTray(id){ return TRAY.some(function(a){ return a.id === id; }); }
+function renderTray(){
+  var t = $("tray");
+  if (!TRAY.length){ t.innerHTML = '<span class="dim">Empty — add up to 4 AIs.</span>'; saveTray(); return; }
+  t.innerHTML = "";
+  TRAY.forEach(function(a){
+    var s = document.createElement("span"); s.className = "chip";
+    s.innerHTML = E.escHtml(a.name) + " ";
+    var x = document.createElement("button"); x.textContent = "✕"; x.setAttribute("aria-label", "Remove " + a.name);
+    x.onclick = function(){ TRAY = TRAY.filter(function(b){ return b.id !== a.id; }); renderTray(); };
+    s.appendChild(x); t.appendChild(s);
+  });
+  saveTray();
+}
+function addAi(a){
+  if (inTray(a.id)) return;
+  if (TRAY.length >= 4){ speak("Tray is full. Four AIs at a time.", "full"); return; }
+  TRAY.push(a); renderTray();
+  speak(a.name + " added. " + TRAY.length + " in the tray.", "add");
+}
+function renderList(filter, cat){
+  var list = $("ailist"); list.innerHTML = "";
+  var n = 0;
+  for (var i = 0; i < AIS.length && n < 60; i++){
+    var a = AIS[i];
+    if (cat && a.cat !== cat) continue;
+    if (filter && E.findAIs(filter, [a]).length === 0 &&
+        a.name.toLowerCase().indexOf(filter.toLowerCase()) < 0) continue;
+    (function(ai){
+      var r = document.createElement("div"); r.className = "airow";
+      r.innerHTML = '<div class="nm"><b>' + E.escHtml(ai.name) + '</b><span>' +
+        E.escHtml(ai.id) + " · " + E.escHtml(ai.cat) + "</span></div>";
+      var b = document.createElement("button"); b.textContent = inTray(ai.id) ? "✓ Added" : "+ Add";
+      b.onclick = function(){ addAi(ai); renderList($("q").value.trim(), $("cat").value); };
+      r.appendChild(b); list.appendChild(r); n++;
+    })(a);
+  }
+  if (!n) list.innerHTML = '<p class="dim" style="padding:12px">No matches — try different words.</p>';
+}
+
+fetch("data/ai-compact.json").then(function(r){ return r.json(); }).then(function(d){
+  AIS = d.ais;
+  var cats = {}, i;
+  for (i = 0; i < AIS.length; i++) cats[AIS[i].cat] = 1;
+  var sel = $("cat");
+  Object.keys(cats).sort().forEach(function(c){
+    var o = document.createElement("option"); o.value = c; o.textContent = c; sel.appendChild(o);
+  });
+  renderList("", "");
+  // restore tray
+  try{
+    var saved = JSON.parse(localStorage.getItem("jah-mix-tray") || "[]"), byId = {};
+    AIS.forEach(function(a){ byId[a.id] = a; });
+    saved.forEach(function(id){ if (byId[id] && TRAY.length < 4) TRAY.push(byId[id]); });
+    renderTray();
+  }catch(e){}
+}).catch(function(){
+  $("ailist").innerHTML = '<p class="dim" style="padding:12px">Could not load the phone book. Check your connection and reload.</p>';
+});
+
+var deb = null;
+$("q").addEventListener("input", function(){
+  clearTimeout(deb);
+  deb = setTimeout(function(){ renderList($("q").value.trim(), $("cat").value); }, 250);
+});
+$("cat").addEventListener("change", function(){ renderList($("q").value.trim(), $("cat").value); });
+
+$("phraseGo").onclick = function(){
+  var ph = $("phrase").value.trim();
+  if (!ph){ $("phraseOut").textContent = "Type something first — e.g. mix airport navigator with date night cook."; return; }
+  var picks = E.matchMixPhrase(ph, AIS);
+  if (!picks.length){ $("phraseOut").textContent = "I couldn't match those words to any phone-book AI. Try different words."; speak("No matches. Try different words.", "nomatch"); return; }
+  var added = [];
+  picks.forEach(function(a){ if (!inTray(a.id) && TRAY.length < 4){ TRAY.push(a); added.push(a.name); } });
+  renderTray();
+  $("phraseOut").innerHTML = "Matched: <b>" + E.escHtml(picks.map(function(a){ return a.name; }).join(" + ")) + "</b>" +
+    (added.length ? " — added to your tray." : " — already in your tray.");
+  speak("Matched " + picks.map(function(a){ return a.name; }).join(" and ") + ".", "matched");
+};
+$("phrase").addEventListener("keydown", function(e){ if (e.key === "Enter") $("phraseGo").click(); });
+
+$("clearTray").onclick = function(){ TRAY = []; $("result").hidden = true; renderTray(); };
+$("readTray").onclick = function(){
+  speak(TRAY.length ? "In your tray: " + TRAY.map(function(a){ return a.name; }).join(", ") + "." : "Your tray is empty.", "tray");
+};
+
+$("mixGo").onclick = function(){
+  var box = $("result");
+  if (TRAY.length < 2){
+    box.hidden = false;
+    box.innerHTML = "<p><b>Add at least 2 AIs</b> to mix — pick from the phone book or type words above.</p>";
+    speak("Add at least two AIs first.", "need2");
+    return;
+  }
+  var hyb = E.buildHybrid(TRAY);
+  var py = E.buildPython(hyb.name, hyb), js = E.buildJS(hyb.name, hyb);
+  box.hidden = false;
+  box.innerHTML =
+    "<h3>⚡ " + E.escHtml(hyb.name) + "</h3>" +
+    '<p class="lin">' + E.escHtml(hyb.lineage) + "</p>" +
+    "<p>" + E.escHtml(hyb.description) + "</p>" +
+    "<p><b>Abilities (" + hyb.abilities.length + "):</b></p><ul>" +
+    hyb.abilities.map(function(a){ return "<li>" + E.escHtml(a) + "</li>"; }).join("") + "</ul>" +
+    "<p><b>What this means:</b></p><ul>" +
+    hyb.implications.map(function(a){ return "<li>" + E.escHtml(a) + "</li>"; }).join("") + "</ul>" +
+    '<div class="row">' +
+    '<button id="rRead">🔊 Read aloud</button>' +
+    '<button id="rCopy">📋 Copy</button>' +
+    '<button id="rPy">⬇ Download Python</button>' +
+    '<button id="rJs">⬇ Download JS</button>' +
+    "</div>" +
+    '<p class="dim">Love it? <a href="mixes.html#generate" style="color:var(--gold)">Name it and generate it on the Mixes page →</a></p>';
+  $("rRead").onclick = function(){ speak(hyb.name + ". " + hyb.description + " Abilities: " + hyb.abilities.slice(0,6).join("; ") + ".", "hyb"); };
+  $("rCopy").onclick = function(){
+    var t = hyb.name + "\n" + hyb.lineage + "\n\n" + hyb.description + "\n\nABILITIES\n- " + hyb.abilities.join("\n- ");
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(
+      function(){ speak("Copied.", "copy"); },
+      function(){ var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); }catch(e){} ta.remove(); speak("Copied.", "copy"); });
+  };
+  $("rPy").onclick = function(){ E.download(E.slug(hyb.name) + ".py", py, "text/x-python"); };
+  $("rJs").onclick = function(){ E.download(E.slug(hyb.name) + ".js", js, "application/javascript"); };
+  box.scrollIntoView();
+  speak(hyb.name + " mixed! " + hyb.abilities.length + " abilities.", "mixed");
+};
+})();
+</script>
+</body>
+</html>

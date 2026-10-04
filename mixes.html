@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mixes — The Signature AI Mix and Match Generator</title>
+<meta name="description" content="Every mix: the Best of All Mixes, the full A–Z archive, and the generator — name your mix, get its story, robot body, and real code.">
+<link rel="canonical" href="https://justinahiggins614-cmyk.github.io/signature-backend/mixes.html">
+<style>
+:root{--bg:#0a0e1a;--panel:#101828;--panel2:#16203a;--line:#243357;--txt:#e2e9fa;--dim:#93a0c0;--gold:#e8c766;--amber:#ffc93c;--acc:#5aa2ff;--grn:#5aff8a;--red:#ff6a6a;--zap:#c77dff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+.jahnet{background:#070b16;color:#9aa4b2;font-size:.74em;padding:8px 10px;text-align:center;line-height:2;border-bottom:1px solid var(--line)}
+.jahnet-t{color:var(--gold);font-weight:700;letter-spacing:.22em;margin-right:8px}
+.jahnet a{color:#9fc2ff;text-decoration:none;margin:0 6px;white-space:nowrap}
+.jahnet a:hover{text-decoration:underline}
+.jahnet .here{color:#0a0e1a;background:var(--gold);font-weight:700;border-radius:20px;padding:3px 14px;margin:4px 6px;display:inline-block}
+.tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:16px 12px 4px}
+.tabs a{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:10px 26px;text-decoration:none;font-weight:700;font-size:1.02em}
+.tabs a.on{background:var(--gold);color:#0a0e1a;border-color:var(--gold)}
+.wrap{max-width:900px;margin:0 auto;padding:10px 16px 70px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:20px 0}
+.panel h2{color:var(--gold);letter-spacing:.06em;margin:.1em 0 .7em;font-size:1.25em}
+.best{border:2px solid var(--gold);border-radius:14px;background:#141021}
+.best summary{cursor:pointer;padding:16px;font-size:1.15em;font-weight:800;color:var(--amber);list-style:none}
+.best summary::-webkit-details-marker{display:none}
+.best .body{padding:0 18px 18px}
+.best ul{margin:.4em 0;padding-left:1.2em}
+.dim{color:var(--dim)}
+input[type=text]{background:#0a1226;border:1px solid var(--line);color:var(--txt);padding:12px 14px;border-radius:10px;font-size:1.05em;width:100%}
+button{background:#16244a;border:1px solid var(--acc);color:#cfe2ff;padding:10px 20px;border-radius:999px;cursor:pointer;font-size:1em;font-weight:700}
+button:hover{border-color:var(--gold)}
+button.bigbtn{background:var(--gold);color:#0a0e1a;font-size:1.15em;padding:14px 36px;border:0}
+button.ghost{background:transparent}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;align-items:center}
+.readbtn{background:#16244a;border:1px solid var(--acc);color:#cfe2ff;padding:6px 14px;border-radius:999px;cursor:pointer;font-size:.9em}
+details.az{border:1px solid var(--line);border-radius:10px;margin:8px 0;background:var(--panel)}
+details.az summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--txt)}
+details.az summary .cnt{color:var(--dim);font-weight:400;font-size:.9em}
+.mixrow{padding:10px 16px;border-top:1px solid var(--line)}
+.mixrow b{color:var(--amber)}
+.mixrow .src{color:var(--dim);font-size:.88em}
+.tray{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;min-height:48px}
+.chip{background:var(--panel2);border:2px solid var(--zap);border-radius:999px;padding:8px 8px 8px 16px;font-weight:700}
+.chip button{border:0;background:transparent;color:var(--red);font-size:1.1em;padding:4px 10px}
+.gen{border:2px solid var(--zap);border-radius:14px;padding:20px;margin-top:16px;background:#0e1428}
+.namemsg{font-weight:700;min-height:1.6em}
+.namemsg.bad{color:var(--red)}
+.namemsg.good{color:var(--grn)}
+.rbody{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:12px 0}
+.rbody a{color:var(--gold);font-weight:800}
+footer{border-top:1px solid var(--line);color:var(--dim);text-align:center;padding:22px 12px;font-size:.88em}
+footer a{color:#9fc2ff}
+</style>
+</head>
+<body>
+<div class="jahnet"><span class="jahnet-t">THE JAH NETWORK</span><a href="https://justinahiggins614-cmyk.github.io/signature-math/">1 Signature Math</a><a href="https://justinahiggins614-cmyk.github.io/jah-calculator/">2 Calculator</a><a href="https://justinahiggins614-cmyk.github.io/jah-dictionary/">3 Dictionary</a><a href="https://justinahiggins614-cmyk.github.io/jah-wiki/">4 JAH Wiki</a><a href="https://justinahiggins614-cmyk.github.io/jah-n-wiki-leaks/">5 JAH-N Wiki</a><a href="https://justinahiggins614-cmyk.github.io/signature-llama/">6 Signature Llama</a><a href="https://justinahiggins614-cmyk.github.io/jah-ai-models/">7 AI Phone Book</a><a href="https://justinahiggins614-cmyk.github.io/cyber-patent-catalog/">8 Patent Catalog</a><a href="https://justinahiggins614-cmyk.github.io/signature-one-archive/specs.html">9 Spec Catalog</a><a href="https://justinahiggins614-cmyk.github.io/jah-computer-systems/">10 PC Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-books/">11 Book Depository</a><a href="https://justinahiggins614-cmyk.github.io/signature-comics/">12 Comic Store</a><a href="https://justinahiggins614-cmyk.github.io/signature-newspapers/">13 Newspaper Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-boundless-generators/">15 Boundless Generators</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-mixlab/">16 AI Mix Lab</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-olypics/">17 AI Olympics</a><a href="https://justinahiggins614-cmyk.github.io/signature-chip-maker/">18 Chip Maker</a><a href="https://justinahiggins614-cmyk.github.io/signature-app-archive/">19 App Archive</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-robot-matcher/">20 Robot Matcher</a><a href="https://justinahiggins614-cmyk.github.io/signature-experiment-solver/">21 Experiment Solver</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-image-video-maker/">22 AI Pixel</a><a href="https://justinahiggins614-cmyk.github.io/signature-ai-song-maker/">23 Music Studio</a><a href="https://justinahiggins614-cmyk.github.io/signature-fixit/">24 Mr Fix-It</a><a href="https://justinahiggins614-cmyk.github.io/signature-university/">25 University</a><a href="https://justinahiggins614-cmyk.github.io/signature-cyber-mega-mall/">26 Cyber Mega-Mall</a><a href="https://justinahiggins614-cmyk.github.io/signature-3d-print/">27 3D Print Mega Mall</a><br><span class="here">14 The Signature AI Mix and Match Generator — YOU ARE HERE</span></div>
+
+<nav class="tabs" aria-label="Site sections">
+<a href="index.html">🏠 Main</a>
+<a href="mixer.html">🧪 Mixer</a>
+<a class="on" href="mixes.html">🗂 Mixes</a>
+</nav>
+
+<div class="wrap">
+
+<div class="panel">
+<h2>🗂 Every mix, A–Z <span class="dim" id="mixcount"></span></h2>
+<details class="best" id="bestBox" open>
+<summary>★ Best of All Mixes — <span id="bestName">loading…</span></summary>
+<div class="body" id="bestBody"><p class="dim">Loading the best mix…</p></div>
+</details>
+<p class="dim" style="margin-top:14px">The full archive — tap a letter. Each mix shows its parents and abilities.</p>
+<div id="az"></div>
+</div>
+
+<div class="panel" id="generate">
+<h2>⚙ Generate your own mix</h2>
+<p class="dim">Pick the AIs (your mixer tray carries over), name your mix, and it gets a full write-up, a robot body, and real downloadable code.</p>
+
+<h3 style="color:var(--amber)">1 · The AIs in this mix</h3>
+<div class="row">
+<input type="text" id="gq" placeholder="Add another AI… e.g. pilot" aria-label="Add an AI" style="flex:1;min-width:200px">
+<button id="gAdd">+ Add</button>
+</div>
+<div class="tray" id="gtray"><span class="dim">Empty.</span></div>
+
+<h3 style="color:var(--amber)">2 · Name your mix</h3>
+<div class="row">
+<input type="text" id="gname" maxlength="48" placeholder="e.g. Sky Kitchen Captain" aria-label="Name your mix" style="flex:1;min-width:200px">
+<button id="gCheck">✓ Check name</button>
+</div>
+<p class="namemsg" id="gNameMsg"></p>
+
+<h3 style="color:var(--amber)">3 · Generate</h3>
+<div class="row">
+<button class="bigbtn" id="gGo">⚙ Generate my mix</button>
+<button class="readbtn" id="gReadTray">🔊 Read tray</button>
+</div>
+<div class="gen" id="gOut" hidden></div>
+</div>
+
+</div>
+
+<footer>
+The Signature AI Mix and Match Generator · Signature-made by Justin Addam Higgins<br>
+Part of <a href="https://justinahiggins614-cmyk.github.io/jah-ai-models/">THE JAH NETWORK</a>.
+</footer>
+
+<script src="js/mix.js"></script>
+<script>
+(function(){
+"use strict";
+var E = MixEngine, AIS = [], GTRAY = [], BESTPAIR = {}, ALLBYID = {};
+var $ = function(id){ return document.getElementById(id); };
+function speak(t, l){ try{ E.speak(t, l); }catch(e){} }
+
+/* ---------- best of all mixes ---------- */
+fetch("data/best/best-mix.json").then(function(r){ return r.json(); }).then(function(b){
+  $("bestName").textContent = b.name + " · " + b.id;
+  var rb = b.robot_body ?
+    '<div class="rbody">🤖 <b>Best robot body:</b> <a href="' + E.escHtml(b.robot_body.url) + '">' +
+    E.escHtml(b.robot_body.body) + "</a> (" + E.escHtml(b.robot_body.body_class) + ", fit " + b.robot_body.score + ")</div>" : "";
+  $("bestBody").innerHTML =
+    '<p class="dim">' + E.escHtml(b.sources.map(function(s){ return s.name; }).join(" + ")) + " · " + E.escHtml(b.id) + "</p>" +
+    "<p>" + E.escHtml(b.blurb) + "</p>" +
+    "<p><b>Why this is the best:</b></p><ul>" + b.why.map(function(w){ return "<li>" + E.escHtml(w) + "</li>"; }).join("") + "</ul>" +
+    "<p><b>What it does:</b></p><ul>" + b.abilities.map(function(a){ return "<li>" + E.escHtml(a) + "</li>"; }).join("") + "</ul>" +
+    "<p><b>Implications:</b></p><ul>" + b.implications.map(function(w){ return "<li>" + E.escHtml(w) + "</li>"; }).join("") + "</ul>" +
+    "<p><b>Stats:</b></p><ul>" + b.stats.map(function(w){ return "<li>" + E.escHtml(w) + "</li>"; }).join("") + "</ul>" + rb +
+    '<div class="row"><button class="readbtn" id="bestRead">🔊 Read aloud</button>' +
+    '<button id="bestCopy">📋 Copy</button><button id="bestDl">⬇ Download</button></div>' +
+    '<p class="dim">Reviewed daily — a better mix takes this spot automatically.</p>';
+  var txt = b.name + ". " + b.blurb + " Why it is the best: " + b.why.join(" ") +
+    " Abilities: " + b.abilities.join("; ") + ". Implications: " + b.implications.join(" ");
+  $("bestRead").onclick = function(){ speak(txt, "best"); };
+  $("bestCopy").onclick = function(){
+    var t = "BEST OF ALL MIXES — " + b.name + " (" + b.id + ")\n\n" + b.blurb + "\n\nWHY\n- " + b.why.join("\n- ") +
+      "\n\nABILITIES\n- " + b.abilities.join("\n- ") + "\n\nIMPLICATIONS\n- " + b.implications.join("\n- ");
+    copyText(t);
+  };
+  $("bestDl").onclick = function(){ E.download(E.slug(b.name) + "-best-mix.txt",
+    "BEST OF ALL MIXES — " + b.name + " (" + b.id + ")\n\n" + b.blurb + "\n\nWHY THE BEST\n- " + b.why.join("\n- ") +
+    "\n\nABILITIES\n- " + b.abilities.join("\n- ") + "\n\nIMPLICATIONS\n- " + b.implications.join("\n- ") +
+    "\n\nSTATS\n- " + b.stats.join("\n- ") + "\n", "text/plain"); };
+}).catch(function(){ $("bestBody").innerHTML = '<p class="dim">Best-mix data is loading — reload in a moment.</p>'; });
+
+function copyText(t){
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(
+    function(){ speak("Copied.", "copy"); },
+    function(){ var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); }catch(e){} ta.remove(); speak("Copied.", "copy"); });
+}
+
+/* ---------- A–Z archive ---------- */
+fetch("data/mix-state.json").then(function(r){ return r.json(); }).then(function(s){
+  $("mixcount").textContent = "· " + s.total_seeded.toLocaleString() + " mixes, marching to 1,000,000";
+}).catch(function(){});
+var azBox = $("az"), loaded = {};
+"abcdefghijklmnopqrstuvwxyz".split("").forEach(function(L){
+  var d = document.createElement("details"); d.className = "az";
+  d.innerHTML = '<summary>' + L.toUpperCase() + ' <span class="cnt">— tap to load</span></summary><div class="mixes"></div>';
+  d.addEventListener("toggle", function(){
+    if (!d.open || loaded[L]) return;
+    loaded[L] = true;
+    var box = d.querySelector(".mixes");
+    box.innerHTML = '<p class="dim" style="padding:10px 16px">Loading…</p>';
+    fetch("data/mixes/az-" + L + ".json").then(function(r){ return r.json(); }).then(function(j){
+      d.querySelector(".cnt").textContent = "— " + j.count + " mixes";
+      box.innerHTML = "";
+      j.mixes.forEach(function(m){
+        var r = document.createElement("div"); r.className = "mixrow";
+        r.innerHTML = "<b>" + E.escHtml(m.name) + '</b> <span class="dim">' + E.escHtml(m.id) + "</span>" +
+          '<div class="src">' + E.escHtml(m.sources.map(function(s){ return s.name; }).join(" + ")) +
+          " · " + m.abilities.length + " abilities</div>";
+        box.appendChild(r);
+      });
+    }).catch(function(){ box.innerHTML = '<p class="dim" style="padding:10px 16px">Could not load — try again.</p>'; loaded[L] = false; });
+  });
+  azBox.appendChild(d);
+});
+
+/* ---------- generate ---------- */
+function renderGTray(){
+  var t = $("gtray");
+  if (!GTRAY.length){ t.innerHTML = '<span class="dim">Empty — add at least 2 AIs.</span>'; return; }
+  t.innerHTML = "";
+  GTRAY.forEach(function(a){
+    var s = document.createElement("span"); s.className = "chip";
+    s.textContent = a.name + " ";
+    var x = document.createElement("button"); x.textContent = "✕"; x.setAttribute("aria-label", "Remove " + a.name);
+    x.onclick = function(){ GTRAY = GTRAY.filter(function(b){ return b.id !== a.id; }); renderGTray(); };
+    s.appendChild(x); t.appendChild(s);
+  });
+}
+function gAddAi(a){
+  if (GTRAY.some(function(b){ return b.id === a.id; })) return;
+  if (GTRAY.length >= 4){ speak("Four AIs at a time.", "full"); return; }
+  GTRAY.push(a); renderGTray();
+}
+$("gAdd").onclick = function(){
+  var q = $("gq").value.trim();
+  if (!q) return;
+  var m = E.findAIs(q, AIS)[0];
+  if (m){ gAddAi(m.ai); $("gq").value = ""; speak(m.ai.name + " added.", "gadd"); }
+  else speak("No match for those words.", "gno");
+};
+$("gq").addEventListener("keydown", function(e){ if (e.key === "Enter") $("gAdd").click(); });
+$("gReadTray").onclick = function(){
+  speak(GTRAY.length ? "In this mix: " + GTRAY.map(function(a){ return a.name; }).join(", ") + "." : "Empty.", "gtray");
+};
+
+var goodName = null;
+$("gCheck").onclick = function(){
+  var chk = E.checkMixName($("gname").value), msg = $("gNameMsg");
+  if (!chk.ok){
+    msg.className = "namemsg bad"; msg.textContent = chk.msg; goodName = null;
+    speak(chk.msg, "badname");
+  } else {
+    msg.className = "namemsg good"; msg.textContent = "✓ “" + chk.name + "” — great name!";
+    goodName = chk.name; speak("Great name: " + chk.name, "goodname");
+  }
+};
+
+function nextSeq(){
+  var s = 1;
+  try{ s = parseInt(localStorage.getItem("jah-mix-seq") || "1", 10) || 1; }catch(e){}
+  return s;
+}
+function bumpSeq(s){ try{ localStorage.setItem("jah-mix-seq", String(s + 2)); }catch(e){} }
+
+$("gGo").onclick = function(){
+  var out = $("gOut");
+  if (GTRAY.length < 2){
+    out.hidden = false;
+    out.innerHTML = "<p><b>Add at least 2 AIs</b> above first — or build a tray on the <a href='mixer.html' style='color:var(--gold)'>Mixer page</a>.</p>";
+    return;
+  }
+  var chk = E.checkMixName($("gname").value);
+  if (!chk.ok){
+    out.hidden = false;
+    out.innerHTML = "<p><b>Name your mix first</b> — " + E.escHtml(chk.msg) + "</p>";
+    $("gname").focus(); return;
+  }
+  goodName = chk.name;
+  var stamp = new Date().toISOString().slice(0, 10);
+  var hyb = E.buildHybrid(GTRAY, stamp);
+  var seq = nextSeq();
+  // best robot body: highest-score pair among source AIs
+  var bp = null;
+  GTRAY.forEach(function(a){
+    var c = BESTPAIR[a.id];
+    if (c && (!bp || c.score > bp.score)) bp = c;
+  });
+  var py = E.buildPython(goodName, hyb), js = E.buildJS(goodName, hyb);
+  var manifest = JSON.stringify({name: goodName, seq: seq, stamp: stamp,
+    sources: GTRAY.map(function(a){ return a.id; }), abilities: hyb.abilities});
+  var entries = E.buildPhoneBookEntries({name: goodName, hyb: hyb, seq: seq, stamp: stamp,
+    extraCaps: bestExtraCaps(hyb), manifestText: manifest});
+  bumpSeq(seq);
+  var rbHtml = bp ?
+    '<div class="rbody">🤖 <b>Best robot body:</b> <a href="' + E.escHtml(bp.url) + '">' + E.escHtml(bp.body) +
+    "</a> (" + E.escHtml(bp.body_class) + ", fit score " + bp.score + ") — see it on the Robot Matcher →</div>" :
+    '<p class="dim">No robot-body pair found for these AIs yet.</p>';
+  out.hidden = false;
+  out.innerHTML =
+    "<h3 style='color:var(--amber)'>🎉 " + E.escHtml(goodName) + "</h3>" +
+    '<p class="dim">' + E.escHtml(hyb.lineage.replace(/^Mixed from/, "Lineage:")) + "</p>" +
+    "<p><b>What it is:</b> " + E.escHtml(hyb.description) + "</p>" +
+    "<p><b>Abilities (" + hyb.abilities.length + "):</b></p><ul>" +
+    hyb.abilities.map(function(a){ return "<li>" + E.escHtml(a) + "</li>"; }).join("") + "</ul>" +
+    "<p><b>Implications:</b></p><ul>" +
+    hyb.implications.map(function(a){ return "<li>" + E.escHtml(a) + "</li>"; }).join("") + "</ul>" + rbHtml +
+    '<div class="row">' +
+    '<button id="goRead">🔊 Read aloud</button>' +
+    '<button id="goCopy">📋 Copy all</button>' +
+    '<button id="goPy">⬇ Python (.py)</button>' +
+    '<button id="goJs">⬇ JS (.js)</button>' +
+    "</div>" +
+    '<div class="row"><button id="goFile" style="border-color:var(--grn)">📖 File in AI Phone Book</button></div>' +
+    '<p class="dim">Filing opens a ticket on the phone-book repo — the daily worker files your mix (Signature version + improved best version) automatically. Nothing to install.</p>';
+  var full = goodName + " — a Signature AI mix\nLineage: " + hyb.lineage + "\n\n" + hyb.description +
+    "\n\nABILITIES\n- " + hyb.abilities.join("\n- ") + "\n\nIMPLICATIONS\n- " + hyb.implications.join("\n- ");
+  $("goRead").onclick = function(){ speak(goodName + ". " + hyb.description + " Abilities: " + hyb.abilities.slice(0,8).join("; ") + ".", "gen"); };
+  $("goCopy").onclick = function(){ copyText(full); };
+  $("goPy").onclick = function(){ E.download(E.slug(goodName) + ".py", py, "text/x-python"); };
+  $("goJs").onclick = function(){ E.download(E.slug(goodName) + ".js", js, "application/javascript"); };
+  $("goFile").onclick = function(){
+    var title = "[phonebook-mix] " + goodName + " (JAH-AI-MIX filed " + stamp + ")";
+    var body = "Filing a user-generated mix from The Signature AI Mix and Match Generator.\n\n" +
+      "```json\n" + JSON.stringify(entries, null, 1) + "\n```\n\n" +
+      "Worker: append both records to ai-catalog.json (re-ID canonically), update counts, close this issue.";
+    var url = "https://github.com/justinahiggins614-cmyk/jah-ai-models/issues/new" +
+      "?title=" + encodeURIComponent(title) + "&body=" + encodeURIComponent(body) +
+      "&labels=" + encodeURIComponent("phonebook-mix");
+    window.open(url, "_blank");
+    speak("Filing ticket opened. Submit it and your mix joins the phone book automatically.", "filed");
+  };
+  out.scrollIntoView();
+  speak(goodName + " generated! " + hyb.abilities.length + " abilities.", "gen-done");
+};
+
+/* complementary abilities for the "best" version: top caps from same-category AIs not in the mix */
+function bestExtraCaps(hyb){
+  var have = {}, i;
+  hyb.abilities.forEach(function(a){ have[a] = 1; });
+  var inMix = {}; hyb.ais.forEach(function(a){ inMix[a.id] = 1; });
+  var cats = {}; hyb.ais.forEach(function(a){ cats[a.cat] = 1; });
+  var out = [];
+  for (i = 0; i < AIS.length && out.length < 3; i++){
+    var a = AIS[i];
+    if (inMix[a.id] || !cats[a.cat]) continue;
+    (a.caps || []).forEach(function(c){
+      if (out.length < 3 && !have[c]){ have[c] = 1; out.push({name: c, from: a.name}); }
+    });
+  }
+  return out;
+}
+
+/* ---------- boot ---------- */
+Promise.all([
+  fetch("data/ai-compact.json").then(function(r){ return r.json(); }),
+  fetch("data/best-pair-by-ai.json").then(function(r){ return r.json(); }).catch(function(){ return {}; })
+]).then(function(res){
+  AIS = res[0].ais; BESTPAIR = res[1] || {};
+  AIS.forEach(function(a){ ALLBYID[a.id] = a; });
+  // carry the mixer tray over
+  try{
+    var saved = JSON.parse(localStorage.getItem("jah-mix-tray") || "[]");
+    saved.forEach(function(id){ if (ALLBYID[id] && GTRAY.length < 4) GTRAY.push(ALLBYID[id]); });
+  }catch(e){}
+  renderGTray();
+}).catch(function(){
+  $("gtray").innerHTML = '<span class="dim">Could not load the phone book — check your connection and reload.</span>';
+});
+})();
+</script>
+</body>
+</html>
