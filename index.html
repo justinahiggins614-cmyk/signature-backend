@@ -1081,7 +1081,7 @@ window.addEventListener('load',function(){ if(location.search.indexOf('=')>0) re
 
   /* ---- permanent "? Guide" panel ---- */
   var guideBtn = $('jahGuideBtn'), guidePanel = $('jahGuidePanel'), guideClose = $('jahGuideClose');
-  function guideOpen() { if (guidePanel) { guidePanel.classList.add('open'); try { guideClose.focus(); } catch (e) {} } }
+  function guideOpen() { if (guidePanel) { guidePanel.classList.add('open'); try { guideClose.focus({preventScroll:true}); } catch (e) {} } }
   function guideShut() { if (guidePanel) guidePanel.classList.remove('open'); }
   if (guideBtn) guideBtn.addEventListener('click', function () {
     if (guidePanel && guidePanel.classList.contains('open')) guideShut(); else guideOpen();
@@ -1091,7 +1091,7 @@ window.addEventListener('load',function(){ if(location.search.indexOf('=')>0) re
   /* ---- first-visit welcome: centered overlay (no auto-scroll, no spotlight) ---- */
   function welcomeShow() {
     var m = $('jahWelcomeModal'), ok = $('jahWelcomeGotIt');
-    if (m) { m.classList.add('show'); if (ok) { try { ok.focus(); } catch (e) {} } }
+    if (m) { m.classList.add('show'); if (ok) { try { ok.focus({preventScroll:true}); } catch (e) {} } }
   }
   function welcomeDone() {
     var m = $('jahWelcomeModal');
