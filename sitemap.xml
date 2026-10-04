@@ -1,24 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/</loc><lastmod>2026-10-04</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/browse.html</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/mixer.html</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/mixes.html</loc><lastmod>2026-10-04</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
   <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/api.json</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/api-manifest.json</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/engine-manifest.json</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/llms.txt</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.4</priority></url>
   <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/signature-backend.d.ts</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?creation=eyJiYXNlIjpudWxsLCJwaWNrcyI6eyJnZW5lcyI6WyJBLVJFU1gxMCJdfX0</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?creation=eyJiYXNlIjpudWxsLCJwaWNrcyI6eyJwYXJ0cyI6WyJCUDExLTE2Il19fQ</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?creation=eyJiYXNlIjpudWxsLCJwaWNrcyI6eyJicmFpbnMiOlsiQlItMTIiXX19</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?creation=eyJiYXNlIjpudWxsLCJwaWNrcyI6eyJwb3dlciI6WyJQVy0xNyJdfX0</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?creation=eyJiYXNlIjpudWxsLCJwaWNrcyI6eyJlcXVpcG1lbnQiOlsiRVEtMjAiXX19</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?creation=eyJiYXNlIjpudWxsLCJwaWNrcyI6eyJzZXJ1bXMiOlsiU1ItNDAiXX19</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?creation=eyJiYXNlIjpudWxsLCJwaWNrcyI6eyJoYWJpdGF0cyI6WyJIQi0yMCJdfX0</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?creation=eyJiYXNlIjpudWxsLCJwaWNrcyI6eyJwcm90b2NvbHMiOlsiWFAtMjMiXX19</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?preset=paragon#api</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?preset=solver#api</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?preset=ecosystem#api</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?preset=reality#api</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?preset=quantum#api</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://justinahiggins614-cmyk.github.io/signature-backend/index.html?preset=translator#api</loc><lastmod>2026-10-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
 </urlset>

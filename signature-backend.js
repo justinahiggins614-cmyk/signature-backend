@@ -1,5 +1,5 @@
 /* ============================================================
-   THE SIGNATURE AI MAD SCIENTIST CREATION LAB — engine v2.0
+   THE SIGNATURE AI MIX AND MATCH GENERATOR — engine v2.0
    (formerly The Signature Backend)
    One shared engine that powers every AI's chat and working
    demo in the Signature AI Telephone Book.
@@ -1052,7 +1052,7 @@
 
 
   /* ============================================================
-     THE MAD SCIENTIST CREATION LAB
+     THE SIGNATURE AI MIX AND MATCH GENERATOR
      Mix-and-match option catalogs. Everything below is generated
      deterministically at load from seeded word lists, so the lab
      works fully offline: no network calls, no live completion —
@@ -1315,7 +1315,7 @@
   // phone book and this page can chat with anything the lab animates.
   function creationToAI(c) {
     var rules = [{ k: ['who are you', 'your name'],
-      r: ['I am ' + c.name + ', ' + c.cls + ', animated in the Mad Scientist Creation Lab (' + c.stamp + ').',
+      r: ['I am ' + c.name + ', ' + c.cls + ', animated in the The Signature AI Mix and Match Generator (' + c.stamp + ').',
           'They call me ' + c.name + '. The lab made me from ' + c.pickCount + ' fine components.'] }];
     var i, kw;
     for (i = 0; i < Math.min(5, c.abilities.length); i++) {
@@ -1501,7 +1501,7 @@
       lp.fallback.length >= 4 && lp.fallback.indexOf(lp.greeting) < 0 &&
       !!lp.demoTitle && !!lp.demoKind && !!lp.demoHTML && !!lp.py]);
     opperaterSelfTest(out);
-    // Mad Scientist Creation Lab checks.
+    // The Signature AI Mix and Match Generator checks.
     var par = loadPreset('saint');
     out.push(['legacy-alias', !!par && par.name === 'Celestial Paragon AI']);
     var go = geneOptions(false);

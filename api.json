@@ -1,6 +1,6 @@
 {
   "api_version": "2.0",
-  "blurb": "The Signature AI Mad Scientist Creation Lab \u2014 mix-and-match genes, parts, brains, serums and equipment into wild scientist creations; also the shared JAH engine API (chat/dial/runDemo/geneOptions/fileRecord) for every Signature AI. All content pre-built, works offline.",
+  "blurb": "The Signature AI Mix and Match Generator \u2014 mix-and-match genes, parts, brains, serums and equipment into wild scientist creations; also the shared JAH engine API (chat/dial/runDemo/geneOptions/fileRecord) for every Signature AI. All content pre-built, works offline.",
   "engine": "signature-backend.js",
   "engine_version": "2.0",
   "functions": [
@@ -36,7 +36,7 @@
     "habitats",
     "protocols"
   ],
-  "name": "The Signature AI Mad Scientist Creation Lab",
+  "name": "The Signature AI Mix and Match Generator",
   "offline": true,
   "site": 16,
   "title_provisional": false,

@@ -87,7 +87,7 @@ def main():
         test_html = ('<span class="fail">ERROR</span> '
                      '<span class="stamped">static check ' + today + "</span>")
     else:
-        ver_html = ("v" + str(info.get("version")) + " — Mad Scientist Creation Lab"
+        ver_html = ("v" + str(info.get("version")) + " — The Signature AI Mix and Match Generator"
                     '<span class="stamped"> · static check ' + today + "</span>")
         if ok:
             test_html = ('<span class="pass">PASS</span> '

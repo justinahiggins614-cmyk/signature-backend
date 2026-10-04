@@ -1,8 +1,8 @@
-# The Signature AI Mad Scientist Creation Lab — Signature Engine
+# The Signature AI Mix and Match Generator — Signature Engine
 
 > The Signature Engine is a dependency-free, offline JavaScript engine for
 > chattable AI records, dial-up AI sessions, genome forging (The Opperater),
-> and a mix-and-match Mad Scientist Creation Lab. No network calls, no build
+> and a mix-and-match The Signature AI Mix and Match Generator. No network calls, no build
 > step, no API keys. Works from a file:// page.
 
 - Site: https://justinahiggins614-cmyk.github.io/signature-backend/

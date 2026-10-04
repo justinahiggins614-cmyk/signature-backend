@@ -1,4 +1,4 @@
-# Changelog — The Signature AI Mad Scientist Creation Lab (signature-backend)
+# Changelog — The Signature AI Mix and Match Generator (signature-backend)
 
 Engine: `signature-backend.js` · backend_id `JAH-BACKEND-1` · api_version pinned at `2.0`.
 
