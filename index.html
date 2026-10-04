@@ -136,26 +136,13 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   <h1><span class="zap">⚗</span> THE SIGNATURE AI MAD SCIENTIST CREATION LAB</h1>
   <p>Mix-and-match genes, body parts, brains, serums and equipment into wild scientist creations — then chat with them, test them, and take them home. Every model's content is pre-built into the lab: it works fully offline, no live connection needed.</p>
   <p style="margin-top:16px"><a href="browse.html" style="text-decoration:none"><button type="button" class="big">📚 BROWSE THE CREATION ARCHIVE — <span><!--ARCHCOUNT-->1,050<!--/ARCHCOUNT--></span> catalogued parts, genes &amp; archetypes →</button></a></p>
+  <p style="margin-top:10px"><a href="#lab" style="text-decoration:none"><button type="button" class="big">⚗️ OPEN THE LAB — START CREATING →</button></a></p>
+  <p class="note" style="color:var(--grn);margin-top:10px">● Engine ready — works fully offline, no live connection needed</p>
 </div>
 
 <div class="wrap">
 
-  <div class="panel" id="status">
-    <h2><span class="tick">●</span> LIVE STATUS</h2>
-    <div class="kv"><b>Engine version</b><span id="st-ver"><!--STVER-->v2.0 — Mad Scientist Creation Lab<span class="stamped"> · static check 2026-10-03</span><!--/STVER--></span></div>
-    <div class="kv"><b>Self-test</b><span id="st-test"><!--STTEST--><span class="pass">PASS</span> <span class="stamped">engine self-test 53/53 · 2026-10-03</span><!--/STTEST--></span></div>
-    <div class="checks" id="st-checks"></div>
-    <div class="kv"><b>Engine APIs</b><span id="st-apis"><!--STAPIS--><span class="pass">✓</span>&nbsp;chat <span class="pass">✓</span>&nbsp;runDemo <span class="pass">✓</span>&nbsp;runDemoReceipt <span class="pass">✓</span>&nbsp;dial <span class="pass">✓</span>&nbsp;presets <span class="pass">✓</span>&nbsp;loadPreset <span class="pass">✓</span>&nbsp;geneOptions <span class="pass">✓</span>&nbsp;buildGenome <span class="pass">✓</span>&nbsp;genomeViable <span class="pass">✓</span>&nbsp;fileRecord <span class="pass">✓</span>&nbsp;tones <span class="pass">✓</span>&nbsp;labCatalogs <span class="pass">✓</span>&nbsp;labOptions <span class="pass">✓</span>&nbsp;animateCreation <span class="pass">✓</span>&nbsp;creationToAI <span class="pass">✓</span>&nbsp;labDemo <span class="pass">✓</span>&nbsp;recordHash <span class="pass">✓</span>&nbsp;capabilities <span class="pass">✓</span>&nbsp;health <span class="pass">✓</span>&nbsp;EngineError<span class="stamped"> · static check 2026-10-03</span><!--/STAPIS--></span></div>
-    <div class="kv"><b>Lab shelfes</b><span id="st-shelfes"><!--STSHELVES-->8 shelfes, 1044 mix-and-match options, all pre-built<span class="stamped"> · static check 2026-10-03</span><!--/STSHELVES--></span></div>
-    <div class="kv"><b>Dependencies</b><span>none — pure JavaScript, no network calls, works offline and inside in-app browsers</span></div>
-    <p class="note">This panel is the single authoritative status of the lab engine — no other status line on this page overrides it.</p>
-  </div>
-
-  <div class="panel" id="apitests">
-    <h2><span class="tick">●</span> ENGINE API TESTS — RUN THEM LIVE</h2>
-    <p class="note" style="margin-top:0">Each test below calls the real engine function on this device and reports an honest PASS or FAIL. Nothing leaves this page; <code>fileRecord()</code> hands the stamped record back to you — it does not save anything anywhere.</p>
-    <div id="apitestrows"></div>
-  </div>
+  
 
   <div class="panel" id="lab">
     <h2><span class="tick">⚗</span> THE CREATION LAB — MIX &amp; MATCH</h2>
@@ -231,6 +218,27 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
 
 </div>
 
+  <details class="panel" id="engine">
+    <summary style="cursor:pointer;color:var(--gold);letter-spacing:.12em;font-size:1.02em;font-weight:700">⚙ LAB ENGINE — STATUS &amp; API TESTS <span class="note">(for developers)</span></summary>
+    <div id="status" style="margin-top:14px">
+
+    <h2><span class="tick">●</span> LIVE STATUS</h2>
+    <div class="kv"><b>Engine version</b><span id="st-ver"><!--STVER-->v2.0 — Mad Scientist Creation Lab<span class="stamped"> · static check 2026-10-03</span><!--/STVER--></span></div>
+    <div class="kv"><b>Self-test</b><span id="st-test"><!--STTEST--><span class="pass">PASS</span> <span class="stamped">engine self-test 53/53 · 2026-10-03</span><!--/STTEST--></span></div>
+    <div class="checks" id="st-checks"></div>
+    <div class="kv"><b>Engine APIs</b><span id="st-apis"><!--STAPIS--><span class="pass">✓</span>&nbsp;chat <span class="pass">✓</span>&nbsp;runDemo <span class="pass">✓</span>&nbsp;runDemoReceipt <span class="pass">✓</span>&nbsp;dial <span class="pass">✓</span>&nbsp;presets <span class="pass">✓</span>&nbsp;loadPreset <span class="pass">✓</span>&nbsp;geneOptions <span class="pass">✓</span>&nbsp;buildGenome <span class="pass">✓</span>&nbsp;genomeViable <span class="pass">✓</span>&nbsp;fileRecord <span class="pass">✓</span>&nbsp;tones <span class="pass">✓</span>&nbsp;labCatalogs <span class="pass">✓</span>&nbsp;labOptions <span class="pass">✓</span>&nbsp;animateCreation <span class="pass">✓</span>&nbsp;creationToAI <span class="pass">✓</span>&nbsp;labDemo <span class="pass">✓</span>&nbsp;recordHash <span class="pass">✓</span>&nbsp;capabilities <span class="pass">✓</span>&nbsp;health <span class="pass">✓</span>&nbsp;EngineError<span class="stamped"> · static check 2026-10-03</span><!--/STAPIS--></span></div>
+    <div class="kv"><b>Lab shelfes</b><span id="st-shelfes"><!--STSHELVES-->8 shelfes, 1044 mix-and-match options, all pre-built<span class="stamped"> · static check 2026-10-03</span><!--/STSHELVES--></span></div>
+    <div class="kv"><b>Dependencies</b><span>none — pure JavaScript, no network calls, works offline and inside in-app browsers</span></div>
+    <p class="note">This panel is the single authoritative status of the lab engine — no other status line on this page overrides it.</p>
+      </div>
+    <div id="apitests" style="margin-top:14px">
+
+    <h2><span class="tick">●</span> ENGINE API TESTS — RUN THEM LIVE</h2>
+    <p class="note" style="margin-top:0">Each test below calls the real engine function on this device and reports an honest PASS or FAIL. Nothing leaves this page; <code>fileRecord()</code> hands the stamped record back to you — it does not save anything anywhere.</p>
+    <div id="apitestrows"></div>
+      </div>
+  </details>
+
 <div class="footer"><span class="sig">A SIGNATURE SYSTEM</span><br>The Signature AI Mad Scientist Creation Lab — mix, match, animate. Chat brains and working demos for all AI modes.<br><span style="font-size:.9em">Developers: <a href="docs/API.md">API docs</a> · <a href="api-manifest.json">api-manifest.json</a> · <a href="engine-manifest.json">engine-manifest.json</a> · <a href="llms.txt">llms.txt</a></span><br><span id="speakstat" aria-live="polite" style="font-size:.85em"></span></div>
 
 <!-- FIRST-TIME USER GUIDE + SPOTLIGHT TOUR (usability wave; theme-matched, non-blocking) -->
@@ -267,7 +275,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
   </ul>
   <h4>● Engine API tests</h4>
   <ul>
-    <li>Five buttons run the real engine functions — <b>chat()</b>, <b>dial()</b>, <b>runDemo()</b>, <b>geneOptions()</b>, <b>fileRecord()</b> — on this device and report an honest <b>PASS</b> or <b>FAIL</b>. The LIVE STATUS panel at the top shows the same results at boot.</li>
+    <li>Five buttons run the real engine functions — <b>chat()</b>, <b>dial()</b>, <b>runDemo()</b>, <b>geneOptions()</b>, <b>fileRecord()</b> — on this device and report an honest <b>PASS</b> or <b>FAIL</b>. The ⚙ Lab Engine section at the bottom of the page shows the same results at boot.</li>
   </ul>
   <h4>🔒 Privacy</h4>
   <ul>
@@ -283,7 +291,7 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
       <li><b>Animate a creation.</b> Open the 8 shelfes — Gene Splices, Body Parts, Brains, Power Sources, Lab Equipment, Serums &amp; Elixirs, Habitats, Experiment Protocols — tick chips, then press ⚡ ANIMATE! The same picks always forge the same stamped JAH-LAB-###### creation.</li>
       <li><b>Talk to the AI.</b> Pick one of the 6 directory AIs — or a creation you animated. Type in the chat box and press Send, or press 📞 Dial for a live call with memory.</li>
       <li><b>Forge your own AI.</b> In The Opperater, drop genes into the TEN gene boxes, slide the personality knobs, then forge — your AI is filed with a JAH-AI-OP-###### stamp and dialed right away.</li>
-      <li><b>Prove it and take it home.</b> Run the five Engine API tests — every row should read PASS. Export forged genomes as .json, download creations as .json/.py, and share exact re-runs with ?creation= links.</li>
+      <li><b>Prove it and take it home.</b> In the ⚙ Lab Engine section at the bottom, run the five Engine API tests — every row should read PASS. Export forged genomes as .json, download creations as .json/.py, and share exact re-runs with ?creation= links.</li>
     </ol>
     <button type="button" class="wok" id="jahWelcomeGotIt">Got it ✓</button>
     <div class="wnote">The ? Guide button brings this guide back any time.</div>
