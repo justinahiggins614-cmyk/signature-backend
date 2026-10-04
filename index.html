@@ -107,18 +107,17 @@ code{background:#05080f;border:1px solid var(--line);border-radius:4px;padding:1
 #jahGuidePanel p,#jahGuidePanel li{color:var(--txt)}
 #jahGuidePanel ul{margin:.2em 0 .6em;padding-left:1.2em}
 #jahGuidePanel .gclose{float:right}
-#jahTourPrompt{position:fixed;left:14px;bottom:14px;z-index:9000;max-width:min(360px,calc(100vw - 28px));background:var(--panel2);border:1px solid var(--zap);border-radius:12px;padding:14px 16px;font-size:.9em;box-shadow:0 6px 30px rgba(0,0,0,.6);display:none}
-#jahTourPrompt.open{display:block}
-#jahTourPrompt .tbtns{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
-#jahTourPrompt button,#jahTourCard button{min-height:44px;min-width:64px}
-#jahTourCard{position:fixed;left:14px;bottom:14px;z-index:9002;width:min(380px,calc(100vw - 28px));background:var(--panel2);border:1px solid var(--zap);border-radius:12px;padding:14px 16px;font-size:.9em;box-shadow:0 6px 30px rgba(0,0,0,.6);display:none}
-#jahTourCard.open{display:block}
-#jahTourCard .tstep{color:var(--dim);font-size:.8em;letter-spacing:.1em}
-#jahTourCard h4{color:var(--amber2);margin:.3em 0;font-size:1.05em}
-#jahTourCard .twhat{margin:.4em 0}
-#jahTourCard .twhat b{color:var(--acc);font-weight:400}
-#jahTourCard .tbtns{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-#jahTourRing{position:fixed;z-index:9001;border:3px solid var(--zap);border-radius:10px;box-shadow:0 0 0 4000px rgba(4,6,12,.55),0 0 18px var(--zap);pointer-events:none;display:none}
+/* FIRST-TIME WELCOME OVERLAY (no auto-scroll, no spotlight): centered modal + one OK button */
+#jahWelcomeModal{position:fixed;inset:0;z-index:9002;display:none;align-items:center;justify-content:center;background:rgba(4,6,12,.62);padding:16px}
+#jahWelcomeModal.show{display:flex}
+#jahWelcomeBox{background:var(--panel2);border:1px solid var(--gold);border-radius:12px;box-shadow:0 6px 30px rgba(0,0,0,.6);max-width:480px;width:100%;max-height:88vh;overflow-y:auto;padding:20px 22px;font-size:.9em}
+#jahWelcomeBox .wkind{color:var(--dim);font-size:.75em;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+#jahWelcomeBox h3{color:var(--amber2);margin:.2em 0 .4em;font-size:1.1em}
+#jahWelcomeBox ol{margin:.4em 0;padding-left:1.3em}
+#jahWelcomeBox li{color:var(--txt);line-height:1.5;margin:.55em 0}
+#jahWelcomeBox li b{color:var(--acc)}
+#jahWelcomeBox .wok{display:block;width:100%;min-height:52px;margin-top:12px;font-size:1em;font-weight:700;border-radius:8px;border:1px solid var(--gold);background:#16244a;color:var(--gold);cursor:pointer}
+#jahWelcomeBox .wnote{color:var(--dim);font-size:.78em;margin-top:8px;text-align:center}
 /* DARK-MODE TOGGLE (opt-in): invert-based dark theme. Default look unchanged. */
 #jahThemeToggle{position:fixed;top:10px;right:10px;z-index:9999;opacity:.72;font-size:.8em;padding:6px 10px;background:#0d1424;border:1px solid var(--line);color:var(--gold);border-radius:20px;cursor:pointer}
 #jahThemeToggle:hover{opacity:1}
@@ -273,23 +272,19 @@ html[data-theme="dark"] img,html[data-theme="dark"] video,html[data-theme="dark"
     <li>Every model&#8217;s content is pre-built into the page — the whole lab works offline with <b>no network calls</b>. Downloads go straight to your device; <b>fileRecord()</b> hands the stamped record back to you and saves nothing anywhere.</li>
   </ul>
 </div>
-<div id="jahTourPrompt" role="dialog" aria-label="Take the guided tour">
-  <b style="color:var(--amber2)">New to the lab? 🧪</b>
-  <p class="note" style="margin:.4em 0">Take the 1-minute spotlight tour — shelfes, the genome forge, the AI phones, the tests and the exports. You can skip it any time.</p>
-  <div class="tbtns">
-    <button type="button" id="jahTourStart">▶ Start tour</button>
-    <button type="button" id="jahTourSkip">Skip</button>
-  </div>
-</div>
-<div id="jahTourRing" aria-hidden="true"></div>
-<div id="jahTourCard" role="dialog" aria-label="Guided tour">
-  <div class="tstep" id="jahTourStep"></div>
-  <h4 id="jahTourWhat"></h4>
-  <div class="twhat" id="jahTourBody"></div>
-  <div class="tbtns">
-    <button type="button" id="jahTourBack">← Back</button>
-    <button type="button" id="jahTourNext">Next →</button>
-    <button type="button" id="jahTourEnd">End tour</button>
+<!-- FIRST-TIME USER WELCOME (centered overlay; no auto-scroll, no spotlight) -->
+<div id="jahWelcomeModal" role="dialog" aria-modal="true" aria-labelledby="jahWelcomeTitle">
+  <div id="jahWelcomeBox">
+    <div class="wkind">Welcome</div>
+    <h3 id="jahWelcomeTitle">The mad-scientist lab in 4 taps</h3>
+    <ol>
+      <li><b>Animate a creation.</b> Open the 8 shelfes — Gene Splices, Body Parts, Brains, Power Sources, Lab Equipment, Serums &amp; Elixirs, Habitats, Experiment Protocols — tick chips, then press ⚡ ANIMATE! The same picks always forge the same stamped JAH-LAB-###### creation.</li>
+      <li><b>Talk to the AI.</b> Pick one of the 6 directory AIs — or a creation you animated. Type in the chat box and press Send, or press 📞 Dial for a live call with memory.</li>
+      <li><b>Forge your own AI.</b> In The Opperater, drop genes into the TEN gene boxes, slide the personality knobs, then forge — your AI is filed with a JAH-AI-OP-###### stamp and dialed right away.</li>
+      <li><b>Prove it and take it home.</b> Run the five Engine API tests — every row should read PASS. Export forged genomes as .json, download creations as .json/.py, and share exact re-runs with ?creation= links.</li>
+    </ol>
+    <button type="button" class="wok" id="jahWelcomeGotIt">Got it ✓</button>
+    <div class="wnote">The ? Guide button brings this guide back any time.</div>
   </div>
 </div>
 
@@ -1083,106 +1078,29 @@ window.addEventListener('load',function(){ if(location.search.indexOf('=')>0) re
   });
   if (guideClose) guideClose.addEventListener('click', guideShut);
 
-  /* ---- spotlight tour: WHAT / WHAT IT DOES / HOW per step ---- */
-  var STEPS = [
-    { sel: 'shelfes', what: 'The 8 mix-and-match shelfes',
-      does: 'Gene Splices, Body Parts, Brains, Power Sources, Lab Equipment, Serums & Elixirs, Habitats and Experiment Protocols — tick any chips you like.',
-      how: 'Open a shelf, tick a few chips, then press the ANIMATE! button below.' },
-    { sel: 'animateBtn', what: 'ANIMATE! · Surprise me · Clear picks',
-      does: 'ANIMATE! forges your creation — the same picks always forge the same creation, stamped JAH-LAB-######. Surprise me ticks random chips; Clear picks starts over.',
-      how: 'Press ANIMATE! — your creation appears below with its stats, abilities and download buttons.' },
-    { sel: 'aisel', what: 'The AI selector + identity card',
-      does: 'Pick one of the 6 directory AIs, or a creation you animated. The identity card names it, lists its duties, and names the on-device engine that talks.',
-      how: 'Choose a different AI above and watch the identity card repaint.' },
-    { sel: 'chatinput', what: 'Send + Dial — talk to the AI',
-      does: 'Send chats one line at a time. Dial opens a live call with memory for the whole call — the AI answers with its greeting. Press Dial again to hang up.',
-      how: 'Type "hello", press Send; then press Dial and keep chatting.' },
-    { sel: 'lockbtn', what: 'Lock role · Unlock · Transcript',
-      does: 'Lock role pins the AI into a job (type the role first, e.g. semiconductor replacement) for short automation-style replies. Transcript downloads the whole call as JSON.',
-      how: 'Dial first, then Lock role, say something, and press Transcript.' },
-    { sel: 'forge', what: 'The Opperater — the genome forge',
-      does: 'TEN main gene boxes (+ advanced): drop genes, slide the Warmth / Humor / Seriousness / Boldness knobs, forge a real AI filed with a JAH-AI-OP-###### stamp, then dial it. A separate forge from the 8 shelfes above.',
-      how: 'Press "Forge a sample genome AI & dial it" and talk to what comes out.' },
-    { sel: 'apitests', what: 'Engine API tests — proof it works',
-      does: 'Five buttons that run the real engine functions — chat(), dial(), runDemo(), geneOptions(), fileRecord() — on this device and report an honest PASS or FAIL.',
-      how: 'Press Run on each row — every row should read PASS.' },
-    { sel: 'genomeexpbtn', what: 'Exports — take it home',
-      does: 'Export downloads the last forged genome as JSON; the creation card offers .json and .py downloads; ?creation= links reopen the exact same creation. Nothing leaves the page — downloads go straight to your device.',
-      how: 'Forge an AI, then press "Export last forged genome (.json)".' }
-  ];
-
-  var idx = -1;
-  function ringTo(el) {
-    var ring = $('jahTourRing');
-    if (!ring) return;
-    if (!el) { ring.style.display = 'none'; return; }
-    try { el.scrollIntoView({ block: 'center' }); } catch (e) {
-      try { if (el.scrollIntoView) el.scrollIntoView(false); } catch (e2) {}
-    }
-    setTimeout(function () {
-      try {
-        var r = el.getBoundingClientRect();
-        if (!r || (r.width === 0 && r.height === 0)) { ring.style.display = 'none'; return; }
-        ring.style.display = 'block';
-        ring.style.left = Math.max(2, r.left - 8) + 'px';
-        ring.style.top = Math.max(2, r.top - 8) + 'px';
-        ring.style.width = (r.width + 16) + 'px';
-        ring.style.height = (r.height + 16) + 'px';
-      } catch (e) { ring.style.display = 'none'; }
-    }, 120);
+  /* ---- first-visit welcome: centered overlay (no auto-scroll, no spotlight) ---- */
+  function welcomeShow() {
+    var m = $('jahWelcomeModal'), ok = $('jahWelcomeGotIt');
+    if (m) { m.classList.add('show'); if (ok) { try { ok.focus(); } catch (e) {} } }
   }
-  function show(i) {
-    idx = i;
-    var s = STEPS[i];
-    var el = document.getElementById(s.sel);
-    $('jahTourStep').textContent = 'STEP ' + (i + 1) + ' OF ' + STEPS.length;
-    $('jahTourWhat').textContent = s.what;
-    $('jahTourBody').innerHTML = '<p><b>WHAT IT DOES:</b> ' + esc(s.does) + '</p><p><b>HOW:</b> ' + esc(s.how) + '</p>';
-    $('jahTourCard').classList.add('open');
-    $('jahTourBack').disabled = (i === 0);
-    $('jahTourNext').textContent = (i === STEPS.length - 1) ? 'Finish' : 'Next';
-    ringTo(el);
-    try { $('jahTourNext').focus({ preventScroll: true }); } catch (e) {
-      try { $('jahTourNext').focus(); } catch (e2) {}
-    }
-  }
-  function endTour() {
-    idx = -1;
-    var card = $('jahTourCard'), ring = $('jahTourRing');
-    if (card) card.classList.remove('open');
-    if (ring) ring.style.display = 'none';
+  function welcomeDone() {
+    var m = $('jahWelcomeModal');
+    if (m) m.classList.remove('show');
     lsSet(SEEN, '1');
   }
-  function tourNext() { if (idx < 0) return; if (idx === STEPS.length - 1) endTour(); else show(idx + 1); }
-  function tourBack() { if (idx > 0) show(idx - 1); }
-
-  $('jahTourNext').addEventListener('click', tourNext);
-  $('jahTourBack').addEventListener('click', tourBack);
-  $('jahTourEnd').addEventListener('click', endTour);
-  $('jahTourStart').addEventListener('click', function () {
-    $('jahTourPrompt').classList.remove('open');
-    show(0);
-  });
-  $('jahTourSkip').addEventListener('click', function () {
-    $('jahTourPrompt').classList.remove('open');
-    lsSet(SEEN, '1');
-  });
+  var welcomeOk = $('jahWelcomeGotIt');
+  if (welcomeOk) welcomeOk.addEventListener('click', welcomeDone);
 
   document.addEventListener('keydown', function (e) {
     var k = e.key || '';
-    if (k === 'Escape') {
-      if (idx >= 0) { endTour(); return; }
-      if (guidePanel && guidePanel.classList.contains('open')) { guideShut(); return; }
-    }
-    if (idx < 0) return;
-    var tag = (e.target && e.target.tagName) || '';
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return; /* don't steal typing */
-    if (k === 'ArrowRight') { e.preventDefault(); tourNext(); }
-    else if (k === 'ArrowLeft') { e.preventDefault(); tourBack(); }
+    if (k !== 'Escape') return;
+    var m = $('jahWelcomeModal');
+    if (m && m.classList.contains('show')) { welcomeDone(); return; }
+    if (guidePanel && guidePanel.classList.contains('open')) { guideShut(); return; }
   });
 
-  /* First visit only: the small non-blocking tour prompt. */
-  if (!lsGet(SEEN)) $('jahTourPrompt').classList.add('open');
+  /* First visit only: show the welcome overlay once. Never shows again. */
+  if (!lsGet(SEEN)) setTimeout(welcomeShow, 900);
 })();
 </script>
 </body>
