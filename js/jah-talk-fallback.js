@@ -12,7 +12,7 @@
      2026-10-04: the conversational upgrade — no more "word blocks". Every
        reply is natural, flowing conversation: genuinely responsive to what
        the user actually asked, covering everything the AI can do, and able
-       to chat about the whole JAH ecosystem (all 31 sites, what each does,
+       to chat about the whole JAH ecosystem (all 33 sites, what each does,
        its tabs and options) as context. Never word salad, never generic
        filler, never Mad-Libs templates.
      2026-10-04: v2.1 chat context — every AI keeps conversation memory
@@ -52,7 +52,7 @@
                                        repair when text looks like a dump
      JAHtalk.canonIssues(site, canon) -> [strings] mismatches vs canon
      JAHtalk.findSite(q)            -> ecosystem site object or null
-     JAHtalk.ecosystem()            -> the 31-site knowledge array
+     JAHtalk.ecosystem()            -> the 33-site knowledge array
 
    profile: { name, id, description, abilities|duties (array of strings),
               domain, kind ('system'|'persona'|'domain'|'word'|...),
@@ -152,7 +152,7 @@
     return abs.slice(0, -1).join(', ') + ' and ' + abs[abs.length - 1];
   }
 
-  /* ---------- the JAH ecosystem knowledge base (all 31 sites) ----------
+  /* ---------- the JAH ecosystem knowledge base (all 33 sites) ----------
      Baked in: site talk works fully offline on every site loading this file.
      code/build_versions.py extracts the JSON between the ECO-JSON markers
      into data/ecosystem.json for the downloadable Python packages. */
@@ -187,7 +187,9 @@
     {"n":28,"repo":"signature-earth","url":"https://justinahiggins614-cmyk.github.io/signature-earth/","name":"Signature Earth","blurb":"his own planet explorer — an interactive 3D globe with a real gazetteer.","tabs":["Globe","Gazetteer"],"aliases":["earth","planet","globe","world"]},
     {"n":29,"repo":"signature-flight-school","url":"https://justinahiggins614-cmyk.github.io/signature-flight-school/","name":"The Signature Flight School","blurb":"pick any plane or jet, fly with an AI instructor — real sim, device-local pilot hours.","tabs":["Aircraft","Sim","AI Instructor"],"aliases":["flight","flight school","flying","planes","pilot"]},
     {"n":30,"repo":"signature-game-store","url":"https://justinahiggins614-cmyk.github.io/signature-game-store/","name":"The Signature Game Store","blurb":"playable games from 1970s arcade-style to modern combat-style, each with cover, play and download.","tabs":["Games","Play","Download"],"aliases":["game store","games","gaming","arcade"]},
-    {"n":31,"repo":"signature-website-creator","url":"https://justinahiggins614-cmyk.github.io/signature-website-creator/","name":"Signature Website Creator","blurb":"an AI website builder — describe the site you want and get a real one, with live-view editing.","tabs":["Builder","1 Million Website Options","Mirror a Website"],"aliases":["website creator","website builder","make a website","build a site","mirror"]}
+    {"n":31,"repo":"signature-website-creator","url":"https://justinahiggins614-cmyk.github.io/signature-website-creator/","name":"Signature Website Creator","blurb":"an AI website builder — describe the site you want and get a real one, with live-view editing.","tabs":["Builder","1 Million Website Options","Mirror a Website"],"aliases":["website creator","website builder","make a website","build a site","mirror"]},
+    {"n":32,"repo":"signature-antivirus","url":"https://justinahiggins614-cmyk.github.io/signature-antivirus/","name":"The Signature Antivirus","blurb":"every PC deserves every cure — Basic, Defense-Grade and AI shields, a million cure add-ons, free forever, with fail-safe rewind.","tabs":["Mission","Shields","AI Versions","1M Add-Ons"],"aliases":["antivirus","anti-virus","virus","shields","malware","cure","cures"]},
+    {"n":33,"repo":"signature-os-updater","url":"https://justinahiggins614-cmyk.github.io/signature-os-updater/","name":"The Signature OS Updater","blurb":"brings any old PC current without removing anything — guided check, AI Q-and-A, tailored plan, AI sweeper, free forever.","tabs":["Upgrade","Check My PC","1M Archive"],"aliases":["os updater","updater","upgrade pc","old pc","old computer","signature os"]}
   ]/*ECO-JSON-END*/;
   function ecosystem() { return ECO; }
   function findSite(q) {
@@ -448,8 +450,8 @@
     }
     out.push('');
     out.push(pickH(P.name, [
-      'And one more thing: I know all 31 sites in the JAH network — what each one does and where everything lives — so if you ever need a tour guide, just ask. What shall we start with?',
-      'Beyond that, I can point you around the whole JAH network — all 31 sites, what they do, which tab to open. Just say the word. What is first?'
+      'And one more thing: I know all 33 sites in the JAH network — what each one does and where everything lives — so if you ever need a tour guide, just ask. What shall we start with?',
+      'Beyond that, I can point you around the whole JAH network — all 33 sites, what they do, which tab to open. Just say the word. What is first?'
     ], 'duties-close'));
     return out.join('\n');
   }
@@ -499,7 +501,7 @@
     for (i = 0; i < ECO.length; i++) names.push(ECO[i].name);
     var tour = 'the math grid, the calculator, the dictionary, the encyclopedia, the dossier archive, this very llama, the AI phone book, the patent and spec catalogs';
     return pickH(t, [
-      'The JAH network is 31 sites, all built by Justin Addam Higgins — ' + tour + ', and plenty more: a book depository, a comics store, a news wire, a chip maker, a music studio, a flight school, even his own planet explorer. ',
+      'The JAH network is 33 sites, all built by Justin Addam Higgins — ' + tour + ', and plenty more: a book depository, a comics store, a news wire, a chip maker, a music studio, a flight school, even his own planet explorer. ',
       'Thirty-one sites, one maker — Justin Addam Higgins built the whole JAH network: ' + tour + ', plus a boundless generator archive, an AI Olympics arena, two mega-malls, a game store and a website builder. '
     ], 'eco') + pickH(t, [
       'Tell me what you are trying to do and I will point you at the right site and the right tab.',
@@ -573,7 +575,7 @@
       'Let me lay it all out. ',
       'Here is the full picture. ',
       'Glad you asked — here is the deeper tour. '
-    ], 'deep-open') + site.name + ' is site ' + site.n + ' of 31 in the JAH network. ' +
+    ], 'deep-open') + site.name + ' is site ' + site.n + ' of 33 in the JAH network. ' +
       cap1(site.blurb) + ' The main sections are ' + tabs + '. ' +
       'Open it at ' + site.url + ' — start with the ' + ((site.tabs || [])[0] || 'main page') +
       ' and you will find your footing fast. ' + downloadHint(site) + ' ' + pickH(t, [
@@ -702,7 +704,7 @@
     if (isQuestion(t)) {
       var variants = [
         'Good question' + about + ' — and I would rather be straight with you than make something up. What I can tell you for sure is this: I am ' + P.name + ', and my strong suits are ' + sum + '. ' +
-          'If your question touches any of that, ask it in plain words and I will go as deep as I can. And if it is about another corner of the network, name the topic — I know all 31 sites and where everything lives.',
+          'If your question touches any of that, ask it in plain words and I will go as deep as I can. And if it is about another corner of the network, name the topic — I know all 33 sites and where everything lives.',
         'I want to give you a real answer' + about + ', not a guess. Here is what is true: ' + purposeLine(P) + ' ' +
           'The most useful thing I can do right now is ' + offer + ' — want to try that angle? Or tell me a little more about what you are after and I will meet you there.',
         'Hmm' + about + ' — that one is outside what I know cold, and I will not pretend otherwise. What I do know cold is ' + sum + '. ' +
@@ -715,7 +717,7 @@
         'Give me a bit more detail and I will run with it — the more specific you are, the more useful I get.',
       'Okay, let us work with that. My wheelhouse is ' + sum + ' — so if ' + (topic ? 'this is about ' + topic + ', tell me what outcome you want and I will map the path.' : 'you tell me the outcome you want, I will map the path.'),
       'Say more — I am listening. ' + (topic ? 'With ' + topic + ', it helps to know: are you trying to learn it, build with it, or find it somewhere? ' : '') +
-        'Meanwhile, know that I am ' + P.name + ', good for ' + sum + ', and I can tour-guide you through all 31 network sites if that is what you need.'
+        'Meanwhile, know that I am ' + P.name + ', good for ' + sum + ', and I can tour-guide you through all 33 network sites if that is what you need.'
     ];
     return topicTail(pickH(t, variants2, 'open-s'), raw, ctx);
   }
