@@ -117,7 +117,7 @@ function renderTray(){
     var s = document.createElement("span"); s.className = "chip";
     s.innerHTML = E.escHtml(a.name) + " ";
     var x = document.createElement("button"); x.textContent = "✕"; x.setAttribute("aria-label", "Remove " + a.name);
-    x.onclick = function(){ TRAY = TRAY.filter(function(b){ return b.id !== a.id; }); renderTray(); };
+    x.onclick = function(){ TRAY = TRAY.filter(function(b){ return b.id !== a.id; }); renderTray(); renderList($("q").value.trim(), $("cat").value); };
     s.appendChild(x); t.appendChild(s);
   });
   saveTray();
@@ -189,7 +189,7 @@ $("phraseGo").onclick = function(){
 };
 $("phrase").addEventListener("keydown", function(e){ if (e.key === "Enter") $("phraseGo").click(); });
 
-$("clearTray").onclick = function(){ TRAY = []; $("result").hidden = true; renderTray(); };
+$("clearTray").onclick = function(){ TRAY = []; $("result").hidden = true; renderTray(); renderList($("q").value.trim(), $("cat").value); };
 $("readTray").onclick = function(){
   speak(TRAY.length ? "In your tray: " + TRAY.map(function(a){ return a.name; }).join(", ") + "." : "Your tray is empty.", "tray");
 };
