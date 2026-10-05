@@ -131,5 +131,13 @@ Mixes are original Signature creations. Part of <a href="https://justinahiggins6
   if (window.JAHProfile && JAHProfile.ui) JAHProfile.ui.renderButton(mount);
 })();
 </script>
+<script>
+(function () {
+  if (window.JAHProfile && JAHProfile.ui) {
+    var mount = document.querySelector('header') || document.body;
+    JAHProfile.ui.renderGreeting(mount); /* renders ONLY when personalization is live */
+  }
+})();
+</script>
 </body>
 </html>

@@ -44,5 +44,13 @@ a:hover{text-decoration:underline}
   if (window.JAHProfile && JAHProfile.ui) JAHProfile.ui.renderButton(mount);
 })();
 </script>
+<script>
+(function () {
+  if (window.JAHProfile && JAHProfile.ui) {
+    var mount = document.querySelector('header') || document.body;
+    JAHProfile.ui.renderGreeting(mount); /* renders ONLY when personalization is live */
+  }
+})();
+</script>
 </body>
 </html>
