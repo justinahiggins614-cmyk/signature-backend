@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="js/signin.js"></script>
+<script>/* JAHProfile storage: signed-out behavior is byte-identical to before; signed-in profiles get per-profile namespaced storage. */
+var PS = (typeof JAHProfile !== 'undefined') ? JAHProfile.store : localStorage;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mixes — The Signature AI Mix and Match Generator</title>
@@ -226,10 +229,10 @@ $("gCheck").onclick = function(){
 
 function nextSeq(){
   var s = 1;
-  try{ s = parseInt(localStorage.getItem("jah-mix-seq") || "1", 10) || 1; }catch(e){}
+  try{ s = parseInt(PS.getItem("jah-mix-seq") || "1", 10) || 1; }catch(e){}
   return s;
 }
-function bumpSeq(s){ try{ localStorage.setItem("jah-mix-seq", String(s + 2)); }catch(e){} }
+function bumpSeq(s){ try{ PS.setItem("jah-mix-seq", String(s + 2)); }catch(e){} }
 
 $("gGo").onclick = function(){
   var out = $("gOut");
@@ -328,13 +331,24 @@ Promise.all([
   AIS.forEach(function(a){ ALLBYID[a.id] = a; });
   // carry the mixer tray over
   try{
-    var saved = JSON.parse(localStorage.getItem("jah-mix-tray") || "[]");
+    var saved = JSON.parse(PS.getItem("jah-mix-tray") || "[]");
     saved.forEach(function(id){ if (ALLBYID[id] && GTRAY.length < 4) GTRAY.push(ALLBYID[id]); });
   }catch(e){}
   renderGTray();
 }).catch(function(){
   $("gtray").innerHTML = '<span class="dim">Could not load the phone book — check your connection and reload.</span>';
 });
+})();
+</script>
+<script>
+(function () {
+  /* mount into the header; falls back gracefully when the header markup differs */
+  var mount = document.querySelector('header .booksearch') ||
+              document.querySelector('nav.jtabbar') ||
+              document.querySelector('header nav') ||
+              document.querySelector('header') ||
+              document.body;
+  if (window.JAHProfile && JAHProfile.ui) JAHProfile.ui.renderButton(mount);
 })();
 </script>
 </body>

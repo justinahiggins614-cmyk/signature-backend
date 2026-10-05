@@ -249,7 +249,7 @@
     //    still answers like a human, in its own voice. The engine's
     //    rotation/no-repeat behavior above is untouched.
     if (!fb || !String(fb).trim()) {
-      try { if (typeof JAHtalk !== 'undefined') { var _bp = beProfile(ai); fb = JAHtalk.chatFor(_bp, 'ai:' + (_bp.id || _bp.name)).reply(t) || fb; } } catch (e) {}
+      try { if (typeof JAHtalk !== 'undefined') { var _bp = beProfile(ai); var _ck = (typeof JAHProfile !== 'undefined') ? JAHProfile.chatKey('ai:' + (_bp.id || _bp.name)) : ('ai:' + (_bp.id || _bp.name)); fb = JAHtalk.chatFor(_bp, _ck).reply(t) || fb; } } catch (e) {}
     }
     h.lastTopic = 'fallback';
     h.lastReply = fb;
