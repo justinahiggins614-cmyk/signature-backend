@@ -6,27 +6,159 @@
 
 /* ---------- one global audio controller (never stacked) ---------- */
 var _W = (typeof window !== "undefined") ? window : null;
+var _D = (typeof document !== "undefined") ? document : null;
 if (_W && !_W.__JAHREAD){
-  _W.__JAHREAD = {
-    _last: {},
-    playGuard: function(label){
-      var now = Date.now(), k = String(label || "speak");
-      if (now - (this._last[k] || 0) < 800) return false;
-      this._last[k] = now;
+  _W.__JAHREAD = (function(){
+    var audios = [];
+    function stopAll(){
+      var i, a;
       try{ if (_W.speechSynthesis) _W.speechSynthesis.cancel(); }catch(e){}
-      return true;
-    },
-    stop: function(){ try{ if (_W.speechSynthesis) _W.speechSynthesis.cancel(); }catch(e){} }
-  };
+      try{ if (_W.responsiveVoice && _W.responsiveVoice.cancel) _W.responsiveVoice.cancel(); }catch(e){}
+      for (i = 0; i < audios.length; i++){
+        a = audios[i];
+        try{ a.pause(); }catch(e){}
+        try{ a.removeAttribute("src"); }catch(e){}
+        try{ a.load(); }catch(e){}
+      }
+      audios.length = 0;
+      if (_D){
+        var els = _D.querySelectorAll("audio"), j;
+        for (j = 0; j < els.length; j++){ try{ els[j].pause(); }catch(e){} }
+      }
+    }
+    return {
+      stopAll: stopAll,
+      reg: function(a){ if (a && audios.indexOf(a) < 0) audios.push(a); return a; },
+      _last: {},
+      playGuard: function(label){
+        var now = Date.now(), k = String(label || "speak");
+        if (now - (this._last[k] || 0) < 800) return false;
+        this._last[k] = now;
+        stopAll();
+        return true;
+      }
+    };
+  })();
+  try{
+    var _NativeAudio = _W.Audio, _RC = _W.__JAHREAD;
+    _W.Audio = function(src){
+      var a = (src === undefined) ? new _NativeAudio() : new _NativeAudio(src);
+      _RC.reg(a); return a;
+    };
+    _W.Audio.prototype = _NativeAudio.prototype;
+  }catch(e){}
+}
+
+/* ---------- tiered online read-aloud (ResponsiveVoice -> Google TTS x2,
+   direct audio-element playback; never speechSynthesis-first, so it works
+   in browsers with no speechSynthesis — e.g. Facebook's in-app browser).
+   Mirrors the comics site's proven rdSpeak: single playGuard at entry,
+   button flips to "⏹ Stop" immediately with a "chunk N of M" indicator,
+   tap-while-reading stops cleanly, per-chunk watchdog with tier advance. ---------- */
+var RD = { audio: null, queue: [], playing: false, stopped: true, timer: null,
+           total: 0, btn: null, baseText: "", manualStop: 0 };
+var RD_TIERS = [
+  function(t){ return "https://code.responsivevoice.org/getvoice.php?t=" + encodeURIComponent(t) + "&tl=en-US&sv=g2&vn=&pitch=0.5&rate=0.95"; },
+  function(t){ return "https://translate.google.com/translate_tts?ie=UTF-8&q=" + encodeURIComponent(t) + "&tl=en&client=tw-ob"; },
+  function(t){ return "https://translate.googleapis.com/translate_tts?ie=UTF-8&q=" + encodeURIComponent(t) + "&tl=en&client=tw-ob"; }
+];
+function rdChunks(t, maxChunks){
+  t = String(t == null ? "" : t).replace(/\s+/g, " ").trim();
+  var out = [], cur = "", i, s, parts, sentences = [];
+  parts = t.split(/([.!?]+)\s+/);
+  for (i = 0; i < parts.length; i += 2){
+    s = ((parts[i] || "") + (parts[i + 1] || "")).trim();
+    if (s) sentences.push(s);
+  }
+  for (i = 0; i < sentences.length; i++){
+    s = sentences[i];
+    if ((cur + " " + s).length > 170){ if (cur) out.push(cur); cur = s; }
+    else cur = (cur ? cur + " " : "") + s;
+  }
+  if (cur) out.push(cur);
+  return out.slice(0, maxChunks || 400);
+}
+function rdProg(){
+  if (RD.btn && RD.btn.textContent !== undefined){
+    RD.btn.textContent = "\u23F9 Stop \u2014 chunk " +
+      (RD.total - RD.queue.length) + " of " + RD.total + "\u2026";
+  }
+}
+function rdStop(){
+  try{ if (_W && _W.__JAHREAD) _W.__JAHREAD.stopAll(); }catch(e){}
+  RD.stopped = true; RD.playing = false; RD.queue = [];
+  if (RD.timer){ try{ clearTimeout(RD.timer); }catch(e){} RD.timer = null; }
+  if (RD.audio){ try{ RD.audio.pause(); }catch(e){} RD.audio = null; }
+  if (RD.btn){
+    try{ RD.btn.textContent = RD.baseText || "\uD83D\uDD0A Read aloud"; }catch(e){}
+    RD.btn = null;
+  }
+}
+function rdPlayTier(chunk, tier, done){
+  if (tier >= RD_TIERS.length){ done(false); return; }
+  var url = RD_TIERS[tier](chunk), finished = false, a;
+  try{ a = new _W.Audio(); }catch(e){ done(false); return; }
+  RD.audio = a;
+  try{ a.playbackRate = 1; }catch(e){}
+  function clearW(){ if (RD.timer){ try{ clearTimeout(RD.timer); }catch(e){} RD.timer = null; } }
+  function finish(ok){
+    if (finished) return; finished = true;
+    clearW(); RD.audio = null;
+    try{ a.pause(); }catch(e){}
+    done(ok);
+  }
+  function advance(){ finish(false); rdPlayTier(chunk, tier + 1, done); }
+  a.onended = function(){ finish(true); };
+  a.onerror = function(){ advance(); };
+  RD.timer = setTimeout(advance, 12000); /* per-chunk watchdog: tier advance */
+  try{ a.src = url; }catch(e){ advance(); return; }
+  var p = null;
+  try{ p = a.play(); }catch(e){ advance(); return; }
+  if (p && p.catch) p.catch(function(){ advance(); });
+}
+function rdNext(){
+  if (RD.stopped || !RD.queue.length){ rdStop(); return; }
+  RD.playing = true;
+  var chunk = RD.queue.shift(), tier = 0;
+  rdProg();
+  (function attempt(){
+    if (RD.stopped) return;
+    rdPlayTier(chunk, tier, function(ok){
+      if (RD.stopped) return;
+      if (ok){ setTimeout(rdNext, 250); }
+      else { tier++; if (tier < RD_TIERS.length) attempt(); else setTimeout(rdNext, 250); }
+    });
+  })();
 }
 function speak(text, label){
   try{
-    if (!_W || !_W.__JAHREAD.playGuard(label || "speak")) return;
-    var u = new _W.SpeechSynthesisUtterance(String(text).slice(0, 1500));
-    _W.speechSynthesis.speak(u);
+    if (!_W || !_W.Audio) return;
+    /* tap-while-reading stops cleanly (before the playGuard debounce) */
+    if (RD.playing && !RD.stopped){
+      RD.manualStop = Date.now();
+      rdStop();
+      return;
+    }
+    /* bounce guard: a tap right after a manual stop is the double-tap's echo */
+    if (Date.now() - RD.manualStop < 400) return;
+    var R = _W.__JAHREAD;
+    if (R && !R.playGuard(label || "speak")) return;
+    rdStop();
+    RD.queue = rdChunks(text, 400);
+    RD.total = RD.queue.length;
+    if (!RD.queue.length) return;
+    RD.stopped = false;
+    /* flip the tapped button to Stop immediately (keep the page's look) */
+    var b = (_D && _D.activeElement) || null;
+    if (b && b.tagName && /^(BUTTON|A|INPUT)$/.test(b.tagName)){
+      RD.btn = b;
+      try{ RD.baseText = b.textContent || ""; }catch(e){ RD.baseText = ""; }
+      try{ b.textContent = "\u23F9 Stop"; b.title = "Tap to stop reading"; }catch(e){}
+    }
+    rdNext();
   }catch(e){}
 }
-function stopSpeak(){ try{ if (_W) _W.__JAHREAD.stop(); }catch(e){} }
+function stopSpeak(){ try{ rdStop(); }catch(e){} }
 
 function escHtml(s){
   return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
