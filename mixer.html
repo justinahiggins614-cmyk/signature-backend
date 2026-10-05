@@ -110,7 +110,7 @@ var E = MixEngine, AIS = [], TRAY = [];
 var $ = function(id){ return document.getElementById(id); };
 function speak(t, l){ try{ E.speak(t, l); }catch(e){} }
 
-function saveTray(){ try{ PS.setItem("jah-mix-tray", JSON.stringify(TRAY.map(function(a){ return a.id; }))); }catch(e){} }
+function saveTray(){ try{ PS.set("jah-mix-tray", JSON.stringify(TRAY.map(function(a){ return a.id; }))); }catch(e){} }
 function inTray(id){ return TRAY.some(function(a){ return a.id === id; }); }
 function renderTray(){
   var t = $("tray");
@@ -162,7 +162,7 @@ fetch("data/ai-compact.json").then(function(r){ return r.json(); }).then(functio
   renderList("", "");
   // restore tray
   try{
-    var saved = JSON.parse(PS.getItem("jah-mix-tray") || "[]"), byId = {};
+    var saved = JSON.parse(PS.get("jah-mix-tray") || "[]"), byId = {};
     AIS.forEach(function(a){ byId[a.id] = a; });
     saved.forEach(function(id){ if (byId[id] && TRAY.length < 4) TRAY.push(byId[id]); });
     renderTray();

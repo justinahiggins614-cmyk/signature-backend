@@ -229,10 +229,10 @@ $("gCheck").onclick = function(){
 
 function nextSeq(){
   var s = 1;
-  try{ s = parseInt(PS.getItem("jah-mix-seq") || "1", 10) || 1; }catch(e){}
+  try{ s = parseInt(PS.get("jah-mix-seq") || "1", 10) || 1; }catch(e){}
   return s;
 }
-function bumpSeq(s){ try{ PS.setItem("jah-mix-seq", String(s + 2)); }catch(e){} }
+function bumpSeq(s){ try{ PS.set("jah-mix-seq", String(s + 2)); }catch(e){} }
 
 $("gGo").onclick = function(){
   var out = $("gOut");
@@ -331,7 +331,7 @@ Promise.all([
   AIS.forEach(function(a){ ALLBYID[a.id] = a; });
   // carry the mixer tray over
   try{
-    var saved = JSON.parse(PS.getItem("jah-mix-tray") || "[]");
+    var saved = JSON.parse(PS.get("jah-mix-tray") || "[]");
     saved.forEach(function(id){ if (ALLBYID[id] && GTRAY.length < 4) GTRAY.push(ALLBYID[id]); });
   }catch(e){}
   renderGTray();
