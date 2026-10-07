@@ -755,11 +755,9 @@
       ]);
     }
     if (isIdentity(t)) {
+      /* Manon's standing order: identity answers list duties upfront, no deferral. */
       var idLine = 'I am ' + P.name + (P.id ? ' (' + P.id + ')' : '') + '. ';
-      return idLine + purposeLine(P) + ' ' + pickR('ident-tail', [
-        'If you want the full rundown, just ask me about my duties.',
-        'Want to know everything I can do? Ask about my duties.'
-      ]);
+      return idLine + duties(P);
     }
     if (isFeeling(t)) {
       return pickR('feeling', [
