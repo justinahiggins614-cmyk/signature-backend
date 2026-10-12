@@ -4,6 +4,122 @@
 (function(){
 "use strict";
 
+/* SigTTS dead-voice guard injected verbatim (node-safe wrapper only):
+   full text at /home/hatch/workspace/hidden_files/sigtts-helper.js */
+if (typeof window !== "undefined"){
+/* === SigTTS dead-voice guard (2026-10-11, full-network read-aloud sweep) ===
+   window.speechSynthesis may EXIST but be dead (notably FB in-app browser on
+   Android: speak() silently does nothing, onend/onerror never fire,
+   getVoices() returns [] forever). Never trust presence — probe aliveness,
+   watch every utterance, fall back to online-audio tiers when dead/stalled.
+   Controller rule: S.speak() stops current audio first (no stacking);
+   S.stop() kills everything. Wire page stop buttons to S.stop().
+   INJECT VERBATIM — do not rename the SigTTS namespace. */
+(function(){
+if(window.SigTTS && window.SigTTS.voiceAlive) return;
+var S = window.SigTTS = window.SigTTS || {};
+S.TTS_URLS = S.TTS_URLS || [
+  function(t){return "https://code.responsivevoice.org/getvoice.php?t="+encodeURIComponent(t)+"&tl=en-US&sv=g2&vn=&pitch=0.5&rate=0.95";},
+  function(t){return "https://translate.google.com/translate_tts?ie=UTF-8&q="+encodeURIComponent(t)+"&tl=en&client=tw-ob";},
+  function(t){return "https://translate.googleapis.com/translate_tts?ie=UTF-8&q="+encodeURIComponent(t)+"&tl=en&client=tw-ob";}
+];
+/* Probe: cb(true) = live voice exists, cb(false) = dead/missing.
+   Waits up to ~3s for onvoiceschanged (healthy browsers load voices async). */
+S.voiceAlive = function(cb){
+  var done=false;
+  function fin(a){ if(done)return; done=true; try{cb(!!a);}catch(e){} }
+  try{
+    var ss=window.speechSynthesis;
+    if(!ss){ fin(false); return; }
+    var v0=null; try{ v0=ss.getVoices(); }catch(e){}
+    if(v0 && v0.length){ fin(true); return; }
+    var to=setTimeout(function(){ fin(false); },3000);
+    var prev=null; try{ prev=ss.onvoiceschanged; }catch(e){}
+    ss.onvoiceschanged=function(){
+      try{ if(prev) prev.call(ss); }catch(e){}
+      if(done) return;
+      var v2=null; try{ v2=ss.getVoices(); }catch(e){}
+      if(v2 && v2.length){ clearTimeout(to); fin(true); }
+    };
+    try{ ss.getVoices(); }catch(e){}
+  }catch(e){ fin(false); }
+};
+S._fb={audio:null,stopped:true,timer:null};
+S.fbStop=function(){
+  var f=S._fb; f.stopped=true;
+  if(f.timer){ clearTimeout(f.timer); f.timer=null; }
+  if(f.audio){ try{f.audio.pause();}catch(e){} f.audio=null; }
+  try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+};
+/* Online-audio fallback: chunk-by-chunk through the tiers.
+   onDone(true)=finished, onDone(false)=failed/stopped. 14s fail-fast/chunk. */
+S.fbSpeak=function(text,onDone){
+  var f=S._fb; S.fbStop(); f.stopped=false;
+  var chunks=String(text).replace(/\s+/g," ").trim().split(/(?<=[.!?;])\s+/).filter(Boolean).slice(0,90);
+  if(!chunks.length){ if(onDone)try{onDone(false);}catch(e){} return; }
+  var i=0,tier=0;
+  function next(){
+    if(f.stopped){ if(onDone)try{onDone(false);}catch(e){} return; }
+    if(i>=chunks.length){ if(onDone)try{onDone(true);}catch(e){} return; }
+    if(tier>=S.TTS_URLS.length){ if(onDone)try{onDone(false);}catch(e){} return; }
+    var a=new Audio(); f.audio=a; var settled=false;
+    function fin(ok){
+      if(settled) return; settled=true;
+      if(f.timer){ clearTimeout(f.timer); f.timer=null; }
+      try{a.pause();}catch(e){}
+      if(f.stopped){ if(onDone)try{onDone(false);}catch(e){} return; }
+      if(ok){ i++; tier=0; f.timer=setTimeout(next,220); }
+      else { tier++; next(); }
+    }
+    a.onended=function(){fin(true);};
+    a.onerror=function(){fin(false);};
+    f.timer=setTimeout(function(){fin(false);},14000);
+    var src=""; try{ src=S.TTS_URLS[tier](chunks[i]); }catch(e){ fin(false); return; }
+    a.src=src;
+    try{ var p=a.play(); if(p&&p.catch)p.catch(function(){fin(false);}); }
+    catch(e){ fin(false); }
+  }
+  next();
+};
+/* Guarded speak: probes first; dead engine -> straight to fbSpeak.
+   Live path: onstart watchdog 6s + absolute budget; stall -> cancel + fallback.
+   onDone(true/false) ALWAYS fires exactly once — reset button/UI state there. */
+S.speak=function(text,opts,onDone){
+  if(typeof opts==="function"){ onDone=opts; opts={}; }
+  opts=opts||{};
+  S.fbStop(); S._fb.stopped=false;
+  S.voiceAlive(function(alive){
+    if(S._fb.stopped){ if(onDone)try{onDone(false);}catch(e){} return; }
+    if(!alive){ S.fbSpeak(text,onDone); return; }
+    try{
+      var ss=window.speechSynthesis, u=new SpeechSynthesisUtterance(String(text));
+      if(opts.rate)u.rate=opts.rate; if(opts.pitch)u.pitch=opts.pitch; if(opts.lang)u.lang=opts.lang;
+      try{
+        var vs=ss.getVoices()||[], en=vs.filter(function(v){return v.lang&&/^en/i.test(v.lang);});
+        if(en.length) u.voice=en[0];
+      }catch(e){}
+      var settled=false, started=false;
+      var budget=Math.min(120000, 30000+Math.ceil(String(text).length/15)*1000);
+      var t1=setTimeout(function(){ if(!started) fin(false); },6000);
+      var t2=setTimeout(function(){ fin(false); },budget);
+      function fin(ok){
+        if(settled) return; settled=true;
+        clearTimeout(t1); clearTimeout(t2);
+        try{ ss.cancel(); }catch(e){}
+        if(ok){ if(onDone)try{onDone(true);}catch(e){} }
+        else { S.fbSpeak(text,onDone); }
+      }
+      u.onstart=function(){ started=true; };
+      u.onend=function(){ fin(true); };
+      u.onerror=function(){ fin(false); };
+      ss.speak(u);
+    }catch(e){ S.fbSpeak(text,onDone); }
+  });
+};
+S.stop=function(){ S.fbStop(); };
+})();
+}
+
 /* ---------- one global audio controller (never stacked) ---------- */
 var _W = (typeof window !== "undefined") ? window : null;
 var _D = (typeof document !== "undefined") ? document : null;
@@ -49,12 +165,14 @@ if (_W && !_W.__JAHREAD){
   }catch(e){}
 }
 
-/* ---------- tiered online read-aloud (ResponsiveVoice -> Google TTS x2,
-   direct audio-element playback; never speechSynthesis-first, so it works
-   in browsers with no speechSynthesis — e.g. Facebook's in-app browser).
-   Mirrors the comics site's proven rdSpeak: single playGuard at entry,
-   button flips to "⏹ Stop" immediately with a "chunk N of M" indicator,
-   tap-while-reading stops cleanly, per-chunk watchdog with tier advance. ---------- */
+/* ---------- read-aloud via SigTTS (dead-voice guard, 2026-10-11) ----------
+   SigTTS.speak() probes the speechSynthesis engine for aliveness first
+   (never trusts mere presence — FB in-app browser has a dead engine),
+   watches every utterance (6s onstart watchdog + absolute budget), and
+   falls back to the tiered online audio below when dead/stalled.
+   onDone ALWAYS fires exactly once -> the Stop button is restored there
+   and can never stick. One controller: playGuard stops everything first,
+   tap-while-reading stops cleanly, S.stop() kills all. ---------- */
 var RD = { audio: null, queue: [], playing: false, stopped: true, timer: null,
            total: 0, btn: null, baseText: "", manualStop: 0 };
 var RD_TIERS = [
@@ -62,28 +180,8 @@ var RD_TIERS = [
   function(t){ return "https://translate.google.com/translate_tts?ie=UTF-8&q=" + encodeURIComponent(t) + "&tl=en&client=tw-ob"; },
   function(t){ return "https://translate.googleapis.com/translate_tts?ie=UTF-8&q=" + encodeURIComponent(t) + "&tl=en&client=tw-ob"; }
 ];
-function rdChunks(t, maxChunks){
-  t = String(t == null ? "" : t).replace(/\s+/g, " ").trim();
-  var out = [], cur = "", i, s, parts, sentences = [];
-  parts = t.split(/([.!?]+)\s+/);
-  for (i = 0; i < parts.length; i += 2){
-    s = ((parts[i] || "") + (parts[i + 1] || "")).trim();
-    if (s) sentences.push(s);
-  }
-  for (i = 0; i < sentences.length; i++){
-    s = sentences[i];
-    if ((cur + " " + s).length > 170){ if (cur) out.push(cur); cur = s; }
-    else cur = (cur ? cur + " " : "") + s;
-  }
-  if (cur) out.push(cur);
-  return out.slice(0, maxChunks || 400);
-}
-function rdProg(){
-  if (RD.btn && RD.btn.textContent !== undefined){
-    RD.btn.textContent = "\u23F9 Stop \u2014 chunk " +
-      (RD.total - RD.queue.length) + " of " + RD.total + "\u2026";
-  }
-}
+/* keep this file's existing tiers as SigTTS's fallback tiers */
+try{ if (_W && _W.SigTTS) _W.SigTTS.TTS_URLS = RD_TIERS; }catch(e){}
 function rdStop(){
   try{ if (_W && _W.__JAHREAD) _W.__JAHREAD.stopAll(); }catch(e){}
   RD.stopped = true; RD.playing = false; RD.queue = [];
@@ -94,60 +192,31 @@ function rdStop(){
     RD.btn = null;
   }
 }
-function rdPlayTier(chunk, tier, done){
-  if (tier >= RD_TIERS.length){ done(false); return; }
-  var url = RD_TIERS[tier](chunk), finished = false, a;
-  try{ a = new _W.Audio(); }catch(e){ done(false); return; }
-  RD.audio = a;
-  try{ a.playbackRate = 1; }catch(e){}
-  function clearW(){ if (RD.timer){ try{ clearTimeout(RD.timer); }catch(e){} RD.timer = null; } }
-  function finish(ok){
-    if (finished) return; finished = true;
-    clearW(); RD.audio = null;
-    try{ a.pause(); }catch(e){}
-    done(ok);
+var _speaking = false;
+function _speakDone(){
+  _speaking = false;
+  if (RD.btn){
+    try{ RD.btn.textContent = RD.baseText || "\uD83D\uDD0A Read aloud"; }catch(e){}
+    RD.btn = null;
   }
-  function advance(){ finish(false); rdPlayTier(chunk, tier + 1, done); }
-  a.onended = function(){ finish(true); };
-  a.onerror = function(){ advance(); };
-  RD.timer = setTimeout(advance, 12000); /* per-chunk watchdog: tier advance */
-  try{ a.src = url; }catch(e){ advance(); return; }
-  var p = null;
-  try{ p = a.play(); }catch(e){ advance(); return; }
-  if (p && p.catch) p.catch(function(){ advance(); });
-}
-function rdNext(){
-  if (RD.stopped || !RD.queue.length){ rdStop(); return; }
-  RD.playing = true;
-  var chunk = RD.queue.shift(), tier = 0;
-  rdProg();
-  (function attempt(){
-    if (RD.stopped) return;
-    rdPlayTier(chunk, tier, function(ok){
-      if (RD.stopped) return;
-      if (ok){ setTimeout(rdNext, 250); }
-      else { tier++; if (tier < RD_TIERS.length) attempt(); else setTimeout(rdNext, 250); }
-    });
-  })();
 }
 function speak(text, label){
   try{
-    if (!_W || !_W.Audio) return;
+    if (!_W || !_W.Audio || !_W.SigTTS) return;
     /* tap-while-reading stops cleanly (before the playGuard debounce) */
-    if (RD.playing && !RD.stopped){
+    if (_speaking){
       RD.manualStop = Date.now();
-      rdStop();
+      try{ _W.SigTTS.stop(); }catch(e){}
+      try{ if (_W.__JAHREAD) _W.__JAHREAD.stopAll(); }catch(e){}
+      _speakDone();
       return;
     }
     /* bounce guard: a tap right after a manual stop is the double-tap's echo */
     if (Date.now() - RD.manualStop < 400) return;
     var R = _W.__JAHREAD;
-    if (R && !R.playGuard(label || "speak")) return;
-    rdStop();
-    RD.queue = rdChunks(text, 400);
-    RD.total = RD.queue.length;
-    if (!RD.queue.length) return;
-    RD.stopped = false;
+    if (R && !R.playGuard(label || "speak")) return; /* playGuard stops everything first */
+    text = String(text == null ? "" : text).replace(/\s+/g, " ").trim();
+    if (!text) return;
     /* flip the tapped button to Stop immediately (keep the page's look) */
     var b = (_D && _D.activeElement) || null;
     if (b && b.tagName && /^(BUTTON|A|INPUT)$/.test(b.tagName)){
@@ -155,10 +224,11 @@ function speak(text, label){
       try{ RD.baseText = b.textContent || ""; }catch(e){ RD.baseText = ""; }
       try{ b.textContent = "\u23F9 Stop"; b.title = "Tap to stop reading"; }catch(e){}
     }
-    rdNext();
-  }catch(e){}
+    _speaking = true;
+    _W.SigTTS.speak(text, {}, function(){ _speakDone(); });
+  }catch(e){ try{ _speakDone(); }catch(e2){} }
 }
-function stopSpeak(){ try{ rdStop(); }catch(e){} }
+function stopSpeak(){ try{ if (_W && _W.SigTTS) _W.SigTTS.stop(); }catch(e){} try{ rdStop(); }catch(e){} try{ _speakDone(); }catch(e){} }
 
 function escHtml(s){
   return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
